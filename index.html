@@ -2,853 +2,986 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Fayruza Restaurant — Jabriya</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --red: #1F9578;
-    --orange: #167A62;
-    --yellow: #4DC4A3;
-    --dark: #0A0F0D;
-    --dark2: #101612;
-    --dark3: #161E1A;
-    --card: #141A17;
-    --text: #EDF5F2;
-    --muted: #7A9990;
-    --gold: #0D4A3A;
-  }
+:root {
+  --red: #1F9578;
+  --orange: #167A62;
+  --yellow: #4DC4A3;
+  --dark: #0A0F0D;
+  --dark2: #101612;
+  --card: #141A17;
+  --text: #EDF5F2;
+  --muted: #7A9990;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--dark); color: var(--text);
+  font-family: 'Barlow', sans-serif; overflow-x: hidden;
+  min-height: 100vh;
+}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body { background: var(--dark); color: var(--text); font-family: 'Barlow', sans-serif; overflow-x: hidden; }
+/* ═══════════════════════════════
+   VIEWS
+═══════════════════════════════ */
+#home-view, #cat-view {
+  min-height: 100vh;
+  transition: transform 0.45s cubic-bezier(0.77,0,0.18,1), opacity 0.35s ease;
+}
+#cat-view {
+  position: fixed; inset: 0; z-index: 100;
+  background: var(--dark); overflow-y: auto;
+  transform: translateY(100%); opacity: 0; pointer-events: none;
+}
+#cat-view.open {
+  transform: translateY(0); opacity: 1; pointer-events: all;
+}
 
-  /* ── HERO ── */
-  .hero {
-    position: relative;
-    min-height: 100vh;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    text-align: center; overflow: hidden; background: var(--dark);
-  }
-  .hero-bg {
-    position: absolute; inset: 0;
-    background:
-      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(31,149,120,0.22) 0%, transparent 70%),
-      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(22,122,98,0.12) 0%, transparent 60%);
-  }
-  .hero-grid {
-    position: absolute; inset: 0;
-    background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-  }
-  .hero-noise {
-    position: absolute; inset: 0; opacity: 0.04;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-    background-size: 200px 200px;
-  }
-  .crown-badge {
-    display: inline-block;
-    background: linear-gradient(135deg, var(--yellow), var(--red));
-    color: var(--dark);
-    font-family: 'Bebas Neue', sans-serif; font-size: 0.85rem; letter-spacing: 4px;
-    padding: 6px 20px; border-radius: 2px; margin-bottom: 24px;
-    animation: fadeSlideDown 0.6s ease both;
-  }
-  .hero h1 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(72px, 14vw, 180px); line-height: 0.9; letter-spacing: -2px;
-    color: var(--text); animation: fadeSlideUp 0.7s ease 0.1s both;
-  }
-  .hero h1 span {
-    display: block; -webkit-text-stroke: 2px var(--red); color: transparent;
-    font-size: clamp(80px, 16vw, 200px);
-  }
-  .hero-sub {
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 600;
-    font-size: clamp(14px, 2vw, 20px); letter-spacing: 6px; text-transform: uppercase;
-    color: var(--muted); margin-top: 16px; animation: fadeSlideUp 0.7s ease 0.25s both;
-  }
-  .hero-cta {
-    display: inline-block; margin-top: 48px; padding: 16px 48px;
-    background: var(--red); color: white;
-    font-family: 'Bebas Neue', sans-serif; font-size: 1.25rem; letter-spacing: 3px;
-    border: none; cursor: pointer; text-decoration: none;
-    clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
-    transition: background 0.2s, transform 0.2s; animation: fadeSlideUp 0.7s ease 0.4s both;
-  }
-  .hero-cta:hover { background: var(--orange); transform: scale(1.04); }
+/* ═══════════════════════════════
+   HERO
+═══════════════════════════════ */
+.hero {
+  position: relative; min-height: 52vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; overflow: hidden; background: var(--dark);
+  padding: 40px 20px 20px;
+}
+.hero-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(31,149,120,0.22) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(22,122,98,0.12) 0%, transparent 60%);
+}
+.hero-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+.crown-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--yellow), var(--red));
+  color: var(--dark); font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.8rem; letter-spacing: 4px; padding: 5px 18px;
+  border-radius: 2px; margin-bottom: 18px; position: relative; z-index: 2;
+  animation: fadeDown 0.6s ease both;
+}
+.hero h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(60px, 14vw, 160px); line-height: 0.9;
+  color: var(--text); position: relative; z-index: 2;
+  animation: fadeUp 0.7s ease 0.1s both;
+}
+.hero h1 span {
+  display: block; -webkit-text-stroke: 2px var(--red);
+  color: transparent; font-size: clamp(68px, 16vw, 180px);
+}
+.hero-sub {
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 600;
+  font-size: clamp(12px, 1.8vw, 17px); letter-spacing: 5px;
+  text-transform: uppercase; color: var(--muted); margin-top: 12px;
+  position: relative; z-index: 2; animation: fadeUp 0.7s ease 0.25s both;
+}
+.hero-cta-label {
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+  font-size: 0.75rem; letter-spacing: 5px; text-transform: uppercase;
+  color: var(--yellow); margin-top: 24px; position: relative; z-index: 2;
+  animation: fadeUp 0.7s ease 0.4s both;
+}
+.bounce-arrow {
+  font-size: 1.2rem; display: block; margin-top: 4px;
+  animation: bounce 1.5s ease infinite;
+  position: relative; z-index: 2;
+}
 
-  /* ── TICKER ── */
-  .ticker { background: var(--yellow); overflow: hidden; padding: 10px 0; white-space: nowrap; }
-  .ticker-inner {
-    display: inline-flex; gap: 48px;
-    animation: marquee 25s linear infinite;
-    font-family: 'Bebas Neue', sans-serif; font-size: 1rem; letter-spacing: 3px; color: var(--dark);
-  }
-  .ticker-dot { color: var(--orange); margin: 0 4px; }
+/* ═══════════════════════════════
+   TICKER
+═══════════════════════════════ */
+.ticker {
+  background: var(--yellow); overflow: hidden;
+  padding: 9px 0; white-space: nowrap;
+}
+.ticker-inner {
+  display: inline-flex; gap: 48px;
+  animation: marquee 28s linear infinite;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.95rem; letter-spacing: 3px; color: var(--dark);
+}
+.ticker-dot { color: var(--orange); margin: 0 4px; }
 
-  /* ── SECTION HEADER ── */
-  .section-header { text-align: center; padding: 80px 20px 48px; position: relative; }
-  .section-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.75rem; letter-spacing: 6px; text-transform: uppercase; color: var(--red); margin-bottom: 8px; }
-  .section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(48px, 8vw, 96px); line-height: 1; color: var(--text); }
-  .section-line { width: 60px; height: 4px; background: linear-gradient(90deg, var(--red), var(--orange)); margin: 16px auto 0; }
+/* ═══════════════════════════════
+   CATEGORIES SECTION LABEL
+═══════════════════════════════ */
+.cat-section-label {
+  text-align: center; padding: 36px 20px 20px;
+}
+.cat-section-label .lbl {
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+  font-size: 0.7rem; letter-spacing: 6px; text-transform: uppercase;
+  color: var(--red); margin-bottom: 4px;
+}
+.cat-section-label .ttl {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(36px, 6vw, 60px); color: var(--text); line-height: 1;
+}
+.cat-section-label .ln {
+  width: 50px; height: 3px;
+  background: linear-gradient(90deg, var(--red), var(--orange));
+  margin: 10px auto 0;
+}
 
-  /* ── MENU GRID ── */
-  .menu-container { max-width: 1200px; margin: 0 auto; padding: 0 20px 80px; }
-  .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 2px; }
+/* ═══════════════════════════════
+   CATEGORY CARDS GRID
+═══════════════════════════════ */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px; padding: 10px 12px 40px;
+  max-width: 900px; margin: 0 auto;
+}
+@media (min-width: 640px) {
+  .cards-grid { grid-template-columns: repeat(4, 1fr); }
+}
 
-  .menu-item {
-    background: var(--card); padding: 28px 24px; position: relative; overflow: hidden;
-    transition: transform 0.25s, background 0.25s; cursor: default;
-  }
-  .menu-item::before {
-    content: ''; position: absolute; inset: 0;
-    background: linear-gradient(135deg, rgba(31,149,120,0.06), transparent);
-    opacity: 0; transition: opacity 0.25s;
-  }
-  .menu-item:hover { transform: translateY(-4px); background: #1a2420; z-index: 2; }
-  .menu-item:hover::before { opacity: 1; }
+.cat-card {
+  position: relative; border-radius: 12px;
+  overflow: hidden; cursor: pointer;
+  aspect-ratio: 1 / 1.05;
+  background: var(--card);
+  border: 1px solid rgba(255,255,255,0.06);
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), border-color 0.3s;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-end;
+  padding: 0 10px 16px;
+}
+.cat-card:active { transform: scale(0.94); }
+.cat-card:hover { border-color: var(--red); transform: translateY(-5px); }
 
-  .item-number { font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; color: rgba(255,255,255,0.04); position: absolute; top: 8px; right: 16px; line-height: 1; user-select: none; }
-  .item-emoji { font-size: 2rem; margin-bottom: 12px; display: block; }
-  .item-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 1.15rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text); margin-bottom: 4px; }
-  .item-name-ar { font-size: 0.9rem; color: var(--muted); margin-bottom: 14px; font-weight: 400; }
+/* ── animated BG layer ── */
+.cat-card .anim-bg {
+  position: absolute; inset: 0; z-index: 0;
+}
+.cat-card .card-emoji {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -60%);
+  font-size: clamp(2.8rem, 7vw, 3.5rem);
+  z-index: 2; animation: floatEmoji 3s ease-in-out infinite;
+  filter: drop-shadow(0 8px 20px rgba(0,0,0,0.5));
+}
+.cat-card .card-name {
+  position: relative; z-index: 2;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(0.95rem, 2.5vw, 1.2rem);
+  letter-spacing: 1.5px; color: var(--text);
+  text-align: center; line-height: 1.1;
+}
+.cat-card .card-name-ar {
+  position: relative; z-index: 2;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.75rem; color: var(--muted);
+  text-align: center; margin-top: 2px;
+}
+.cat-card .card-count {
+  position: absolute; top: 10px; right: 10px; z-index: 3;
+  background: rgba(0,0,0,0.5); backdrop-filter: blur(6px);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.7rem; letter-spacing: 1px;
+  color: var(--yellow); padding: 2px 7px; border-radius: 20px;
+}
+.cat-card .card-arrow {
+  position: absolute; bottom: 16px; right: 12px; z-index: 3;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--red); display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; color: white; opacity: 0;
+  transition: opacity 0.2s;
+}
+.cat-card:hover .card-arrow { opacity: 1; }
 
-  .price-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-  .price-single { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 1.5rem; color: var(--text); }
-  .price-kd { font-size: 0.8rem; font-weight: 400; color: var(--muted); margin-left: 2px; }
-  .price-meal { font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 0.95rem; color: var(--yellow); background: rgba(31,149,120,0.15); padding: 3px 10px; border-radius: 3px; }
-  .price-meal::before { content: "+ Meal: "; font-weight: 400; color: var(--muted); }
+/* ═════════════════════════════════════════
+   ANIMATED CARD BACKGROUNDS — 8 UNIQUE
+═════════════════════════════════════════ */
 
-  /* S/M/L pricing */
-  .sml-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
-  .sml-badge {
-    display: flex; flex-direction: column; align-items: center;
-    background: rgba(31,149,120,0.1); border: 1px solid rgba(31,149,120,0.2);
-    padding: 4px 10px; border-radius: 4px; min-width: 48px;
-  }
-  .sml-label { font-size: 0.6rem; letter-spacing: 1px; color: var(--muted); font-family: 'Barlow Condensed', sans-serif; font-weight: 700; }
-  .sml-price { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.9rem; color: var(--yellow); }
+/* 1 — BURGERS: Radar pulse rings */
+.anim-bg.burgers {
+  background: radial-gradient(ellipse at 50% 40%, rgba(31,149,120,0.25), var(--card));
+}
+.anim-bg.burgers::before,
+.anim-bg.burgers::after {
+  content: '';
+  position: absolute; top: 38%; left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1.5px solid rgba(77,196,163,0.4);
+  animation: radarRing 2.5s ease-out infinite;
+}
+.anim-bg.burgers::after { animation-delay: 1.25s; }
+@keyframes radarRing {
+  0%   { width: 20px; height: 20px; opacity: 0.8; }
+  100% { width: 140px; height: 140px; opacity: 0; }
+}
 
-  /* ── HOT BADGE ── */
-  .hot-badge {
-    position: absolute; top: 14px; left: 14px; background: var(--red); color: white;
-    font-family: 'Bebas Neue', sans-serif; font-size: 0.75rem; letter-spacing: 1px; padding: 2px 8px;
-    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
-  }
+/* 2 — ROLLS: Diagonal shimmer sweep */
+.anim-bg.rolls {
+  background: linear-gradient(135deg, rgba(22,122,98,0.3) 0%, var(--card) 60%);
+}
+.anim-bg.rolls::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent, transparent 10px,
+    rgba(77,196,163,0.06) 10px, rgba(77,196,163,0.06) 20px
+  );
+  animation: shimmerSlide 3s linear infinite;
+}
+@keyframes shimmerSlide {
+  0%   { background-position: 0 0; }
+  100% { background-position: 56px 56px; }
+}
+.anim-bg.rolls::after {
+  content: '';
+  position: absolute; top: -40%; left: -60%;
+  width: 80%; height: 200%;
+  background: linear-gradient(90deg, transparent, rgba(77,196,163,0.12), transparent);
+  animation: sweepLight 3.5s ease-in-out infinite;
+}
+@keyframes sweepLight {
+  0%   { left: -80%; }
+  100% { left: 150%; }
+}
 
-  /* ── CATEGORY BADGE ── */
-  .cat-badge {
-    display: inline-block; background: linear-gradient(90deg, var(--red), var(--orange)); color: white;
-    font-family: 'Bebas Neue', sans-serif; font-size: 0.9rem; letter-spacing: 3px; padding: 5px 18px;
-    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%); margin-bottom: 28px;
-  }
+/* 3 — CHAPATHI: Wave at bottom */
+.anim-bg.chapathi {
+  background: linear-gradient(180deg, var(--card) 40%, rgba(13,74,58,0.6));
+}
+.anim-bg.chapathi::before {
+  content: '';
+  position: absolute; bottom: 0; left: -10%;
+  width: 120%; height: 55%;
+  background: rgba(31,149,120,0.12);
+  border-radius: 100% 100% 0 0;
+  animation: waveRise 3s ease-in-out infinite alternate;
+}
+.anim-bg.chapathi::after {
+  content: '';
+  position: absolute; bottom: 0; left: -10%;
+  width: 120%; height: 40%;
+  background: rgba(77,196,163,0.08);
+  border-radius: 100% 100% 0 0;
+  animation: waveRise 3s ease-in-out infinite alternate-reverse;
+}
+@keyframes waveRise {
+  0%   { transform: translateX(-5%) scaleY(0.9); }
+  100% { transform: translateX(5%) scaleY(1.1); }
+}
 
-  /* ── DIVIDER ── */
-  .divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent); margin: 0 auto; max-width: 1200px; }
+/* 4 — BIRYANI: Rising steam dots */
+.anim-bg.biryani {
+  background: radial-gradient(ellipse at 50% 80%, rgba(31,149,120,0.3), var(--card));
+}
+.anim-bg.biryani::before,
+.anim-bg.biryani::after {
+  content: '';
+  position: absolute; bottom: 24px;
+  width: 5px; height: 5px; border-radius: 50%;
+  background: rgba(77,196,163,0.5);
+  animation: steamRise 2s ease-out infinite;
+}
+.anim-bg.biryani::before { left: 38%; animation-delay: 0s; }
+.anim-bg.biryani::after  { left: 55%; animation-delay: 1s; }
+@keyframes steamRise {
+  0%   { transform: translateY(0) scale(1); opacity: 0.6; }
+  50%  { opacity: 0.4; }
+  100% { transform: translateY(-60px) scale(0.3); opacity: 0; }
+}
 
-  /* ── CHAPATHI SECTION ── */
-  .alt-section { background: var(--dark2); padding: 60px 20px; }
-  .chapathi-grid { max-width: 800px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 2px; }
-  .chapathi-item { background: var(--card); padding: 20px 22px; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; }
-  .chapathi-item:hover { background: #1a2420; }
-  .chapathi-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; }
-  .chapathi-price { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; color: var(--yellow); }
-  .chapathi-fils { font-size: 0.65rem; color: var(--muted); letter-spacing: 1px; }
+/* 5 — RICE: Dot matrix pulse */
+.anim-bg.rice {
+  background: var(--card);
+  background-image: radial-gradient(circle, rgba(77,196,163,0.18) 1px, transparent 1px);
+  background-size: 16px 16px;
+  animation: dotFade 2s ease-in-out infinite alternate;
+}
+@keyframes dotFade {
+  0%   { background-image: radial-gradient(circle, rgba(77,196,163,0.08) 1px, transparent 1px); }
+  100% { background-image: radial-gradient(circle, rgba(77,196,163,0.28) 1px, transparent 1px); }
+}
+.anim-bg.rice::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 80% 80% at 50% 50%, transparent 30%, var(--card));
+}
 
-  /* ── INFO STRIP ── */
-  .info-strip { background: var(--red); padding: 60px 20px; position: relative; overflow: hidden; }
-  .info-strip::before {
-    content: 'FAYRUZA FAYRUZA FAYRUZA FAYRUZA FAYRUZA FAYRUZA FAYRUZA FAYRUZA';
-    position: absolute; top: 10px; left: 0;
-    font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: 8px; white-space: nowrap;
-    color: rgba(255,255,255,0.08); animation: marquee 12s linear infinite;
-  }
-  .info-inner { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; text-align: center; position: relative; }
-  .info-icon { font-size: 2rem; margin-bottom: 8px; }
-  .info-heading { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: 2px; margin-bottom: 4px; }
-  .info-text { font-size: 0.9rem; opacity: 0.85; font-family: 'Barlow Condensed', sans-serif; font-weight: 500; letter-spacing: 0.5px; line-height: 1.5; }
+/* 6 — NOODLES: Wiggly SVG lines */
+.anim-bg.noodles {
+  background: linear-gradient(160deg, rgba(13,74,58,0.6), var(--card));
+  overflow: hidden;
+}
+.anim-bg.noodles svg {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  opacity: 0.25;
+}
+.noodle-line { animation: wiggle 2.5s ease-in-out infinite; }
+.noodle-line:nth-child(2) { animation-delay: 0.5s; }
+.noodle-line:nth-child(3) { animation-delay: 1s; }
+@keyframes wiggle {
+  0%, 100% { d: path("M-10 40 Q 30 20, 60 40 Q 90 60, 130 40"); }
+  50%       { d: path("M-10 40 Q 30 60, 60 40 Q 90 20, 130 40"); }
+}
 
-  /* ── FOOTER ── */
-  footer { background: var(--dark); padding: 48px 20px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); }
-  .footer-brand { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; letter-spacing: 6px; background: linear-gradient(90deg, var(--red), var(--yellow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-  .footer-address { font-family: 'Barlow Condensed', sans-serif; font-size: 0.95rem; letter-spacing: 2px; color: var(--muted); margin-top: 8px; text-transform: uppercase; }
-  .footer-phones { display: flex; gap: 16px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
-  .phone-pill {
-    display: flex; align-items: center; gap: 8px; background: var(--card);
-    border: 1px solid rgba(255,255,255,0.08); padding: 10px 22px; border-radius: 50px;
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 1.1rem; letter-spacing: 1px;
-    color: var(--text); text-decoration: none; transition: border-color 0.2s, background 0.2s;
-  }
-  .phone-pill:hover { border-color: var(--red); background: rgba(31,149,120,0.08); }
+/* 7 — SOUPS: Concentric ripples */
+.anim-bg.soups {
+  background: radial-gradient(circle at 50% 45%, rgba(31,149,120,0.2), var(--card) 70%);
+}
+.soup-ripple {
+  position: absolute; top: 40%; left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%; border: 1px solid rgba(77,196,163,0.3);
+  animation: rippleGrow 3s ease-out infinite;
+}
+.soup-ripple:nth-child(2) { animation-delay: 1s; }
+.soup-ripple:nth-child(3) { animation-delay: 2s; }
+@keyframes rippleGrow {
+  0%   { width: 0; height: 0; opacity: 0.8; }
+  100% { width: 120px; height: 120px; opacity: 0; }
+}
 
-  /* ── ANIMATIONS ── */
-  @keyframes fadeSlideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+/* 8 — JUICES: Floating orbs */
+.anim-bg.juices {
+  background: linear-gradient(135deg, rgba(31,149,120,0.15), var(--card) 60%);
+  overflow: hidden;
+}
+.juice-orb {
+  position: absolute; border-radius: 50%;
+  animation: orbFloat 4s ease-in-out infinite;
+}
+.juice-orb:nth-child(1) { width: 40px; height: 40px; background: rgba(77,196,163,0.2); bottom: 20%; left: 15%; animation-delay: 0s; }
+.juice-orb:nth-child(2) { width: 25px; height: 25px; background: rgba(31,149,120,0.25); bottom: 35%; right: 18%; animation-delay: 1.3s; }
+.juice-orb:nth-child(3) { width: 15px; height: 15px; background: rgba(77,196,163,0.3); bottom: 55%; left: 55%; animation-delay: 0.7s; }
+@keyframes orbFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%       { transform: translateY(-12px) scale(1.08); }
+}
 
-  /* ── SCROLL REVEAL ── */
-  .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.5s ease, transform 0.5s ease; }
-  .reveal.visible { opacity: 1; transform: none; }
+/* ═══════════════════════════════
+   CATEGORY VIEW
+═══════════════════════════════ */
+.cat-header {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(10,15,13,0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+}
+.back-btn {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(31,149,120,0.12);
+  border: 1px solid rgba(31,149,120,0.3);
+  color: var(--text); font-family: 'Bebas Neue', sans-serif;
+  font-size: 1rem; letter-spacing: 2px;
+  padding: 8px 14px; border-radius: 6px; cursor: pointer;
+  transition: background 0.2s; flex-shrink: 0;
+}
+.back-btn:hover { background: rgba(31,149,120,0.22); }
+.cat-header-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(1.1rem, 3.5vw, 1.5rem);
+  letter-spacing: 2px; color: var(--text); flex: 1;
+  text-align: center;
+}
+.cat-header-emoji {
+  font-size: 1.3rem; flex-shrink: 0;
+}
 
-  @media (max-width: 600px) {
-    .info-inner { grid-template-columns: 1fr; gap: 28px; }
-    .menu-grid { grid-template-columns: 1fr; }
-    .chapathi-grid { grid-template-columns: 1fr; }
-  }
+/* ── Items inside category ── */
+.items-container {
+  max-width: 960px; margin: 0 auto;
+  padding: 16px 12px 60px;
+}
+.subcat-label {
+  display: flex; align-items: center; gap: 12px;
+  margin: 28px 0 14px;
+}
+.subcat-label span {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.85rem; letter-spacing: 3px; color: var(--yellow);
+  white-space: nowrap;
+}
+.subcat-label::before, .subcat-label::after {
+  content: ''; flex: 1; height: 1px;
+  background: rgba(255,255,255,0.07);
+}
+
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+@media (min-width: 600px) {
+  .items-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 860px) {
+  .items-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+.item-card {
+  background: var(--card);
+  border: 1px solid rgba(255,255,255,0.04);
+  border-radius: 8px; padding: 14px 12px;
+  position: relative; overflow: hidden;
+  transition: transform 0.2s, border-color 0.2s, background 0.2s;
+  cursor: default;
+}
+.item-card:hover {
+  background: #1a2420; border-color: rgba(31,149,120,0.25);
+  transform: translateY(-2px);
+}
+.item-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(31,149,120,0.05), transparent);
+  opacity: 0; transition: opacity 0.2s;
+}
+.item-card:hover::before { opacity: 1; }
+
+.ic-badge {
+  position: absolute; top: 8px; right: 8px;
+  background: var(--red); color: white;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.6rem; letter-spacing: 1px; padding: 2px 6px;
+  border-radius: 3px; line-height: 1.4;
+}
+.ic-emoji { font-size: 1.6rem; margin-bottom: 8px; display: block; }
+.ic-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800; font-size: 0.9rem;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  color: var(--text); line-height: 1.2; margin-bottom: 3px;
+}
+.ic-name-ar { font-size: 0.75rem; color: var(--muted); margin-bottom: 10px; }
+.ic-price {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700; font-size: 1.15rem; color: var(--text);
+}
+.ic-price-kd { font-size: 0.7rem; font-weight: 400; color: var(--muted); }
+.ic-meal {
+  display: block; margin-top: 4px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 600; font-size: 0.78rem;
+  color: var(--yellow);
+  background: rgba(31,149,120,0.12);
+  padding: 2px 6px; border-radius: 3px;
+  display: inline-block;
+}
+
+/* SML sizes */
+.sml-row {
+  display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px;
+}
+.sml-badge {
+  display: flex; flex-direction: column; align-items: center;
+  background: rgba(31,149,120,0.1);
+  border: 1px solid rgba(31,149,120,0.2);
+  padding: 3px 8px; border-radius: 4px; min-width: 40px;
+}
+.sml-lbl {
+  font-size: 0.55rem; letter-spacing: 1px;
+  color: var(--muted); font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+}
+.sml-val {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700; font-size: 0.8rem; color: var(--yellow);
+}
+
+/* ═══════════════════════════════
+   FOOTER (home only)
+═══════════════════════════════ */
+.home-footer {
+  background: var(--dark2); padding: 32px 20px;
+  text-align: center; border-top: 1px solid rgba(255,255,255,0.05);
+}
+.home-footer .brand {
+  font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem;
+  letter-spacing: 5px;
+  background: linear-gradient(90deg, var(--red), var(--yellow));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.home-footer .addr {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.85rem;
+  letter-spacing: 2px; color: var(--muted); margin-top: 6px;
+  text-transform: uppercase;
+}
+
+/* ═══════════════════════════════
+   ANIMATIONS
+═══════════════════════════════ */
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@keyframes floatEmoji {
+  0%, 100% { transform: translate(-50%, -60%) translateY(0); }
+  50%       { transform: translate(-50%, -60%) translateY(-8px); }
+}
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(6px); }
+}
+
+/* stagger card entries */
+.cards-grid .cat-card { opacity: 0; animation: cardReveal 0.5s ease forwards; }
+.cards-grid .cat-card:nth-child(1) { animation-delay: 0.05s; }
+.cards-grid .cat-card:nth-child(2) { animation-delay: 0.1s; }
+.cards-grid .cat-card:nth-child(3) { animation-delay: 0.15s; }
+.cards-grid .cat-card:nth-child(4) { animation-delay: 0.2s; }
+.cards-grid .cat-card:nth-child(5) { animation-delay: 0.25s; }
+.cards-grid .cat-card:nth-child(6) { animation-delay: 0.3s; }
+.cards-grid .cat-card:nth-child(7) { animation-delay: 0.35s; }
+.cards-grid .cat-card:nth-child(8) { animation-delay: 0.4s; }
+@keyframes cardReveal {
+  from { opacity: 0; transform: scale(0.88) translateY(16px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* item card entrance in category */
+.item-card {
+  opacity: 0; animation: itemIn 0.35s ease forwards;
+}
+@keyframes itemIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 </style>
 </head>
 <body>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-grid"></div>
-  <div class="hero-noise"></div>
-  <div style="position:relative; z-index:2;">
-    <div class="crown-badge">👑 &nbsp;ESTABLISHED IN JABRIYA&nbsp; 👑</div>
-    <h1>FAYRUZA<span>RESTAURANT</span></h1>
-    <p class="hero-sub">Burgers · Biryani · Grills · Juices · Indian Cuisine</p>
-    <a href="#menu" class="hero-cta">EXPLORE THE MENU →</a>
-  </div>
-</section>
+<!-- ══════════════════════════════════════════
+     HOME VIEW
+══════════════════════════════════════════ -->
+<div id="home-view">
 
-<!-- TICKER -->
-<div class="ticker">
-  <div class="ticker-inner">
-    <span>🍔 ZINGER BURGER <span class="ticker-dot">✦</span></span>
-    <span>🍛 CHICKEN BIRYANI <span class="ticker-dot">✦</span></span>
-    <span>🥤 FRESH JUICES <span class="ticker-dot">✦</span></span>
-    <span>🌯 CHAPATHI SANDWICHES <span class="ticker-dot">✦</span></span>
-    <span>🍜 NOODLES & RICE <span class="ticker-dot">✦</span></span>
-    <span>📞 CALL 90901709 <span class="ticker-dot">✦</span></span>
-    <span>🍔 ZINGER BURGER <span class="ticker-dot">✦</span></span>
-    <span>🍛 CHICKEN BIRYANI <span class="ticker-dot">✦</span></span>
-    <span>🥤 FRESH JUICES <span class="ticker-dot">✦</span></span>
-    <span>🌯 CHAPATHI SANDWICHES <span class="ticker-dot">✦</span></span>
-    <span>🍜 NOODLES & RICE <span class="ticker-dot">✦</span></span>
-    <span>📞 CALL 90901709 <span class="ticker-dot">✦</span></span>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div style="position:relative; z-index:2;">
+      <div class="crown-badge">👑 &nbsp;ESTABLISHED IN JABRIYA&nbsp; 👑</div>
+      <h1>FAYRUZA<span>RESTAURANT</span></h1>
+      <p class="hero-sub">Burgers · Biryani · Grills · Juices · Indian Cuisine</p>
+      <div class="hero-cta-label">CHOOSE YOUR CATEGORY</div>
+      <span class="bounce-arrow">↓</span>
+    </div>
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker">
+    <div class="ticker-inner">
+      <span>🍔 ZINGER BURGER <span class="ticker-dot">✦</span></span>
+      <span>🍛 CHICKEN BIRYANI <span class="ticker-dot">✦</span></span>
+      <span>🥤 FRESH JUICES <span class="ticker-dot">✦</span></span>
+      <span>🌯 CHAPATHI SANDWICHES <span class="ticker-dot">✦</span></span>
+      <span>🍜 NOODLES & RICE <span class="ticker-dot">✦</span></span>
+      <span>🥣 SOUPS <span class="ticker-dot">✦</span></span>
+      <span>🍔 ZINGER BURGER <span class="ticker-dot">✦</span></span>
+      <span>🍛 CHICKEN BIRYANI <span class="ticker-dot">✦</span></span>
+      <span>🥤 FRESH JUICES <span class="ticker-dot">✦</span></span>
+      <span>🌯 CHAPATHI SANDWICHES <span class="ticker-dot">✦</span></span>
+      <span>🍜 NOODLES & RICE <span class="ticker-dot">✦</span></span>
+      <span>🥣 SOUPS <span class="ticker-dot">✦</span></span>
+    </div>
   </div>
+
+  <!-- CATEGORIES -->
+  <div class="cat-section-label">
+    <div class="lbl">Pick a Category</div>
+    <div class="ttl">OUR MENU</div>
+    <div class="ln"></div>
+  </div>
+
+  <div class="cards-grid" id="cards-grid"></div>
+
+  <!-- FOOTER -->
+  <div class="home-footer">
+    <div class="brand">FAYRUZA RESTAURANT</div>
+    <div class="addr">Jabriya · Block 12 · Jamia Branch</div>
+  </div>
+
+</div><!-- end #home-view -->
+
+
+<!-- ══════════════════════════════════════════
+     CATEGORY VIEW
+══════════════════════════════════════════ -->
+<div id="cat-view">
+  <div class="cat-header">
+    <button class="back-btn" onclick="goHome()">
+      ← BACK
+    </button>
+    <div class="cat-header-name" id="cat-header-name">CATEGORY</div>
+    <div class="cat-header-emoji" id="cat-header-emoji"></div>
+  </div>
+  <div class="items-container" id="items-container"></div>
 </div>
 
-<!-- ══ BURGERS ══ -->
-<section id="menu">
-  <div class="section-header reveal">
-    <div class="section-label">Our Specialties</div>
-    <div class="section-title">BURGERS<br>&amp; MEALS</div>
-    <div class="section-line"></div>
-  </div>
-  <div class="menu-container">
-    <div style="text-align:center; margin-bottom:32px;" class="reveal">
-      <span class="cat-badge">🍔 SIGNATURE BURGERS</span>
-    </div>
-    <div class="menu-grid">
-
-      <div class="menu-item reveal">
-        <div class="hot-badge">🔥 HOT</div>
-        <div class="item-number">01</div>
-        <span class="item-emoji">🍔</span>
-        <div class="item-name">Zinger Burger</div>
-        <div class="item-name-ar">برجر زنجر</div>
-        <div class="price-row">
-          <span class="price-single">0.900 <span class="price-kd">KD</span></span>
-          <span class="price-meal">1.400 KD</span>
-        </div>
-      </div>
-
-      <div class="menu-item reveal">
-        <div class="item-number">02</div>
-        <span class="item-emoji">👑</span>
-        <div class="item-name">King Burger</div>
-        <div class="item-name-ar">كنغ برجر</div>
-        <div class="price-row">
-          <span class="price-single">0.750 <span class="price-kd">KD</span></span>
-          <span class="price-meal">1.250 KD</span>
-        </div>
-      </div>
-
-      <div class="menu-item reveal">
-        <div class="item-number">03</div>
-        <span class="item-emoji">🍗</span>
-        <div class="item-name">Chicken Fillet Burger</div>
-        <div class="item-name-ar">برجر دجاج فيليه</div>
-        <div class="price-row">
-          <span class="price-single">0.750 <span class="price-kd">KD</span></span>
-          <span class="price-meal">1.250 KD</span>
-        </div>
-      </div>
-
-      <div class="menu-item reveal">
-        <div class="item-number">04</div>
-        <span class="item-emoji">🌶️</span>
-        <div class="item-name">Khaleej Burger</div>
-        <div class="item-name-ar">برجر خليج</div>
-        <div class="price-row">
-          <span class="price-single">0.850 <span class="price-kd">KD</span></span>
-          <span class="price-meal">1.350 KD</span>
-        </div>
-      </div>
-
-      <div class="menu-item reveal">
-        <div class="hot-badge">🔥 DOUBLE</div>
-        <div class="item-number">05</div>
-        <span class="item-emoji">🍔</span>
-        <div class="item-name">Zinger Double Burger</div>
-        <div class="item-name-ar">برجر زنجر دبل</div>
-        <div class="price-row">
-          <span class="price-single">1.300 <span class="price-kd">KD</span></span>
-          <span class="price-meal">1.750 KD</span>
-        </div>
-      </div>
-
-      <div class="menu-item reveal">
-        <div class="hot-badge">🔥 DOUBLE</div>
-        <div class="item-number">06</div>
-        <span class="item-emoji">🍗</span>
-        <div class="item-name">Chicken Double Burger</div>
-        <div class="item-name-ar">برجر دجاج دبل</div>
-        <div class="price-row">
-          <span class="price-single">1.000 <span class="price-kd">KD</span></span>
-          <span class="price-meal">1.500 KD</span>
-        </div>
-      </div>
-
-      <div class="menu-item reveal">
-        <div class="item-number">07</div>
-        <span class="item-emoji">🍔</span>
-        <div class="item-name">Hamburger Chicken</div>
-        <div class="item-name-ar">همبرجر دجاج</div>
-        <div class="price-row">
-          <span class="price-single">0.750 <span class="price-kd">KD</span></span>
-          <span class="price-meal">1.250 KD</span>
-        </div>
-      </div>
-
-      <div class="menu-item reveal">
-        <div class="item-number">08</div>
-        <span class="item-emoji">⚡</span>
-        <div class="item-name">Hamburger Super</div>
-        <div class="item-name-ar">همبرجر سوبر</div>
-        <div class="price-row">
-          <span class="price-single">0.850 <span class="price-kd">KD</span></span>
-          <span class="price-meal">1.350 KD</span>
-        </div>
-      </div>
-
-      <div class="menu-item reveal">
-        <div class="item-number">09</div>
-        <span class="item-emoji">🥩</span>
-        <div class="item-name">Hamburger Meat</div>
-        <div class="item-name-ar">همبرجر لحم</div>
-        <div class="price-row">
-          <span class="price-single">0.750 <span class="price-kd">KD</span></span>
-          <span class="price-meal">1.250 KD</span>
-        </div>
-      </div>
-
-      <div class="menu-item reveal">
-        <div class="item-number">10</div>
-        <span class="item-emoji">🍗</span>
-        <div class="item-name">Chicken Burger</div>
-        <div class="item-name-ar">برجر دجاج</div>
-        <div class="price-row">
-          <span class="price-single">0.750 <span class="price-kd">KD</span></span>
-          <span class="price-meal">1.250 KD</span>
-        </div>
-      </div>
-
-      <div class="menu-item reveal">
-        <div class="item-number">11</div>
-        <span class="item-emoji">🌮</span>
-        <div class="item-name">Mexico Chicken Francy</div>
-        <div class="item-name-ar">مكسيكو دجاج فرنسي</div>
-        <div class="price-row">
-          <span class="price-single">0.750 <span class="price-kd">KD</span></span>
-          <span class="price-meal">1.250 KD</span>
-        </div>
-      </div>
-
-      <div class="menu-item reveal">
-        <div class="item-number">12</div>
-        <span class="item-emoji">👻</span>
-        <div class="item-name">Shabah Meal</div>
-        <div class="item-name-ar">وجبة شبح</div>
-        <div class="price-row">
-          <span class="price-single">0.750 <span class="price-kd">KD</span></span>
-          <span class="price-meal">1.250 KD</span>
-        </div>
-      </div>
-
-      <div class="menu-item reveal">
-        <div class="item-number">13</div>
-        <span class="item-emoji">💫</span>
-        <div class="item-name">Ladeda Meal</div>
-        <div class="item-name-ar">وجبة لذيذا</div>
-        <div class="price-row">
-          <span class="price-single">0.750 <span class="price-kd">KD</span></span>
-          <span class="price-meal">1.250 KD</span>
-        </div>
-      </div>
-
-      <div class="menu-item reveal">
-        <div class="item-number">14</div>
-        <span class="item-emoji">🍗</span>
-        <div class="item-name">Chicken Fillet Francy</div>
-        <div class="item-name-ar">دجاج فيليه فرنسي</div>
-        <div class="price-row">
-          <span class="price-single">0.750 <span class="price-kd">KD</span></span>
-          <span class="price-meal">1.250 KD</span>
-        </div>
-      </div>
-
-      <div class="menu-item reveal">
-        <div class="item-number">15</div>
-        <span class="item-emoji">⚡</span>
-        <div class="item-name">Chicken Zinger Francy</div>
-        <div class="item-name-ar">دجاج زنجر فرنسي</div>
-        <div class="price-row">
-          <span class="price-single">0.900 <span class="price-kd">KD</span></span>
-          <span class="price-meal">1.400 KD</span>
-        </div>
-      </div>
-
-      <div class="menu-item reveal">
-        <div class="hot-badge">🥩 BEEF</div>
-        <div class="item-number">16</div>
-        <span class="item-emoji">🥩</span>
-        <div class="item-name">Beef Supreme</div>
-        <div class="item-name-ar">لحم سريم</div>
-        <div class="price-row">
-          <span class="price-single">1.000 <span class="price-kd">KD</span></span>
-          <span class="price-meal">1.350 KD</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- ROLLS & CLUB -->
-    <div style="text-align:center; margin:52px 0 32px;" class="reveal">
-      <span class="cat-badge">🌯 ROLLS &amp; CLUB MEALS</span>
-    </div>
-    <div class="menu-grid">
-      <div class="menu-item reveal">
-        <div class="item-number">17</div>
-        <span class="item-emoji">🌯</span>
-        <div class="item-name">King Roll</div>
-        <div class="item-name-ar">كينغ رول</div>
-        <div class="price-row"><span class="price-single">0.750 <span class="price-kd">KD</span></span></div>
-      </div>
-      <div class="menu-item reveal">
-        <div class="item-number">18</div>
-        <span class="item-emoji">🌯</span>
-        <div class="item-name">Francisco Roll</div>
-        <div class="item-name-ar">فرانسيسكو رول</div>
-        <div class="price-row"><span class="price-single">0.850 <span class="price-kd">KD</span></span></div>
-      </div>
-      <div class="menu-item reveal">
-        <div class="item-number">19</div>
-        <span class="item-emoji">🍱</span>
-        <div class="item-name">Twister Meal</div>
-        <div class="item-name-ar">وجبة تويستر</div>
-        <div class="price-row">
-          <span class="price-single">0.950 <span class="price-kd">KD</span></span>
-          <span class="price-meal">1.500 KD</span>
-        </div>
-      </div>
-      <div class="menu-item reveal">
-        <div class="item-number">20</div>
-        <span class="item-emoji">🍽️</span>
-        <div class="item-name">Talayani</div>
-        <div class="item-name-ar">تلاياني</div>
-        <div class="price-row">
-          <span class="price-single">0.750 <span class="price-kd">KD</span></span>
-          <span class="price-meal">1.250 KD</span>
-        </div>
-      </div>
-      <div class="menu-item reveal">
-        <div class="item-number">21</div>
-        <span class="item-emoji">🥚</span>
-        <div class="item-name">Club Egg Meal</div>
-        <div class="item-name-ar">وجبة كلوب بيض</div>
-        <div class="price-row"><span class="price-single">1.000 <span class="price-kd">KD</span></span></div>
-      </div>
-      <div class="menu-item reveal">
-        <div class="item-number">22</div>
-        <span class="item-emoji">🍗</span>
-        <div class="item-name">Club Chicken Meal</div>
-        <div class="item-name-ar">وجبة كلوب دجاج</div>
-        <div class="price-row"><span class="price-single">1.500 <span class="price-kd">KD</span></span></div>
-      </div>
-      <div class="menu-item reveal">
-        <div class="hot-badge">🥩 BEEF</div>
-        <div class="item-number">23</div>
-        <span class="item-emoji">🥩</span>
-        <div class="item-name">Beef Club Meal</div>
-        <div class="item-name-ar">وجبة كلوب لحم</div>
-        <div class="price-row"><span class="price-single">1.750 <span class="price-kd">KD</span></span></div>
-      </div>
-      <div class="menu-item reveal">
-        <div class="item-number">24</div>
-        <span class="item-emoji">🍟</span>
-        <div class="item-name">Nuggets Meal</div>
-        <div class="item-name-ar">وجبة ناجتس</div>
-        <div class="price-row"><span class="price-single">1.250 <span class="price-kd">KD</span></span></div>
-      </div>
-      <div class="menu-item reveal">
-        <div class="item-number">25</div>
-        <span class="item-emoji">🥔</span>
-        <div class="item-name">Potato Chips</div>
-        <div class="item-name-ar">بطاط شيبس</div>
-        <div class="price-row">
-          <span class="price-single">0.750 <span class="price-kd">KD</span></span>
-          <span class="price-meal">1.250 KD</span>
-        </div>
-      </div>
-      <div class="menu-item reveal">
-        <div class="item-number">26</div>
-        <span class="item-emoji">✨</span>
-        <div class="item-name">King Chips Special</div>
-        <div class="item-name-ar">رقائق كينغ الخاصة</div>
-        <div class="price-row"><span class="price-single">1.250 <span class="price-kd">KD</span></span></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- ══ CHAPATHI SANDWICHES ══ -->
-<section class="alt-section">
-  <div class="section-header reveal">
-    <div class="section-label">Light Bites</div>
-    <div class="section-title">CHAPATHI<br>SANDWICHES</div>
-    <div class="section-line"></div>
-    <p style="margin-top:16px; color: var(--muted); font-family:'Barlow Condensed'; font-size:1rem; letter-spacing:1px;">سندويش شباتي</p>
-  </div>
-  <div class="chapathi-grid reveal">
-    <div class="chapathi-item">
-      <div><div class="chapathi-name">Rashid</div><div style="font-size:0.8rem;color:var(--muted);">راشد</div></div>
-      <div style="text-align:right;"><div class="chapathi-price">400</div><div class="chapathi-fils">FILS</div></div>
-    </div>
-    <div class="chapathi-item">
-      <div><div class="chapathi-name">Halloum</div><div style="font-size:0.8rem;color:var(--muted);">حلوم</div></div>
-      <div style="text-align:right;"><div class="chapathi-price">350</div><div class="chapathi-fils">FILS</div></div>
-    </div>
-    <div class="chapathi-item">
-      <div><div class="chapathi-name">Pubg</div><div style="font-size:0.8rem;color:var(--muted);">بوبجي</div></div>
-      <div style="text-align:right;"><div class="chapathi-price">500</div><div class="chapathi-fils">FILS</div></div>
-    </div>
-    <div class="chapathi-item">
-      <div><div class="chapathi-name">Nutella</div><div style="font-size:0.8rem;color:var(--muted);">نوتيلا</div></div>
-      <div style="text-align:right;"><div class="chapathi-price">250</div><div class="chapathi-fils">FILS</div></div>
-    </div>
-    <div class="chapathi-item">
-      <div><div class="chapathi-name">Azeez</div><div style="font-size:0.8rem;color:var(--muted);">عزيز</div></div>
-      <div style="text-align:right;"><div class="chapathi-price">400</div><div class="chapathi-fils">FILS</div></div>
-    </div>
-    <div class="chapathi-item">
-      <div><div class="chapathi-name">Askari</div><div style="font-size:0.8rem;color:var(--muted);">عسكري</div></div>
-      <div style="text-align:right;"><div class="chapathi-price">400</div><div class="chapathi-fils">FILS</div></div>
-    </div>
-    <div class="chapathi-item">
-      <div><div class="chapathi-name">☕ Karak Tea</div><div style="font-size:0.8rem;color:var(--muted);">شاي كرك</div></div>
-      <div style="text-align:right;"><div class="chapathi-price">250</div><div class="chapathi-fils">FILS</div></div>
-    </div>
-    <div class="chapathi-item">
-      <div><div class="chapathi-name">☕ Coffee</div><div style="font-size:0.8rem;color:var(--muted);">نسكافي</div></div>
-      <div style="text-align:right;"><div class="chapathi-price">250</div><div class="chapathi-fils">FILS</div></div>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- ══ BIRYANI & RICE ══ -->
-<section>
-  <div class="section-header reveal">
-    <div class="section-label">Slow Cooked</div>
-    <div class="section-title">BIRYANI<br>&amp; RICE</div>
-    <div class="section-line"></div>
-  </div>
-  <div class="menu-container">
-    <div style="text-align:center; margin-bottom:32px;" class="reveal">
-      <span class="cat-badge">🍛 BIRYANI</span>
-    </div>
-    <div class="menu-grid">
-      <div class="menu-item reveal"><span class="item-emoji">🍛</span><div class="item-name">Chicken Biryani</div><div class="item-name-ar">برياني دجاج</div><div class="price-row"><span class="price-single">1.250 <span class="price-kd">KD</span></span></div></div>
-      <div class="menu-item reveal"><span class="item-emoji">🍛</span><div class="item-name">Mutton Biryani</div><div class="item-name-ar">برياني لحم</div><div class="price-row"><span class="price-single">2.000 <span class="price-kd">KD</span></span></div></div>
-      <div class="menu-item reveal"><span class="item-emoji">🍛</span><div class="item-name">Beef Biryani</div><div class="item-name-ar">برياني لحم بقر</div><div class="price-row"><span class="price-single">1.500 <span class="price-kd">KD</span></span></div></div>
-      <div class="menu-item reveal"><div class="hot-badge">🔥 SPECIAL</div><span class="item-emoji">🍛</span><div class="item-name">Chicken 65 Biryani</div><div class="item-name-ar">برياني دجاج 65</div><div class="price-row"><span class="price-single">1.750 <span class="price-kd">KD</span></span></div></div>
-      <div class="menu-item reveal"><span class="item-emoji">🍛</span><div class="item-name">Chicken Fry Biryani</div><div class="item-name-ar">برياني دجاج مقلي</div><div class="price-row"><span class="price-single">1.750 <span class="price-kd">KD</span></span></div></div>
-      <div class="menu-item reveal"><span class="item-emoji">🍛</span><div class="item-name">Chicken Majboos</div><div class="item-name-ar">مجبوس دجاج</div><div class="price-row"><span class="price-single">1.750 <span class="price-kd">KD</span></span></div></div>
-      <div class="menu-item reveal"><span class="item-emoji">🐟</span><div class="item-name">Pomfret Biryani</div><div class="item-name-ar">برياني سمك زبيدي</div><div class="price-row"><span class="price-single">2.500 <span class="price-kd">KD</span></span></div></div>
-      <div class="menu-item reveal"><span class="item-emoji">🐟</span><div class="item-name">Sheri</div><div class="item-name-ar">شيري</div><div class="price-row"><span class="price-single">2.000 <span class="price-kd">KD</span></span></div></div>
-      <div class="menu-item reveal"><span class="item-emoji">🐟</span><div class="item-name">Tilapia Biryani</div><div class="item-name-ar">برياني سمك بلطي</div><div class="price-row"><span class="price-single">1.750 <span class="price-kd">KD</span></span></div></div>
-      <div class="menu-item reveal"><span class="item-emoji">🦐</span><div class="item-name">Prawns Biryani</div><div class="item-name-ar">برياني ربيان</div><div class="price-row"><span class="price-single">2.000 <span class="price-kd">KD</span></span></div></div>
-    </div>
-
-    <div style="text-align:center; margin:52px 0 32px;" class="reveal">
-      <span class="cat-badge">🍚 RICE & SPECIALS</span>
-    </div>
-    <div class="menu-grid">
-      <div class="menu-item reveal"><span class="item-emoji">🍚</span><div class="item-name">Chicken 65 Boneless With Rice</div><div class="item-name-ar">رز مع مقطع بونلس 65 دجاج</div><div class="price-row"><span class="price-single">2.400 <span class="price-kd">KD</span></span></div></div>
-      <div class="menu-item reveal"><div class="hot-badge">🌶️ SPICY</div><span class="item-emoji">🍚</span><div class="item-name">Chicken Chilly With Rice</div><div class="item-name-ar">دجاج حار مع الارز</div><div class="price-row"><span class="price-single">2.250 <span class="price-kd">KD</span></span></div></div>
-      <div class="menu-item reveal"><span class="item-emoji">🍚</span><div class="item-name">Chicken Fried Rice</div><div class="item-name-ar">ارز مقلي دجاج</div><div class="price-row"><span class="price-single">1.500 <span class="price-kd">KD</span></span></div></div>
-      <div class="menu-item reveal"><span class="item-emoji">🥦</span><div class="item-name">Veg Fried Rice</div><div class="item-name-ar">ارز مقلي خضار</div><div class="price-row"><span class="price-single">1.250 <span class="price-kd">KD</span></span></div></div>
-      <div class="menu-item reveal"><span class="item-emoji">🍳</span><div class="item-name">Egg Fried Rice</div><div class="item-name-ar">ارز مقلي بيض</div><div class="price-row"><span class="price-single">1.250 <span class="price-kd">KD</span></span></div></div>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- ══ INDIAN / CHINESE ══ -->
-<section class="alt-section">
-  <div class="section-header reveal">
-    <div class="section-label">Indian & Chinese</div>
-    <div class="section-title">NOODLES<br>&amp; MAINS</div>
-    <div class="section-line"></div>
-  </div>
-  <div class="menu-container">
-    <div style="text-align:center; margin-bottom:32px;" class="reveal">
-      <span class="cat-badge">🍜 NOODLES</span>
-    </div>
-    <div class="menu-grid">
-      <div class="menu-item reveal"><span class="item-emoji">🍜</span><div class="item-name">Chicken Noodles</div><div class="item-name-ar">نودلز دجاج</div><div class="price-row"><span class="price-single">1.750 <span class="price-kd">KD</span></span></div></div>
-      <div class="menu-item reveal"><span class="item-emoji">🍜</span><div class="item-name">Egg Noodles</div><div class="item-name-ar">نودلز بيض</div><div class="price-row"><span class="price-single">1.500 <span class="price-kd">KD</span></span></div></div>
-      <div class="menu-item reveal"><span class="item-emoji">🍜</span><div class="item-name">Veg Noodles</div><div class="item-name-ar">نودلز خضار</div><div class="price-row"><span class="price-single">1.500 <span class="price-kd">KD</span></span></div></div>
-    </div>
-
-    <div style="text-align:center; margin:52px 0 32px;" class="reveal">
-      <span class="cat-badge">🍲 INDIAN MAINS</span>
-    </div>
-    <div class="menu-grid">
-      <div class="menu-item reveal"><span class="item-emoji">🍛</span><div class="item-name">Butter Chicken</div><div class="item-name-ar">دجاج بالزبدة</div><div class="price-row"><span class="price-single">1.750 <span class="price-kd">KD</span></span></div></div>
-      <div class="menu-item reveal"><div class="hot-badge">🌶️ SPICY</div><span class="item-emoji">🌶️</span><div class="item-name">Chicken Chilly Chinese</div><div class="item-name-ar">دجاج تشيلي صينيه</div><div class="price-row"><span class="price-single">1.500 <span class="price-kd">KD</span></span></div></div>
-      <div class="menu-item reveal"><span class="item-emoji">🍲</span><div class="item-name">Chicken Manchurian</div><div class="item-name-ar">دجاج مانشوريان</div><div class="price-row"><span class="price-single">1.500 <span class="price-kd">KD</span></span></div></div>
-      <div class="menu-item reveal"><div class="hot-badge">🔥 SPECIAL</div><span class="item-emoji">🍗</span><div class="item-name">Chicken 65</div><div class="item-name-ar">دجاج 65</div><div class="price-row"><span class="price-single">1.250 <span class="price-kd">KD</span></span></div></div>
-      <div class="menu-item reveal"><span class="item-emoji">🧀</span><div class="item-name">Paneer Butter Masala</div><div class="item-name-ar">بانير زبدة مسالا</div><div class="price-row"><span class="price-single">1.500 <span class="price-kd">KD</span></span></div></div>
-      <div class="menu-item reveal"><span class="item-emoji">🥦</span><div class="item-name">Gobi 65</div><div class="item-name-ar">قرنبيط 65</div><div class="price-row"><span class="price-single">1.250 <span class="price-kd">KD</span></span></div></div>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- ══ SOUPS ══ -->
-<section>
-  <div class="section-header reveal">
-    <div class="section-label">Warm &amp; Comforting</div>
-    <div class="section-title">SOUPS</div>
-    <div class="section-line"></div>
-  </div>
-  <div class="menu-container">
-    <div class="menu-grid">
-      <div class="menu-item reveal"><span class="item-emoji">🥣</span><div class="item-name">Veg Soup</div><div class="item-name-ar">حساء الخضار</div><div class="price-row"><span class="price-single">0.900 <span class="price-kd">KD</span></span></div></div>
-      <div class="menu-item reveal"><span class="item-emoji">🥣</span><div class="item-name">Mix Soup</div><div class="item-name-ar">مزيج الحساء</div><div class="price-row"><span class="price-single">0.900 <span class="price-kd">KD</span></span></div></div>
-      <div class="menu-item reveal"><span class="item-emoji">🥣</span><div class="item-name">Paneer Soup</div><div class="item-name-ar">حساء بانير</div><div class="price-row"><span class="price-single">0.900 <span class="price-kd">KD</span></span></div></div>
-      <div class="menu-item reveal"><span class="item-emoji">🥣</span><div class="item-name">Egg Soup</div><div class="item-name-ar">شوربة البيض</div><div class="price-row"><span class="price-single">0.900 <span class="price-kd">KD</span></span></div></div>
-      <div class="menu-item reveal"><span class="item-emoji">🍗</span><div class="item-name">Chicken Soup</div><div class="item-name-ar">حساء الدجاج</div><div class="price-row"><span class="price-single">1.000 <span class="price-kd">KD</span></span></div></div>
-      <div class="menu-item reveal"><span class="item-emoji">🥩</span><div class="item-name">Mutton Soup</div><div class="item-name-ar">شوربة لحم الضأن</div><div class="price-row"><span class="price-single">1.000 <span class="price-kd">KD</span></span></div></div>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- ══ DRINKS & JUICES ══ -->
-<section class="alt-section">
-  <div class="section-header reveal">
-    <div class="section-label">Fresh &amp; Cold</div>
-    <div class="section-title">JUICES<br>&amp; DRINKS</div>
-    <div class="section-line"></div>
-  </div>
-  <div class="menu-container">
-    <!-- Single price drinks -->
-    <div style="text-align:center; margin-bottom:32px;" class="reveal">
-      <span class="cat-badge">🥤 SPECIAL DRINKS</span>
-    </div>
-    <div class="menu-grid">
-      <div class="menu-item reveal"><span class="item-emoji">🍹</span><div class="item-name">Mojito</div><div class="item-name-ar">موهيتو</div><div class="price-row"><span class="price-single">0.750 <span class="price-kd">KD</span></span></div></div>
-      <div class="menu-item reveal"><span class="item-emoji">🐂</span><div class="item-name">Red Bull Mix</div><div class="item-name-ar">ريد بول خلطة</div><div class="price-row"><span class="price-single">1.000 <span class="price-kd">KD</span></span></div></div>
-    </div>
-
-    <!-- S/M/L juices -->
-    <div style="text-align:center; margin:52px 0 32px;" class="reveal">
-      <span class="cat-badge">🍊 FRESH JUICES — S / M / L</span>
-    </div>
-    <div class="menu-grid">
-
-      <div class="menu-item reveal">
-        <span class="item-emoji">🥑</span>
-        <div class="item-name">Avocado Juice</div><div class="item-name-ar">عصير افوكادو</div>
-        <div class="sml-row">
-          <div class="sml-badge"><span class="sml-label">S</span><span class="sml-price">1.000</span></div>
-          <div class="sml-badge"><span class="sml-label">M</span><span class="sml-price">1.250</span></div>
-          <div class="sml-badge"><span class="sml-label">L</span><span class="sml-price">1.500</span></div>
-        </div>
-      </div>
-
-      <div class="menu-item reveal">
-        <span class="item-emoji">🌺</span>
-        <div class="item-name">Awargulb</div><div class="item-name-ar">عصير عوار قلب</div>
-        <div class="sml-row">
-          <div class="sml-badge"><span class="sml-label">S</span><span class="sml-price">0.750</span></div>
-          <div class="sml-badge"><span class="sml-label">M</span><span class="sml-price">1.000</span></div>
-          <div class="sml-badge"><span class="sml-label">L</span><span class="sml-price">1.250</span></div>
-        </div>
-      </div>
-
-      <div class="menu-item reveal">
-        <span class="item-emoji">🍹</span>
-        <div class="item-name">Cocktail</div><div class="item-name-ar">كوكتيل</div>
-        <div class="sml-row">
-          <div class="sml-badge"><span class="sml-label">S</span><span class="sml-price">1.000</span></div>
-          <div class="sml-badge"><span class="sml-label">M</span><span class="sml-price">1.250</span></div>
-          <div class="sml-badge"><span class="sml-label">L</span><span class="sml-price">1.500</span></div>
-        </div>
-      </div>
-
-      <div class="menu-item reveal">
-        <span class="item-emoji">🌹</span>
-        <div class="item-name">Samadi</div><div class="item-name-ar">صمدي</div>
-        <div class="sml-row">
-          <div class="sml-badge"><span class="sml-label">S</span><span class="sml-price">1.000</span></div>
-          <div class="sml-badge"><span class="sml-label">M</span><span class="sml-price">1.250</span></div>
-          <div class="sml-badge"><span class="sml-label">L</span><span class="sml-price">1.500</span></div>
-        </div>
-      </div>
-
-      <div class="menu-item reveal">
-        <span class="item-emoji">🍨</span>
-        <div class="item-name">Falooda</div><div class="item-name-ar">فالودا</div>
-        <div class="sml-row">
-          <div class="sml-badge"><span class="sml-label">S</span><span class="sml-price">1.000</span></div>
-          <div class="sml-badge"><span class="sml-label">M</span><span class="sml-price">1.250</span></div>
-          <div class="sml-badge"><span class="sml-label">L</span><span class="sml-price">1.500</span></div>
-        </div>
-      </div>
-
-      <div class="menu-item reveal">
-        <span class="item-emoji">🍋</span>
-        <div class="item-name">Lemon Mint</div><div class="item-name-ar">ليمون نعناع</div>
-        <div class="sml-row">
-          <div class="sml-badge"><span class="sml-label">S</span><span class="sml-price">0.500</span></div>
-          <div class="sml-badge"><span class="sml-label">M</span><span class="sml-price">0.750</span></div>
-          <div class="sml-badge"><span class="sml-label">L</span><span class="sml-price">1.000</span></div>
-        </div>
-      </div>
-
-      <div class="menu-item reveal">
-        <span class="item-emoji">🥭</span>
-        <div class="item-name">Mango Juice</div><div class="item-name-ar">عصير مانجو</div>
-        <div class="sml-row">
-          <div class="sml-badge"><span class="sml-label">S</span><span class="sml-price">0.750</span></div>
-          <div class="sml-badge"><span class="sml-label">M</span><span class="sml-price">1.000</span></div>
-          <div class="sml-badge"><span class="sml-label">L</span><span class="sml-price">1.250</span></div>
-        </div>
-      </div>
-
-      <div class="menu-item reveal">
-        <span class="item-emoji">🍊</span>
-        <div class="item-name">Orange Juice</div><div class="item-name-ar">عصير برتقال</div>
-        <div class="sml-row">
-          <div class="sml-badge"><span class="sml-label">S</span><span class="sml-price">0.750</span></div>
-          <div class="sml-badge"><span class="sml-label">M</span><span class="sml-price">1.000</span></div>
-          <div class="sml-badge"><span class="sml-label">L</span><span class="sml-price">1.250</span></div>
-        </div>
-      </div>
-
-      <div class="menu-item reveal">
-        <span class="item-emoji">🍓</span>
-        <div class="item-name">Strawberry Juice</div><div class="item-name-ar">عصير فراولة</div>
-        <div class="sml-row">
-          <div class="sml-badge"><span class="sml-label">S</span><span class="sml-price">0.750</span></div>
-          <div class="sml-badge"><span class="sml-label">M</span><span class="sml-price">1.000</span></div>
-          <div class="sml-badge"><span class="sml-label">L</span><span class="sml-price">1.250</span></div>
-        </div>
-      </div>
-
-      <div class="menu-item reveal">
-        <span class="item-emoji">🍌</span>
-        <div class="item-name">Banana Milk Juice</div><div class="item-name-ar">عصير موز حليب</div>
-        <div class="sml-row">
-          <div class="sml-badge"><span class="sml-label">S</span><span class="sml-price">0.500</span></div>
-          <div class="sml-badge"><span class="sml-label">M</span><span class="sml-price">0.750</span></div>
-          <div class="sml-badge"><span class="sml-label">L</span><span class="sml-price">1.000</span></div>
-        </div>
-      </div>
-
-      <div class="menu-item reveal">
-        <span class="item-emoji">🍪</span>
-        <div class="item-name">Oreo Milk Shake</div><div class="item-name-ar">اورويو ميلك شيك</div>
-        <div class="sml-row">
-          <div class="sml-badge"><span class="sml-label">S</span><span class="sml-price">0.750</span></div>
-          <div class="sml-badge"><span class="sml-label">M</span><span class="sml-price">1.000</span></div>
-          <div class="sml-badge"><span class="sml-label">L</span><span class="sml-price">1.250</span></div>
-        </div>
-      </div>
-
-      <div class="menu-item reveal">
-        <span class="item-emoji">🍫</span>
-        <div class="item-name">Snickers Milk Shake</div><div class="item-name-ar">سنيكرز ميلك شيك</div>
-        <div class="sml-row">
-          <div class="sml-badge"><span class="sml-label">S</span><span class="sml-price">0.750</span></div>
-          <div class="sml-badge"><span class="sml-label">M</span><span class="sml-price">1.000</span></div>
-          <div class="sml-badge"><span class="sml-label">L</span><span class="sml-price">1.250</span></div>
-        </div>
-      </div>
-
-      <div class="menu-item reveal">
-        <span class="item-emoji">☕</span>
-        <div class="item-name">Cold Coffee</div><div class="item-name-ar">نسكافيه بارد</div>
-        <div class="sml-row">
-          <div class="sml-badge"><span class="sml-label">S</span><span class="sml-price">0.750</span></div>
-          <div class="sml-badge"><span class="sml-label">M</span><span class="sml-price">1.000</span></div>
-          <div class="sml-badge"><span class="sml-label">L</span><span class="sml-price">1.250</span></div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- ══ INFO STRIP ══ -->
-<div class="info-strip">
-  <div class="info-inner">
-    <div class="info-block reveal">
-      <div class="info-icon">📞</div>
-      <div class="info-heading">ORDER NOW</div>
-      <div class="info-text">90901709 &nbsp;/&nbsp; 90901710<br>WhatsApp Welcome</div>
-    </div>
-    <div class="info-block reveal">
-      <div class="info-icon">📍</div>
-      <div class="info-heading">FIND US</div>
-      <div class="info-text">Jabriya<br>Block 12, Jamia Branch</div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ FOOTER ══ -->
-<footer>
-  <div class="footer-brand">FAYRUZA RESTAURANT</div>
-  <div class="footer-address">Jabriya · Block 12 · Jamia Branch</div>
-  <div class="footer-phones">
-    <a href="tel:90901709" class="phone-pill">📞 90901709</a>
-    <a href="tel:90901710" class="phone-pill">📱 90901710</a>
-  </div>
-</footer>
 
 <script>
-  const reveals = document.querySelectorAll('.reveal');
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        setTimeout(() => entry.target.classList.add('visible'), 50);
-        observer.unobserve(entry.target);
+/* ══════════════════════════════════════════
+   MENU DATA
+══════════════════════════════════════════ */
+const MENU = [
+  {
+    id: 'burgers',
+    name: 'Burgers',
+    nameAr: 'برجر',
+    emoji: '🍔',
+    animClass: 'burgers',
+    count: 16,
+    subcats: [
+      {
+        label: '🍔 SIGNATURE BURGERS',
+        items: [
+          { e:'🍔', n:'Zinger Burger',          ar:'برجر زنجر',         price:'0.900', meal:'1.400', badge:'🔥 HOT' },
+          { e:'👑', n:'King Burger',             ar:'كنغ برجر',          price:'0.750', meal:'1.250' },
+          { e:'🍗', n:'Chicken Fillet Burger',   ar:'برجر دجاج فيليه',   price:'0.750', meal:'1.250' },
+          { e:'🌶️', n:'Khaleej Burger',          ar:'برجر خليج',         price:'0.850', meal:'1.350' },
+          { e:'🍔', n:'Zinger Double Burger',    ar:'برجر زنجر دبل',     price:'1.300', meal:'1.750', badge:'🔥 DOUBLE' },
+          { e:'🍗', n:'Chicken Double Burger',   ar:'برجر دجاج دبل',     price:'1.000', meal:'1.500', badge:'🔥 DOUBLE' },
+          { e:'🍔', n:'Hamburger Chicken',       ar:'همبرجر دجاج',       price:'0.750', meal:'1.250' },
+          { e:'⚡', n:'Hamburger Super',          ar:'همبرجر سوبر',       price:'0.850', meal:'1.350' },
+          { e:'🥩', n:'Hamburger Meat',          ar:'همبرجر لحم',        price:'0.750', meal:'1.250' },
+          { e:'🍗', n:'Chicken Burger',          ar:'برجر دجاج',         price:'0.750', meal:'1.250' },
+          { e:'🌮', n:'Mexico Chicken Francy',   ar:'مكسيكو دجاج فرنسي', price:'0.750', meal:'1.250' },
+          { e:'👻', n:'Shabah Meal',             ar:'وجبة شبح',          price:'0.750', meal:'1.250' },
+          { e:'💫', n:'Ladeda Meal',             ar:'وجبة لذيذا',        price:'0.750', meal:'1.250' },
+          { e:'🍗', n:'Chicken Fillet Francy',   ar:'دجاج فيليه فرنسي',  price:'0.750', meal:'1.250' },
+          { e:'⚡', n:'Chicken Zinger Francy',   ar:'دجاج زنجر فرنسي',   price:'0.900', meal:'1.400' },
+          { e:'🥩', n:'Beef Supreme',            ar:'لحم سريم',          price:'1.000', meal:'1.350', badge:'🥩 BEEF' },
+        ]
       }
+    ]
+  },
+  {
+    id: 'rolls',
+    name: 'Rolls & Club',
+    nameAr: 'رولز وكلوب',
+    emoji: '🌯',
+    animClass: 'rolls',
+    count: 10,
+    subcats: [
+      {
+        label: '🌯 ROLLS & CLUB MEALS',
+        items: [
+          { e:'🌯', n:'King Roll',          ar:'كينغ رول',       price:'0.750' },
+          { e:'🌯', n:'Francisco Roll',     ar:'فرانسيسكو رول',  price:'0.850' },
+          { e:'🍱', n:'Twister Meal',       ar:'وجبة تويستر',    price:'0.950', meal:'1.500' },
+          { e:'🍽️', n:'Talayani',           ar:'تلاياني',        price:'0.750', meal:'1.250' },
+          { e:'🥚', n:'Club Egg Meal',      ar:'وجبة كلوب بيض',  price:'1.000' },
+          { e:'🍗', n:'Club Chicken Meal',  ar:'وجبة كلوب دجاج', price:'1.500' },
+          { e:'🥩', n:'Beef Club Meal',     ar:'وجبة كلوب لحم',  price:'1.750', badge:'🥩 BEEF' },
+          { e:'🍟', n:'Nuggets Meal',       ar:'وجبة ناجتس',     price:'1.250' },
+          { e:'🥔', n:'Potato Chips',       ar:'بطاط شيبس',      price:'0.750', meal:'1.250' },
+          { e:'✨', n:'King Chips Special', ar:'رقائق كينغ الخاصة', price:'1.250' },
+        ]
+      }
+    ]
+  },
+  {
+    id: 'chapathi',
+    name: 'Chapathi',
+    nameAr: 'شباتي',
+    emoji: '🫓',
+    animClass: 'chapathi',
+    count: 8,
+    subcats: [
+      {
+        label: '🫓 CHAPATHI SANDWICHES — سندويش شباتي',
+        items: [
+          { e:'🫓', n:'Rashid',    ar:'راشد',   fils: 400 },
+          { e:'🫓', n:'Halloum',   ar:'حلوم',   fils: 350 },
+          { e:'🎮', n:'Pubg',      ar:'بوبجي',  fils: 500 },
+          { e:'🍫', n:'Nutella',   ar:'نوتيلا', fils: 250 },
+          { e:'🫓', n:'Azeez',     ar:'عزيز',   fils: 400 },
+          { e:'🫓', n:'Askari',    ar:'عسكري',  fils: 400 },
+          { e:'☕', n:'Karak Tea', ar:'شاي كرك', fils: 250 },
+          { e:'☕', n:'Coffee',    ar:'نسكافي',  fils: 250 },
+        ]
+      }
+    ]
+  },
+  {
+    id: 'biryani',
+    name: 'Biryani',
+    nameAr: 'برياني',
+    emoji: '🍛',
+    animClass: 'biryani',
+    count: 10,
+    subcats: [
+      {
+        label: '🍛 BIRYANI',
+        items: [
+          { e:'🍛', n:'Chicken Biryani',       ar:'برياني دجاج',      price:'1.250' },
+          { e:'🍛', n:'Mutton Biryani',         ar:'برياني لحم',       price:'2.000' },
+          { e:'🍛', n:'Beef Biryani',           ar:'برياني لحم بقر',   price:'1.500' },
+          { e:'🍛', n:'Chicken 65 Biryani',     ar:'برياني دجاج 65',   price:'1.750', badge:'🔥 SPECIAL' },
+          { e:'🍛', n:'Chicken Fry Biryani',    ar:'برياني دجاج مقلي', price:'1.750' },
+          { e:'🍛', n:'Chicken Majboos',        ar:'مجبوس دجاج',       price:'1.750' },
+          { e:'🐟', n:'Pomfret Biryani',        ar:'برياني سمك زبيدي', price:'2.500' },
+          { e:'🐟', n:'Sheri',                  ar:'شيري',             price:'2.000' },
+          { e:'🐟', n:'Tilapia Biryani',        ar:'برياني سمك بلطي',  price:'1.750' },
+          { e:'🦐', n:'Prawns Biryani',         ar:'برياني ربيان',     price:'2.000' },
+        ]
+      }
+    ]
+  },
+  {
+    id: 'rice',
+    name: 'Rice & Specials',
+    nameAr: 'أرز وأكلات',
+    emoji: '🍚',
+    animClass: 'rice',
+    count: 5,
+    subcats: [
+      {
+        label: '🍚 RICE & SPECIALS',
+        items: [
+          { e:'🍚', n:'Chicken 65 Boneless With Rice', ar:'رز مع بونلس دجاج 65',  price:'2.400' },
+          { e:'🌶️', n:'Chicken Chilly With Rice',      ar:'دجاج حار مع الارز',    price:'2.250', badge:'🌶️ SPICY' },
+          { e:'🍚', n:'Chicken Fried Rice',             ar:'ارز مقلي دجاج',        price:'1.500' },
+          { e:'🥦', n:'Veg Fried Rice',                ar:'ارز مقلي خضار',        price:'1.250' },
+          { e:'🍳', n:'Egg Fried Rice',                ar:'ارز مقلي بيض',         price:'1.250' },
+        ]
+      }
+    ]
+  },
+  {
+    id: 'noodles',
+    name: 'Noodles & Mains',
+    nameAr: 'نودلز ومقبلات',
+    emoji: '🍜',
+    animClass: 'noodles',
+    count: 9,
+    subcats: [
+      {
+        label: '🍜 NOODLES',
+        items: [
+          { e:'🍜', n:'Chicken Noodles', ar:'نودلز دجاج', price:'1.750' },
+          { e:'🍜', n:'Egg Noodles',     ar:'نودلز بيض',  price:'1.500' },
+          { e:'🍜', n:'Veg Noodles',     ar:'نودلز خضار', price:'1.500' },
+        ]
+      },
+      {
+        label: '🍲 INDIAN MAINS',
+        items: [
+          { e:'🍛', n:'Butter Chicken',        ar:'دجاج بالزبدة',    price:'1.750' },
+          { e:'🌶️', n:'Chicken Chilly Chinese', ar:'دجاج تشيلي صينيه', price:'1.500', badge:'🌶️ SPICY' },
+          { e:'🍲', n:'Chicken Manchurian',    ar:'دجاج مانشوريان',   price:'1.500' },
+          { e:'🍗', n:'Chicken 65',            ar:'دجاج 65',          price:'1.250', badge:'🔥 SPECIAL' },
+          { e:'🧀', n:'Paneer Butter Masala',  ar:'بانير زبدة مسالا', price:'1.500' },
+          { e:'🥦', n:'Gobi 65',              ar:'قرنبيط 65',         price:'1.250' },
+        ]
+      }
+    ]
+  },
+  {
+    id: 'soups',
+    name: 'Soups',
+    nameAr: 'شوربات',
+    emoji: '🥣',
+    animClass: 'soups',
+    count: 6,
+    subcats: [
+      {
+        label: '🥣 SOUPS — شوربات',
+        items: [
+          { e:'🥣', n:'Veg Soup',     ar:'حساء الخضار',    price:'0.900' },
+          { e:'🥣', n:'Mix Soup',     ar:'مزيج الحساء',    price:'0.900' },
+          { e:'🥣', n:'Paneer Soup',  ar:'حساء بانير',     price:'0.900' },
+          { e:'🥣', n:'Egg Soup',     ar:'شوربة البيض',    price:'0.900' },
+          { e:'🍗', n:'Chicken Soup', ar:'حساء الدجاج',    price:'1.000' },
+          { e:'🥩', n:'Mutton Soup',  ar:'شوربة لحم الضأن',price:'1.000' },
+        ]
+      }
+    ]
+  },
+  {
+    id: 'juices',
+    name: 'Juices & Drinks',
+    nameAr: 'عصائر ومشروبات',
+    emoji: '🥤',
+    animClass: 'juices',
+    count: 14,
+    subcats: [
+      {
+        label: '🥤 SPECIAL DRINKS',
+        items: [
+          { e:'🍹', n:'Mojito', ar:'موهيتو', price:'0.750' },
+        ]
+      },
+      {
+        label: '🍊 FRESH JUICES — S / M / L',
+        items: [
+          { e:'🥑', n:'Avocado Juice',      ar:'عصير افوكادو',  sml:{s:'1.000',m:'1.250',l:'1.500'} },
+          { e:'🌺', n:'Awargulb',           ar:'عصير عوار قلب', sml:{s:'0.750',m:'1.000',l:'1.250'} },
+          { e:'🍹', n:'Cocktail',           ar:'كوكتيل',        sml:{s:'1.000',m:'1.250',l:'1.500'} },
+          { e:'🌹', n:'Samadi',             ar:'صمدي',          sml:{s:'1.000',m:'1.250',l:'1.500'} },
+          { e:'🍨', n:'Falooda',            ar:'فالودا',        sml:{s:'1.000',m:'1.250',l:'1.500'} },
+          { e:'🍋', n:'Lemon Mint',         ar:'ليمون نعناع',   sml:{s:'0.500',m:'0.750',l:'1.000'} },
+          { e:'🥭', n:'Mango Juice',        ar:'عصير مانجو',    sml:{s:'0.750',m:'1.000',l:'1.250'} },
+          { e:'🍊', n:'Orange Juice',       ar:'عصير برتقال',   sml:{s:'0.750',m:'1.000',l:'1.250'} },
+          { e:'🍓', n:'Strawberry Juice',   ar:'عصير فراولة',   sml:{s:'0.750',m:'1.000',l:'1.250'} },
+          { e:'🍌', n:'Banana Milk Juice',  ar:'عصير موز حليب', sml:{s:'0.500',m:'0.750',l:'1.000'} },
+          { e:'🍪', n:'Oreo Milk Shake',    ar:'اورويو ميلك شيك',sml:{s:'0.750',m:'1.000',l:'1.250'} },
+          { e:'🍫', n:'Snickers Milk Shake',ar:'سنيكرز ميلك شيك',sml:{s:'0.750',m:'1.000',l:'1.250'} },
+          { e:'☕', n:'Cold Coffee',        ar:'نسكافيه بارد',  sml:{s:'0.750',m:'1.000',l:'1.250'} },
+        ]
+      }
+    ]
+  },
+];
+
+/* ══════════════════════════════════════════
+   BUILD CATEGORY CARDS
+══════════════════════════════════════════ */
+function buildCards() {
+  const grid = document.getElementById('cards-grid');
+  grid.innerHTML = '';
+  MENU.forEach(cat => {
+    const card = document.createElement('div');
+    card.className = 'cat-card';
+    card.onclick = () => openCategory(cat.id);
+
+    let animBgHTML = '';
+    if (cat.animClass === 'soups') {
+      animBgHTML = `<div class="anim-bg soups">
+        <div class="soup-ripple"></div>
+        <div class="soup-ripple"></div>
+        <div class="soup-ripple"></div>
+      </div>`;
+    } else if (cat.animClass === 'juices') {
+      animBgHTML = `<div class="anim-bg juices">
+        <div class="juice-orb"></div>
+        <div class="juice-orb"></div>
+        <div class="juice-orb"></div>
+      </div>`;
+    } else if (cat.animClass === 'noodles') {
+      animBgHTML = `<div class="anim-bg noodles">
+        <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path class="noodle-line" d="M-10 25 Q 30 10, 60 25 Q 90 40, 130 25" stroke="rgba(77,196,163,0.8)" stroke-width="2.5" fill="none"/>
+          <path class="noodle-line" d="M-10 45 Q 30 30, 60 45 Q 90 60, 130 45" stroke="rgba(31,149,120,0.6)" stroke-width="2" fill="none"/>
+          <path class="noodle-line" d="M-10 65 Q 30 50, 60 65 Q 90 80, 130 65" stroke="rgba(77,196,163,0.5)" stroke-width="1.5" fill="none"/>
+        </svg>
+      </div>`;
+    } else {
+      animBgHTML = `<div class="anim-bg ${cat.animClass}"></div>`;
+    }
+
+    card.innerHTML = `
+      ${animBgHTML}
+      <span class="card-emoji">${cat.emoji}</span>
+      <div class="card-count">${cat.count} ITEMS</div>
+      <div class="card-arrow">→</div>
+      <div class="card-name">${cat.name}</div>
+      <div class="card-name-ar">${cat.nameAr}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+/* ══════════════════════════════════════════
+   BUILD ITEM CARD HTML
+══════════════════════════════════════════ */
+function renderItem(item, delay) {
+  const style = `animation-delay:${delay}ms`;
+  let priceHTML = '';
+
+  if (item.fils) {
+    priceHTML = `<div class="ic-price">${item.fils} <span class="ic-price-kd">FILS</span></div>`;
+  } else if (item.sml) {
+    priceHTML = `<div class="sml-row">
+      <div class="sml-badge"><span class="sml-lbl">S</span><span class="sml-val">${item.sml.s}</span></div>
+      <div class="sml-badge"><span class="sml-lbl">M</span><span class="sml-val">${item.sml.m}</span></div>
+      <div class="sml-badge"><span class="sml-lbl">L</span><span class="sml-val">${item.sml.l}</span></div>
+    </div>`;
+  } else {
+    priceHTML = `<div class="ic-price">${item.price} <span class="ic-price-kd">KD</span></div>`;
+    if (item.meal) {
+      priceHTML += `<span class="ic-meal">+ Meal: ${item.meal} KD</span>`;
+    }
+  }
+
+  return `
+    <div class="item-card" style="${style}">
+      ${item.badge ? `<div class="ic-badge">${item.badge}</div>` : ''}
+      <span class="ic-emoji">${item.e}</span>
+      <div class="ic-name">${item.n}</div>
+      <div class="ic-name-ar">${item.ar}</div>
+      ${priceHTML}
+    </div>`;
+}
+
+/* ══════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════ */
+function openCategory(id) {
+  const cat = MENU.find(c => c.id === id);
+  if (!cat) return;
+
+  // Update header
+  document.getElementById('cat-header-name').textContent = cat.name.toUpperCase();
+  document.getElementById('cat-header-emoji').textContent = cat.emoji;
+
+  // Build items
+  const container = document.getElementById('items-container');
+  let html = '';
+  let delay = 0;
+  cat.subcats.forEach(sub => {
+    html += `<div class="subcat-label"><span>${sub.label}</span></div>`;
+    html += `<div class="items-grid">`;
+    sub.items.forEach(item => {
+      html += renderItem(item, delay);
+      delay += 40;
     });
-  }, { threshold: 0.1 });
-  reveals.forEach(el => observer.observe(el));
+    html += `</div>`;
+  });
+  container.innerHTML = html;
+
+  // Slide in
+  const catView = document.getElementById('cat-view');
+  catView.scrollTop = 0;
+  catView.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function goHome() {
+  const catView = document.getElementById('cat-view');
+  catView.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Handle browser back gesture / button
+window.addEventListener('popstate', () => {
+  const catView = document.getElementById('cat-view');
+  if (catView.classList.contains('open')) goHome();
+});
+
+// Init
+buildCards();
 </script>
 </body>
 </html>
