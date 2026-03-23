@@ -4,339 +4,459 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fayruza Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
-:root{--red:#1F9578;--orange:#167A62;--yellow:#4DC4A3;--dark:#0A0F0D;--dark2:#0D1410;--card:#141A17;--text:#EDF5F2;--muted:#7A9990;--border:rgba(77,196,163,0.12);--pending:#f59e0b;--preparing:#3b82f6;--ready:#8b5cf6;--completed:#10b981;--cancelled:#ef4444;}
+:root{--green:#1F9578;--green2:#167A62;--teal:#4DC4A3;--dark:#0A0F0D;--dark2:#0E1511;--dark3:#141A17;--card:#111714;--border:rgba(255,255,255,0.07);--text:#EDF5F2;--muted:#7A9990;--red:#ff4757;--yellow:#ffd43b;--sw:220px;}
 *{margin:0;padding:0;box-sizing:border-box;}
-html,body{height:100%;overflow:hidden;}
-body{background:var(--dark2);color:var(--text);font-family:'Barlow',sans-serif;display:flex;}
-.sidebar{width:220px;background:var(--dark);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;height:100vh;overflow-y:auto;}
-.sb-brand{padding:22px 20px 16px;border-bottom:1px solid var(--border);}
-.sb-name{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:3px;background:linear-gradient(90deg,var(--red),var(--yellow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.sb-sub{font-family:'Barlow Condensed',sans-serif;font-size:0.68rem;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-top:2px;}
-.live{display:inline-flex;align-items:center;gap:5px;font-size:0.65rem;letter-spacing:2px;color:var(--yellow);font-family:'Barlow Condensed',sans-serif;font-weight:700;margin-top:8px;}
-.dot{width:7px;height:7px;border-radius:50%;background:var(--yellow);animation:pulse 1.5s ease-in-out infinite;}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-.nav{padding:14px 12px;}
-.nav-lbl{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.65rem;letter-spacing:4px;text-transform:uppercase;color:var(--muted);padding:0 8px;margin-bottom:6px;}
-.ni{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:background 0.15s;margin-bottom:2px;}
-.ni:hover{background:rgba(77,196,163,0.07);}
-.ni.active{background:rgba(31,149,120,0.2);}
-.ni.active .nl{color:var(--yellow);}
-.ni-icon{font-size:1rem;width:20px;text-align:center;}
-.nl{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:0.85rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);}
-.nbadge{margin-left:auto;background:var(--red);color:white;font-family:'Bebas Neue',sans-serif;font-size:0.7rem;min-width:20px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 5px;}
-.sb-foot{margin-top:auto;padding:14px 12px;border-top:1px solid var(--border);}
-.sb-link{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;color:var(--muted);text-decoration:none;transition:background 0.15s;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:0.78rem;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;}
-.sb-link:hover{background:rgba(255,255,255,0.05);color:var(--text);}
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
-.topbar{background:var(--dark);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
-.topbar-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:4px;}
-.tr{display:flex;align-items:center;gap:12px;}
-.tdate{font-family:'Barlow Condensed',sans-serif;font-size:0.82rem;letter-spacing:2px;color:var(--muted);}
-.rbtn{background:rgba(77,196,163,0.1);border:1px solid var(--border);color:var(--yellow);padding:7px 14px;border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:0.8rem;letter-spacing:2px;cursor:pointer;transition:background 0.2s;}
-.rbtn:hover{background:rgba(77,196,163,0.18);}
-.content{flex:1;overflow-y:auto;padding:24px;}
-::-webkit-scrollbar{width:5px;} ::-webkit-scrollbar-track{background:var(--dark2);} ::-webkit-scrollbar-thumb{background:var(--orange);border-radius:3px;}
-.page{display:none;} .page.active{display:block;}
-.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
-.kpi{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;position:relative;overflow:hidden;}
-.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--red),var(--yellow));}
-.kpi-lbl{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.68rem;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
-.kpi-val{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:1px;line-height:1;}
-.kpi-sub{font-size:0.78rem;color:var(--muted);margin-top:4px;font-family:'Barlow Condensed',sans-serif;}
-.kpi-ico{position:absolute;right:16px;top:18px;font-size:1.8rem;opacity:0.2;}
-.dgrid{display:grid;grid-template-columns:2fr 1fr;gap:16px;}
-.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;}
-.ph{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-.pt{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:3px;}
-.pa{font-family:'Barlow Condensed',sans-serif;font-size:0.75rem;letter-spacing:2px;color:var(--yellow);cursor:pointer;text-transform:uppercase;}
-.pb{padding:16px;}
-table.ot{width:100%;border-collapse:collapse;}
-.ot th{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);padding:0 10px 10px;text-align:left;border-bottom:1px solid var(--border);}
-.ot td{padding:11px 10px;border-bottom:1px solid rgba(255,255,255,0.03);font-size:0.88rem;}
-.ot tr:last-child td{border-bottom:none;}
-.ot tr:hover td{background:rgba(255,255,255,0.02);}
-.sb{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-family:'Bebas Neue',sans-serif;font-size:0.7rem;letter-spacing:1px;white-space:nowrap;}
-.sp{background:rgba(245,158,11,.15);color:var(--pending);border:1px solid rgba(245,158,11,.3);}
-.sg{background:rgba(59,130,246,.15);color:var(--preparing);border:1px solid rgba(59,130,246,.3);}
-.sr{background:rgba(139,92,246,.15);color:var(--ready);border:1px solid rgba(139,92,246,.3);}
-.sc{background:rgba(16,185,129,.15);color:var(--completed);border:1px solid rgba(16,185,129,.3);}
-.sx{background:rgba(239,68,68,.15);color:var(--cancelled);border:1px solid rgba(239,68,68,.3);}
-.ti{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
-.ti:last-child{border-bottom:none;}
-.orders-fb{display:flex;align-items:center;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
-.fb{padding:7px 14px;border-radius:20px;border:1px solid rgba(77,196,163,0.2);background:rgba(255,255,255,0.03);font-family:'Bebas Neue',sans-serif;font-size:0.75rem;letter-spacing:2px;color:var(--muted);cursor:pointer;transition:all 0.15s;}
-.fb.active{background:rgba(31,149,120,0.2);border-color:var(--yellow);color:var(--yellow);}
-.si{margin-left:auto;background:rgba(255,255,255,0.04);border:1px solid rgba(77,196,163,0.15);border-radius:8px;color:var(--text);font-family:'Barlow',sans-serif;font-size:0.85rem;padding:7px 14px;min-width:180px;}
-.si:focus{outline:none;border-color:var(--yellow);}
-.oc{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:10px;}
-.och{padding:14px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.04);}
-.on{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--yellow);}
-.ot2{font-size:0.78rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;}
-.otot{font-family:'Bebas Neue',sans-serif;font-size:1rem;margin-left:auto;}
-.exp{color:var(--muted);font-size:0.85rem;transition:transform 0.2s;}
-.exp.open{transform:rotate(180deg);}
-.ocb{padding:14px 18px;display:none;}
-.ocb.open{display:block;}
-.oir{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.03);}
-.oir:last-child{border-bottom:none;}
-.oin{flex:1;color:var(--text);font-weight:600;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;font-size:0.82rem;}
-.oip{color:var(--yellow);font-family:'Barlow Condensed',sans-serif;font-weight:700;}
-.ometa{display:flex;gap:16px;flex-wrap:wrap;margin:12px 0;font-family:'Barlow Condensed',sans-serif;font-size:0.8rem;color:var(--muted);}
-.ometa strong{color:var(--text);}
-.onotes{background:rgba(255,255,255,0.03);border-radius:6px;padding:8px 12px;font-size:0.82rem;color:var(--muted);margin-bottom:12px;}
-.sa{display:flex;gap:7px;flex-wrap:wrap;}
-.sab{padding:7px 13px;border-radius:6px;border:none;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:0.72rem;letter-spacing:2px;color:white;transition:opacity 0.2s;}
-.sab:hover{opacity:0.8;}
-.sab.cur{outline:2px solid white;outline-offset:2px;}
-.sab.sap{background:var(--pending);}.sab.sag{background:var(--preparing);}.sab.sar{background:var(--ready);}.sab.sac{background:var(--completed);}.sab.sax{background:var(--cancelled);}
-.sab.sai{background:rgba(77,196,163,0.15);color:var(--yellow);border:1px solid rgba(77,196,163,0.3);}
-.inv-list{display:flex;flex-direction:column;gap:8px;}
-.ir{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:border-color 0.2s;}
-.ir:hover{border-color:rgba(77,196,163,0.3);}
-.inum{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--yellow);min-width:80px;}
-.idate{font-family:'Barlow Condensed',sans-serif;font-size:0.82rem;color:var(--muted);flex:1;}
-.itot{font-family:'Bebas Neue',sans-serif;font-size:1rem;}
-.ipbtn{background:rgba(77,196,163,0.1);border:1px solid rgba(77,196,163,0.2);color:var(--yellow);padding:5px 12px;border-radius:5px;font-family:'Bebas Neue',sans-serif;font-size:0.7rem;letter-spacing:2px;cursor:pointer;transition:background 0.2s;flex-shrink:0;}
-.ipbtn:hover{background:rgba(77,196,163,0.2);}
-#inv-modal{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.85);display:none;align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto;}
-#inv-modal.open{display:flex;}
-.ip{background:white;color:#111;border-radius:8px;width:100%;max-width:480px;padding:32px 28px;font-family:'Barlow',sans-serif;position:relative;}
-.iclose{position:absolute;top:12px;right:12px;background:#f0f0f0;border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;}
-.ih{text-align:center;padding-bottom:16px;border-bottom:2px dashed #ccc;margin-bottom:16px;}
-.ibrand{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:4px;color:#1F9578;}
-.iaddr{font-size:0.82rem;color:#666;margin-top:4px;}
-.img{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;font-size:0.85rem;}
-.imk{color:#888;font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;}
-.imv{font-weight:600;}
-table.iit{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:0.85rem;}
-.iit th{text-align:left;padding:6px 0;border-bottom:1px solid #ddd;font-size:0.75rem;text-transform:uppercase;color:#888;letter-spacing:1px;}
-.iit td{padding:8px 0;border-bottom:1px solid #f0f0f0;}
-.iit td:last-child{text-align:right;font-weight:600;}
-.itots{border-top:2px dashed #ccc;padding-top:12px;}
-.itr{display:flex;justify-content:space-between;padding:4px 0;font-size:0.85rem;}
-.itr.grand{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:#1F9578;border-top:1px solid #ccc;margin-top:6px;padding-top:8px;}
-.ifoo{text-align:center;margin-top:20px;font-size:0.78rem;color:#999;}
-.pbtn{display:block;width:100%;margin-top:16px;padding:12px;background:#1F9578;color:white;border:none;border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:3px;cursor:pointer;}
-.empty{text-align:center;padding:60px 20px;color:var(--muted);}
-.empty-ico{font-size:3rem;margin-bottom:16px;}
-.empty-msg{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:3px;}
-@media print{body>*:not(#inv-modal){display:none!important;} #inv-modal{display:flex!important;background:white;padding:0;} .iclose,.pbtn{display:none!important;} .ip{box-shadow:none;margin:0;}}
+body{background:var(--dark);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;display:flex;}
+.sidebar{width:var(--sw);background:var(--dark2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;transition:transform .3s;}
+.sb-brand{padding:20px 20px 14px;border-bottom:1px solid var(--border);}
+.sb-brand .name{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:3px;background:linear-gradient(90deg,var(--teal),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sb-brand .sub{font-family:'Barlow Condensed',sans-serif;font-size:.68rem;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-top:2px;}
+.sb-nav{flex:1;padding:12px 10px;overflow-y:auto;}
+.sb-sec{font-family:'Barlow Condensed',sans-serif;font-size:.62rem;letter-spacing:4px;text-transform:uppercase;color:var(--muted);padding:8px 10px 4px;margin-top:4px;}
+.nb{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:.92rem;letter-spacing:1px;color:var(--muted);transition:background .2s,color .2s;margin-bottom:2px;border:none;background:transparent;width:100%;text-align:left;text-decoration:none;}
+.nb .ic{font-size:1.1rem;width:22px;text-align:center;}
+.nb:hover{background:rgba(31,149,120,.1);color:var(--text);}
+.nb.active{background:rgba(31,149,120,.18);color:var(--teal);}
+.nb .bdg{margin-left:auto;background:var(--red);color:#fff;font-size:.6rem;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 5px;}
+.sb-foot{padding:12px 18px;border-top:1px solid var(--border);font-family:'Barlow Condensed',sans-serif;font-size:.78rem;color:var(--muted);letter-spacing:1px;}
+.sb-clock{font-size:.85rem;color:var(--teal);margin-bottom:2px;}
+.live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#2ecc71;margin-right:6px;animation:pdot 2s ease-in-out infinite;}
+@keyframes pdot{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(.8);}}
+.sb-toggle{display:none;position:fixed;top:14px;left:14px;z-index:200;background:var(--green);color:#fff;border:none;width:40px;height:40px;border-radius:8px;cursor:pointer;font-size:1.2rem;align-items:center;justify-content:center;}
+.main{margin-left:var(--sw);flex:1;min-height:100vh;display:flex;flex-direction:column;}
+.topbar{background:var(--dark2);border-bottom:1px solid var(--border);padding:15px 26px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.tb-title{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:3px;}
+.tb-right{display:flex;align-items:center;gap:12px;}
+.tb-time{font-family:'Barlow Condensed',sans-serif;font-size:.82rem;color:var(--muted);letter-spacing:1px;}
+.tb-link{background:rgba(31,149,120,.12);border:1px solid rgba(31,149,120,.3);color:var(--teal);font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:2px;padding:7px 14px;border-radius:6px;text-decoration:none;transition:background .2s;}
+.tb-link:hover{background:rgba(31,149,120,.22);}
+.content{padding:22px 26px;flex:1;}
+.page{display:none;}.page.active{display:block;}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:22px;}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:17px 18px;transition:transform .2s,border-color .2s;}
+.stat-card:hover{border-color:rgba(31,149,120,.3);transform:translateY(-2px);}
+.stat-icon{font-size:1.5rem;margin-bottom:7px;}
+.stat-lbl{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.65rem;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.stat-val{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:1px;}
+.stat-sub{font-family:'Barlow Condensed',sans-serif;font-size:.75rem;color:var(--muted);margin-top:3px;}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:18px;}
+.ph{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.ph-title{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:3px;}
+.ph-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.btn-filter{font-family:'Barlow Condensed',sans-serif;font-size:.75rem;letter-spacing:2px;text-transform:uppercase;padding:6px 13px;border-radius:6px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all .2s;}
+.btn-filter:hover{border-color:var(--teal);color:var(--teal);}
+.btn-filter.active{background:var(--green);border-color:var(--green);color:#fff;}
+.btn-refresh{font-family:'Barlow Condensed',sans-serif;font-size:.75rem;letter-spacing:2px;padding:6px 13px;border-radius:6px;cursor:pointer;border:1px solid rgba(31,149,120,.3);background:rgba(31,149,120,.1);color:var(--teal);transition:all .2s;}
+.btn-refresh:hover{background:rgba(31,149,120,.2);}
+.search-inp{background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:.83rem;padding:6px 11px;border-radius:6px;outline:none;width:170px;transition:border-color .2s;}
+.search-inp:focus{border-color:var(--teal);}
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+th{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.67rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);padding:11px 15px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:12px 15px;border-bottom:1px solid rgba(255,255,255,.03);font-family:'Barlow Condensed',sans-serif;font-size:.88rem;vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
+.new-row td{border-left:3px solid var(--red);}
+.amt{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;color:var(--teal);}
+.sbadge{display:inline-flex;align-items:center;gap:4px;font-family:'Bebas Neue',sans-serif;font-size:.72rem;letter-spacing:1.5px;padding:4px 9px;border-radius:20px;}
+.s-new{background:rgba(255,71,87,.15);color:#ff4757;border:1px solid rgba(255,71,87,.3);}
+.s-preparing{background:rgba(255,212,59,.15);color:#ffd43b;border:1px solid rgba(255,212,59,.3);}
+.s-ready{background:rgba(31,149,120,.15);color:var(--teal);border:1px solid rgba(31,149,120,.3);}
+.s-done{background:rgba(255,255,255,.05);color:var(--muted);border:1px solid var(--border);}
+.s-cancelled{background:rgba(120,120,120,.1);color:#666;border:1px solid rgba(120,120,120,.2);}
+.empty-state{text-align:center;padding:56px 20px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:1rem;letter-spacing:1px;}
+.empty-icon{font-size:2.8rem;display:block;margin-bottom:12px;}
+.dash-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;}
+.top-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.top-item:last-child{border-bottom:none;}
+.ti-emoji{font-size:1.4rem;flex-shrink:0;}
+.ti-info{flex:1;}
+.ti-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.86rem;text-transform:uppercase;color:var(--text);}
+.ti-bar-wrap{height:3px;background:rgba(255,255,255,.06);border-radius:2px;margin-top:5px;}
+.ti-bar{height:100%;background:linear-gradient(90deg,var(--green),var(--teal));border-radius:2px;}
+.ti-count{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--teal);flex-shrink:0;}
+.chart-wrap{display:flex;align-items:flex-end;gap:6px;height:110px;padding:0 4px;}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;}
+.bar{width:100%;background:linear-gradient(to top,var(--green),var(--teal));border-radius:4px 4px 0 0;min-height:3px;transition:height .5s ease;}
+.bar-lbl{font-family:'Barlow Condensed',sans-serif;font-size:.62rem;color:var(--muted);text-align:center;letter-spacing:1px;}
+.modal-bg{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s;}
+.modal-bg.open{opacity:1;pointer-events:all;}
+.modal{background:var(--dark3);border:1px solid var(--border);border-radius:16px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;transform:scale(.95);transition:transform .25s;}
+.modal-bg.open .modal{transform:scale(1);}
+.mh{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;}
+.mh-title{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:3px;}
+.mh-sub{font-family:'Barlow Condensed',sans-serif;font-size:.75rem;color:var(--muted);letter-spacing:2px;margin-top:3px;}
+.mc{color:var(--text);background:rgba(255,255,255,.08);border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:.95rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.mbody{padding:18px 22px;}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
+.meta-item .ml{font-family:'Barlow Condensed',sans-serif;font-size:.63rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
+.meta-item .mv{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.92rem;color:var(--text);}
+.inv-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);font-family:'Barlow Condensed',sans-serif;}
+.inv-item:last-child{border-bottom:none;}
+.inv-item .in{font-size:.87rem;color:var(--text);}
+.inv-item .iq{font-size:.75rem;color:var(--muted);margin-left:6px;}
+.inv-item .ip{font-weight:700;font-size:.87rem;color:var(--teal);}
+.totals-box{background:rgba(0,0,0,.2);border-radius:8px;padding:13px 15px;margin-top:14px;}
+.tot-row{display:flex;justify-content:space-between;font-family:'Barlow Condensed',sans-serif;padding:5px 0;font-size:.86rem;}
+.tot-row .l{color:var(--muted);}
+.tot-row .v{font-weight:700;color:var(--text);}
+.tot-row.grand{border-top:1px solid var(--border);margin-top:6px;padding-top:10px;}
+.tot-row.grand .l{font-size:.95rem;color:var(--text);}
+.tot-row.grand .v{font-size:1.05rem;color:var(--teal);}
+.status-sel{background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:.88rem;padding:7px 11px;border-radius:6px;outline:none;cursor:pointer;width:100%;}
+.mfoot{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:9px;flex-wrap:wrap;}
+.btn-pri{flex:1;padding:10px 16px;background:var(--green);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:2px;border:none;border-radius:8px;cursor:pointer;transition:background .2s;}
+.btn-pri:hover{background:var(--green2);}
+.btn-dng{padding:10px 14px;background:rgba(255,71,87,.12);color:var(--red);font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:2px;border:1px solid rgba(255,71,87,.3);border-radius:8px;cursor:pointer;}
+.btn-dng:hover{background:rgba(255,71,87,.22);}
+.btn-ghost{padding:10px 14px;background:transparent;color:var(--muted);font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:2px;border:1px solid var(--border);border-radius:8px;cursor:pointer;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a2420;border:1px solid rgba(31,149,120,.4);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:.9rem;letter-spacing:1px;padding:12px 22px;border-radius:10px;z-index:900;transition:transform .3s;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+@media(max-width:900px){:root{--sw:0px;}.sidebar{transform:translateX(-220px);width:220px;}.sidebar.open{transform:translateX(0);}.main{margin-left:0;}.sb-toggle{display:flex;}.stats-grid{grid-template-columns:repeat(2,1fr);}.dash-cols{grid-template-columns:1fr;}.content{padding:14px;}.topbar{padding:14px 14px 14px 58px;}}
+@media(max-width:480px){.stats-grid{grid-template-columns:1fr 1fr;}}
+@media print{.sidebar,.topbar,.mfoot,.mc{display:none!important;}.main{margin-left:0;}.modal-bg{position:static;opacity:1;pointer-events:all;background:none;}.modal{max-height:none;border:none;}}
 </style>
 </head>
 <body>
-<div class="sidebar">
-  <div class="sb-brand">
-    <div class="sb-name">FAYRUZA</div>
-    <div class="sb-sub">Restaurant Admin</div>
-    <div class="live"><span class="dot"></span>LIVE</div>
-  </div>
-  <div class="nav">
-    <div class="nav-lbl">Main</div>
-    <div class="ni active" onclick="showPage('dashboard',this)"><span class="ni-icon">📊</span><span class="nl">Dashboard</span></div>
-    <div class="ni" onclick="showPage('orders',this)"><span class="ni-icon">🧾</span><span class="nl">Orders</span><span class="nbadge" id="pbadge" style="display:none">0</span></div>
-    <div class="ni" onclick="showPage('invoices',this)"><span class="ni-icon">📄</span><span class="nl">Invoices</span></div>
+
+<button class="sb-toggle" id="sb-toggle" onclick="toggleSidebar()">☰</button>
+
+<nav class="sidebar" id="sidebar">
+  <div class="sb-brand"><div class="name">FAYRUZA</div><div class="sub">Admin Panel</div></div>
+  <div class="sb-nav">
+    <div class="sb-sec">MAIN</div>
+    <button class="nb active" onclick="showPage('dashboard',this)"><span class="ic">📊</span> Dashboard</button>
+    <button class="nb" onclick="showPage('orders',this)"><span class="ic">📋</span> Orders<span class="bdg" id="new-badge" style="display:none">0</span></button>
+    <div class="sb-sec">REPORTS</div>
+    <button class="nb" onclick="showPage('analytics',this)"><span class="ic">📈</span> Analytics</button>
+    <div class="sb-sec">SITE</div>
+    <a href="index.html" class="nb"><span class="ic">🍔</span> View Menu</a>
   </div>
   <div class="sb-foot">
-    <a href="index.html" class="sb-link">🍔 Menu Website</a>
-    <a href="checkout.html" class="sb-link">🛒 New Order</a>
+    <div class="sb-clock" id="sb-clock">--:--:--</div>
+    <div><span class="live-dot"></span>Live · Jabriya</div>
   </div>
-</div>
+</nav>
+
 <div class="main">
   <div class="topbar">
-    <div class="topbar-title" id="ptitle">DASHBOARD</div>
-    <div class="tr">
-      <div class="tdate" id="tdate"></div>
-      <button class="rbtn" onclick="loadAll()">↻ REFRESH</button>
+    <div class="tb-title" id="page-title">DASHBOARD</div>
+    <div class="tb-right">
+      <div class="tb-time" id="tb-time"></div>
+      <a href="index.html" class="tb-link">🍔 MENU SITE</a>
     </div>
   </div>
   <div class="content">
-    <!-- DASHBOARD -->
+
     <div class="page active" id="page-dashboard">
-      <div class="kpi-grid">
-        <div class="kpi"><span class="kpi-ico">🧾</span><div class="kpi-lbl">Total Orders</div><div class="kpi-val" id="k1">0</div><div class="kpi-sub">All time</div></div>
-        <div class="kpi"><span class="kpi-ico">💰</span><div class="kpi-lbl">Revenue</div><div class="kpi-val" id="k2">—</div><div class="kpi-sub">Completed orders</div></div>
-        <div class="kpi"><span class="kpi-ico">⏳</span><div class="kpi-lbl">Pending</div><div class="kpi-val" id="k3">0</div><div class="kpi-sub">Need attention</div></div>
-        <div class="kpi"><span class="kpi-ico">📦</span><div class="kpi-lbl">Avg Order</div><div class="kpi-val" id="k4">—</div><div class="kpi-sub">Per order</div></div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon">📋</div><div class="stat-lbl">Today's Orders</div><div class="stat-val" id="s-orders">–</div><div class="stat-sub">All types</div></div>
+        <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-lbl">Today's Revenue</div><div class="stat-val" id="s-revenue">–</div><div class="stat-sub">Completed only</div></div>
+        <div class="stat-card"><div class="stat-icon">⏳</div><div class="stat-lbl">Pending</div><div class="stat-val" id="s-pending">–</div><div class="stat-sub">New + Preparing</div></div>
+        <div class="stat-card"><div class="stat-icon">🧾</div><div class="stat-lbl">Avg Order</div><div class="stat-val" id="s-avg">–</div><div class="stat-sub">Per order value</div></div>
       </div>
-      <div class="dgrid">
+      <div class="dash-cols">
         <div class="panel">
-          <div class="ph"><div class="pt">RECENT ORDERS</div><span class="pa" onclick="showPage('orders',document.querySelectorAll('.ni')[1])">View All →</span></div>
-          <div class="pb"><table class="ot"><thead><tr><th>ORDER</th><th>TYPE</th><th>ITEMS</th><th>TOTAL</th><th>STATUS</th></tr></thead><tbody id="dtbody"><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px">No orders yet</td></tr></tbody></table></div>
+          <div class="ph"><div class="ph-title">RECENT ORDERS</div><button class="btn-refresh" onclick="loadAll()">↻ REFRESH</button></div>
+          <div class="tbl-wrap"><table><thead><tr><th>ORDER</th><th>ITEMS</th><th>TOTAL</th><th>STATUS</th></tr></thead><tbody id="recent-tbody"></tbody></table></div>
         </div>
         <div class="panel">
-          <div class="ph"><div class="pt">TOP ITEMS</div></div>
-          <div class="pb" id="topitems"><div style="text-align:center;padding:24px;color:var(--muted);font-size:0.85rem">No data yet</div></div>
+          <div class="ph"><div class="ph-title">TOP SELLING</div></div>
+          <div style="padding:12px 18px" id="top-items"></div>
         </div>
+      </div>
+      <div class="panel">
+        <div class="ph"><div class="ph-title">ORDERS TODAY — HOURLY</div></div>
+        <div style="padding:18px 18px 10px"><div class="chart-wrap" id="hourly-chart"></div></div>
       </div>
     </div>
-    <!-- ORDERS -->
+
     <div class="page" id="page-orders">
-      <div class="orders-fb">
-        <button class="fb active" onclick="filt('all',this)">ALL</button>
-        <button class="fb" onclick="filt('pending',this)">PENDING</button>
-        <button class="fb" onclick="filt('preparing',this)">PREPARING</button>
-        <button class="fb" onclick="filt('ready',this)">READY</button>
-        <button class="fb" onclick="filt('completed',this)">COMPLETED</button>
-        <input type="text" class="si" id="osearch" placeholder="🔍 Search..." oninput="renderOrders()">
+      <div class="panel">
+        <div class="ph">
+          <div class="ph-title">ALL ORDERS</div>
+          <div class="ph-actions">
+            <input class="search-inp" id="order-search" placeholder="Search…" oninput="renderOrdersTable()">
+            <button class="btn-filter active" onclick="setFilter('all',this)">ALL</button>
+            <button class="btn-filter" onclick="setFilter('new',this)">NEW</button>
+            <button class="btn-filter" onclick="setFilter('preparing',this)">PREP</button>
+            <button class="btn-filter" onclick="setFilter('ready',this)">READY</button>
+            <button class="btn-filter" onclick="setFilter('done',this)">DONE</button>
+            <button class="btn-refresh" onclick="loadAll()">↻</button>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table><thead><tr><th>ORDER ID</th><th>TIME</th><th>CUSTOMER</th><th>TYPE</th><th>ITEMS</th><th>TOTAL</th><th>PAYMENT</th><th>STATUS</th></tr></thead>
+          <tbody id="orders-tbody"></tbody></table>
+        </div>
+        <div id="orders-empty" class="empty-state" style="display:none"><span class="empty-icon">📋</span>No orders yet. They'll appear here in real-time.</div>
       </div>
-      <div id="ocards"><div class="empty"><div class="empty-ico">🧾</div><div class="empty-msg">No orders yet</div></div></div>
     </div>
-    <!-- INVOICES -->
-    <div class="page" id="page-invoices">
-      <div class="inv-list" id="invlist"><div class="empty"><div class="empty-ico">📄</div><div class="empty-msg">No invoices yet</div></div></div>
+
+    <div class="page" id="page-analytics">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-bottom:18px" id="an-stats"></div>
+      <div class="panel"><div class="ph"><div class="ph-title">ORDER HISTORY</div></div><div style="padding:14px 18px" id="an-body"></div></div>
     </div>
+
   </div>
 </div>
-<div id="inv-modal">
-  <div class="ip">
-    <button class="iclose" onclick="closeInv()">✕</button>
-    <div id="inv-inner"></div>
-    <button class="pbtn" onclick="window.print()">🖨️ PRINT INVOICE</button>
+
+<div class="modal-bg" id="order-modal">
+  <div class="modal">
+    <div class="mh"><div><div class="mh-title" id="m-oid"></div><div class="mh-sub" id="m-time"></div></div><button class="mc" onclick="closeModal()">✕</button></div>
+    <div class="mbody" id="m-body"></div>
+    <div class="mfoot" id="m-foot"></div>
   </div>
 </div>
+
+<div class="toast" id="toast"></div>
+
 <script>
-let orders=[], cf='all';
-function fp(v){if(!v||v<=0)return'0 Fils';if(v<1)return Math.round(v*1000)+' Fils';return v.toFixed(3)+' KD';}
-function fd(s){const d=new Date(s);return d.toLocaleDateString('en-KW',{day:'2-digit',month:'short'})+' '+d.toLocaleTimeString('en-KW',{hour:'2-digit',minute:'2-digit'});}
-function fdl(s){return new Date(s).toLocaleString('en-KW',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});}
-function tl(t){return{dinein:'🪑 Dine In',takeaway:'🛍️ Takeaway',delivery:'🛵 Delivery'}[t]||t;}
-function pl(p){return{cash:'💵 Cash',knet:'💳 KNET',card:'🏦 Credit'}[p]||p;}
-function sc(s){return{pending:'sp',preparing:'sg',ready:'sr',completed:'sc',cancelled:'sx'}[s]||'sp';}
-function loadAll(){
-  orders=JSON.parse(localStorage.getItem('fayruza_orders')||'[]');
-  renderDash(); renderOrders(); renderInvoices();
-  const p=orders.filter(o=>o.status==='pending').length;
-  const b=document.getElementById('pbadge');
-  b.textContent=p; b.style.display=p>0?'flex':'none';
+const SB_URL = 'https://zbsdmtjtypzfqrjuvpts.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpic2RtdGp0eXB6ZnFyanV2cHRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyNTQ2ODcsImV4cCI6MjA4OTgzMDY4N30.qeoSk8L7SQbsKetUEbm5Koe0iIIVlkhKkaaUG9qVrxo';
+const sb = supabase.createClient(SB_URL, SB_KEY);
+
+let allOrders = [];
+let currentFilter = 'all';
+let currentOrderId = null;
+
+function fmt(kd) {
+  if (!kd || kd === 0) return '0 Fils';
+  if (kd < 1) return Math.round(kd * 1000) + ' Fils';
+  return Number(kd).toFixed(3) + ' KD';
 }
-function renderDash(){
-  const comp=orders.filter(o=>o.status==='completed');
-  const rev=comp.reduce((s,o)=>s+o.total,0);
-  const avg=orders.length?orders.reduce((s,o)=>s+o.total,0)/orders.length:0;
-  document.getElementById('k1').textContent=orders.length;
-  document.getElementById('k2').textContent=fp(rev);
-  document.getElementById('k3').textContent=orders.filter(o=>o.status==='pending').length;
-  document.getElementById('k4').textContent=fp(avg);
-  const tb=document.getElementById('dtbody');
-  if(!orders.length){tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px">No orders yet</td></tr>';return;}
-  tb.innerHTML=orders.slice(0,8).map(o=>`<tr>
-    <td style="font-family:'Bebas Neue',sans-serif;color:var(--yellow);letter-spacing:1px">${o.number}</td>
-    <td style="font-size:0.85rem;color:var(--muted)">${tl(o.orderType)}</td>
-    <td style="color:var(--muted);font-size:0.8rem">${o.items.reduce((s,i)=>s+i.qty,0)} items</td>
-    <td style="font-family:'Bebas Neue',sans-serif">${fp(o.total)}</td>
-    <td><span class="sb ${sc(o.status)}">${o.status.toUpperCase()}</span></td>
-  </tr>`).join('');
-  const ic={};
-  orders.forEach(o=>o.items.forEach(i=>{if(!ic[i.name])ic[i.name]={name:i.name,emoji:i.emoji,c:0};ic[i.name].c+=i.qty;}));
-  const top=Object.values(ic).sort((a,b)=>b.c-a.c).slice(0,7);
-  document.getElementById('topitems').innerHTML=top.length?top.map(i=>`<div class="ti"><span style="font-size:1.3rem">${i.emoji}</span><span style="flex:1;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.88rem;text-transform:uppercase">${i.name}</span><span style="font-family:'Bebas Neue',sans-serif;color:var(--yellow)">x${i.c}</span></div>`).join(''):'<div style="text-align:center;padding:24px;color:var(--muted);font-size:0.85rem">No items yet</div>';
+function fmtTime(ts) { return ts ? new Date(ts).toLocaleTimeString('en-KW',{hour:'2-digit',minute:'2-digit'}) : '—'; }
+function fmtDate(ts) { return ts ? new Date(ts).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—'; }
+function isToday(ts) { return new Date(ts).toDateString() === new Date().toDateString(); }
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
 }
-function filt(f,btn){
-  cf=f;
-  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('active'));
+
+async function loadAll() {
+  try {
+    const { data, error } = await sb.from('orders').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    allOrders = data || [];
+    renderAll();
+  } catch(e) { showToast('⚠ Load error: ' + e.message); }
+}
+
+function renderAll() {
+  renderStats(); renderRecentOrders(); renderTopItems(); renderHourlyChart();
+  const active = document.querySelector('.page.active')?.id;
+  if (active === 'page-orders') renderOrdersTable();
+  if (active === 'page-analytics') renderAnalytics();
+  const nc = allOrders.filter(o => o.status === 'new').length;
+  const badge = document.getElementById('new-badge');
+  badge.style.display = nc > 0 ? 'flex' : 'none';
+  badge.textContent = nc;
+}
+
+function subscribeRealtime() {
+  sb.channel('orders-rt')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
+      showToast('🔔 New activity — refreshing…');
+      loadAll();
+    })
+    .subscribe();
+}
+
+function renderStats() {
+  const today = allOrders.filter(o => isToday(o.created_at));
+  const done = today.filter(o => o.status === 'done');
+  const pending = today.filter(o => o.status === 'new' || o.status === 'preparing');
+  const revenue = done.reduce((s,o) => s + (o.total||0), 0);
+  const avg = today.length ? today.reduce((s,o) => s + (o.total||0), 0) / today.length : 0;
+  document.getElementById('s-orders').textContent = today.length;
+  document.getElementById('s-revenue').textContent = fmt(revenue);
+  document.getElementById('s-pending').textContent = pending.length;
+  document.getElementById('s-avg').textContent = fmt(avg);
+}
+
+function renderRecentOrders() {
+  const tbody = document.getElementById('recent-tbody');
+  if (!tbody) return;
+  const recent = allOrders.slice(0, 8);
+  if (!recent.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:28px">No orders yet</td></tr>'; return; }
+  tbody.innerHTML = recent.map(o => `
+    <tr class="${o.status==='new'?'new-row':''}" onclick="openOrder('${o.id}')">
+      <td><span style="font-family:'Bebas Neue';letter-spacing:1px">${o.order_id||o.id}</span><br><span style="font-size:.7rem;color:var(--muted)">${fmtTime(o.created_at)}</span></td>
+      <td>${(o.items||[]).length} item${(o.items||[]).length!==1?'s':''}</td>
+      <td class="amt">${fmt(o.total)}</td>
+      <td><span class="sbadge s-${o.status}">${(o.status||'').toUpperCase()}</span></td>
+    </tr>`).join('');
+}
+
+function renderTopItems() {
+  const counts = {};
+  allOrders.forEach(o => (o.items||[]).forEach(i => {
+    const k = (i.emoji||'') + ' ' + (i.name||'');
+    counts[k] = (counts[k]||0) + (i.qty||1);
+  }));
+  const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0,6);
+  const max = sorted[0]?.[1]||1;
+  const el = document.getElementById('top-items');
+  if (!el) return;
+  if (!sorted.length) { el.innerHTML = '<div style="color:var(--muted);font-family:\'Barlow Condensed\';font-size:.9rem;text-align:center;padding:20px">No data yet</div>'; return; }
+  el.innerHTML = sorted.map(([k, count]) => {
+    const [emoji, ...rest] = k.split(' ');
+    return `<div class="top-item"><span class="ti-emoji">${emoji}</span><div class="ti-info"><div class="ti-name">${rest.join(' ')}</div><div class="ti-bar-wrap"><div class="ti-bar" style="width:${Math.round(count/max*100)}%"></div></div></div><span class="ti-count">×${count}</span></div>`;
+  }).join('');
+}
+
+function renderHourlyChart() {
+  const todayO = allOrders.filter(o => isToday(o.created_at));
+  const hours = Array(24).fill(0);
+  todayO.forEach(o => { hours[new Date(o.created_at).getHours()]++; });
+  const now = new Date().getHours();
+  const slots = [];
+  for (let h = Math.max(0,now-7); h <= now; h++) slots.push(h);
+  const maxH = Math.max(...slots.map(h => hours[h]), 1);
+  const el = document.getElementById('hourly-chart');
+  if (!el) return;
+  el.innerHTML = slots.map(h => `<div class="bar-col"><div class="bar" style="height:${Math.round(hours[h]/maxH*100)}%"></div><div class="bar-lbl">${h}:00<br><strong style="color:var(--teal)">${hours[h]||''}</strong></div></div>`).join('');
+}
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  renderOrders();
+  renderOrdersTable();
 }
-function renderOrders(){
-  const q=(document.getElementById('osearch')?.value||'').toLowerCase();
-  let fl=orders;
-  if(cf!=='all')fl=fl.filter(o=>o.status===cf);
-  if(q)fl=fl.filter(o=>o.number.toLowerCase().includes(q)||o.items.some(i=>i.name.toLowerCase().includes(q)));
-  const c=document.getElementById('ocards');
-  if(!fl.length){c.innerHTML=`<div class="empty"><div class="empty-ico">🔍</div><div class="empty-msg">${!orders.length?'No orders yet':'No matches'}</div></div>`;return;}
-  c.innerHTML=fl.map(o=>`<div class="oc">
-    <div class="och" onclick="tog('${o.id}')">
-      <span class="on">${o.number}</span>
-      <span class="sb ${sc(o.status)}">${o.status.toUpperCase()}</span>
-      <span style="font-size:0.9rem">${tl(o.orderType)}</span>
-      ${o.tableNum?`<span style="font-size:0.78rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif">T${o.tableNum}</span>`:''}
-      <span class="ot2">${fd(o.timestamp)}</span>
-      <span class="otot">${fp(o.total)}</span>
-      <span class="exp" id="exp-${o.id}">▼</span>
-    </div>
-    <div class="ocb" id="body-${o.id}">
-      <div style="margin-bottom:12px">${o.items.map(i=>`<div class="oir"><span style="font-size:1.1rem">${i.emoji}</span><span class="oin">${i.name}</span><span style="color:var(--muted);font-size:0.82rem">x${i.qty}</span><span class="oip">${fp(i.price*i.qty)}</span></div>`).join('')}</div>
-      <div class="ometa">
-        <span>Payment: <strong>${pl(o.payMethod)}</strong></span>
-        ${o.discount>0?`<span>Discount: <strong>- ${fp(o.discount)}</strong></span>`:''}
-        <span>Subtotal: <strong>${fp(o.subtotal)}</strong></span>
-        <span>Total: <strong>${fp(o.total)}</strong></span>
+
+function renderOrdersTable() {
+  const search = (document.getElementById('order-search')?.value||'').toLowerCase();
+  let orders = [...allOrders];
+  if (currentFilter !== 'all') orders = orders.filter(o => o.status === currentFilter);
+  if (search) orders = orders.filter(o =>
+    (o.order_id||'').toLowerCase().includes(search) ||
+    (o.customer_name||'').toLowerCase().includes(search) ||
+    (o.table_number||'').toLowerCase().includes(search)
+  );
+  const tbody = document.getElementById('orders-tbody');
+  const empty = document.getElementById('orders-empty');
+  if (!tbody) return;
+  if (!orders.length) { tbody.innerHTML = ''; if (empty) empty.style.display = 'block'; return; }
+  if (empty) empty.style.display = 'none';
+  const payL = {cash:'💵 Cash',knet:'💳 KNET',card:'💳 Card'};
+  const typeL = {dinein:'🍽 Dine-In',takeaway:'🥡 Takeaway',delivery:'🚴 Delivery'};
+  tbody.innerHTML = orders.map(o => `
+    <tr class="${o.status==='new'?'new-row':''}" onclick="openOrder('${o.id}')">
+      <td><span style="font-family:'Bebas Neue';letter-spacing:1px">${o.order_id||o.id}</span></td>
+      <td style="font-size:.78rem;color:var(--muted)">${fmtDate(o.created_at)}<br>${fmtTime(o.created_at)}</td>
+      <td>${o.customer_name||'<span style="color:var(--muted)">—</span>'}</td>
+      <td style="font-size:.78rem;color:var(--muted)">${typeL[o.order_type]||o.order_type||'—'}${o.table_number?' · T'+o.table_number:''}</td>
+      <td>${(o.items||[]).length} items</td>
+      <td class="amt">${fmt(o.total)}</td>
+      <td style="font-size:.78rem;color:var(--muted)">${payL[o.payment_method]||o.payment_method||'—'}</td>
+      <td><span class="sbadge s-${o.status}">${(o.status||'').toUpperCase()}</span></td>
+    </tr>`).join('');
+}
+
+function openOrder(id) {
+  const order = allOrders.find(o => String(o.id) === String(id));
+  if (!order) return;
+  currentOrderId = id;
+  document.getElementById('m-oid').textContent = order.order_id || order.id;
+  document.getElementById('m-time').textContent = fmtDate(order.created_at) + ' · ' + fmtTime(order.created_at);
+  const payL = {cash:'Cash',knet:'KNET',card:'Credit Card'};
+  const typeL = {dinein:'Dine In',takeaway:'Takeaway',delivery:'Delivery'};
+  document.getElementById('m-body').innerHTML = `
+    <div class="meta-grid">
+      <div class="meta-item"><div class="ml">Customer</div><div class="mv">${order.customer_name||'—'}</div></div>
+      <div class="meta-item"><div class="ml">Type</div><div class="mv">${typeL[order.order_type]||order.order_type||'—'}${order.table_number?' · Table '+order.table_number:''}</div></div>
+      <div class="meta-item"><div class="ml">Payment</div><div class="mv">${payL[order.payment_method]||order.payment_method||'—'}</div></div>
+      <div class="meta-item"><div class="ml">Status</div>
+        <select class="status-sel" onchange="updateStatus(this.value)">
+          ${['new','preparing','ready','done','cancelled'].map(s => `<option value="${s}" ${order.status===s?'selected':''}>${s.toUpperCase()}</option>`).join('')}
+        </select>
       </div>
-      ${o.notes?`<div class="onotes">📝 ${o.notes}</div>`:''}
-      <div class="sa">
-        <button class="sab sap ${o.status==='pending'?'cur':''}" onclick="setS('${o.id}','pending')">PENDING</button>
-        <button class="sab sag ${o.status==='preparing'?'cur':''}" onclick="setS('${o.id}','preparing')">PREPARING</button>
-        <button class="sab sar ${o.status==='ready'?'cur':''}" onclick="setS('${o.id}','ready')">READY</button>
-        <button class="sab sac ${o.status==='completed'?'cur':''}" onclick="setS('${o.id}','completed')">COMPLETED</button>
-        <button class="sab sax ${o.status==='cancelled'?'cur':''}" onclick="setS('${o.id}','cancelled')">CANCEL</button>
-        <button class="sab sai" onclick="viewInv('${o.id}')">🖨️ INVOICE</button>
-      </div>
+      ${order.notes?`<div class="meta-item" style="grid-column:1/-1"><div class="ml">Notes</div><div class="mv" style="color:var(--teal)">${order.notes}</div></div>`:''}
     </div>
-  </div>`).join('');
+    <div>${(order.items||[]).map(i => `<div class="inv-item"><span>${i.emoji||''} <span class="in">${i.name}${i.size?' ('+i.size+')':''}</span><span class="iq">×${i.qty}</span></span><span class="ip">${fmt((i.price||0)*(i.qty||1))}</span></div>`).join('')}</div>
+    <div class="totals-box">
+      <div class="tot-row"><span class="l">Subtotal</span><span class="v">${fmt(order.subtotal)}</span></div>
+      ${(order.discount_amt>0)?`<div class="tot-row"><span class="l">Discount</span><span class="v" style="color:var(--red)">– ${fmt(order.discount_amt)}</span></div>`:''}
+      <div class="tot-row"><span class="l">Tax</span><span class="v">—</span></div>
+      <div class="tot-row grand"><span class="l">TOTAL</span><span class="v">${fmt(order.total)}</span></div>
+    </div>`;
+  document.getElementById('m-foot').innerHTML = `
+    <button class="btn-pri" onclick="window.print()">🖨 PRINT</button>
+    <button class="btn-ghost" onclick="closeModal()">CLOSE</button>
+    <button class="btn-dng" onclick="deleteOrder('${order.id}')">🗑 DELETE</button>`;
+  document.getElementById('order-modal').classList.add('open');
 }
-function tog(id){
-  document.getElementById('body-'+id).classList.toggle('open');
-  document.getElementById('exp-'+id).classList.toggle('open');
+
+async function updateStatus(newStatus) {
+  if (!currentOrderId) return;
+  try {
+    const { error } = await sb.from('orders').update({ status: newStatus }).eq('id', currentOrderId);
+    if (error) throw error;
+    showToast('✓ Status → ' + newStatus.toUpperCase());
+    await loadAll();
+  } catch(e) { showToast('⚠ ' + e.message); }
 }
-function setS(id,status){
-  const i=orders.findIndex(o=>o.id===id);if(i===-1)return;
-  orders[i].status=status;
-  localStorage.setItem('fayruza_orders',JSON.stringify(orders));
-  renderOrders(); renderDash();
-  const p=orders.filter(o=>o.status==='pending').length;
-  const b=document.getElementById('pbadge');
-  b.textContent=p; b.style.display=p>0?'flex':'none';
+
+async function deleteOrder(id) {
+  if (!confirm('Delete this order?')) return;
+  try {
+    const { error } = await sb.from('orders').delete().eq('id', id);
+    if (error) throw error;
+    closeModal(); showToast('🗑 Deleted'); await loadAll();
+  } catch(e) { showToast('⚠ ' + e.message); }
 }
-function renderInvoices(){
-  const c=document.getElementById('invlist');
-  if(!orders.length){c.innerHTML='<div class="empty"><div class="empty-ico">📄</div><div class="empty-msg">No invoices yet</div></div>';return;}
-  c.innerHTML=orders.map(o=>`<div class="ir" onclick="viewInv('${o.id}')">
-    <span class="inum">INV-${o.id}</span>
-    <span class="sb ${sc(o.status)}">${o.status.toUpperCase()}</span>
-    <span class="idate">${fdl(o.timestamp)}</span>
-    <span style="font-family:'Barlow Condensed',sans-serif;font-size:0.82rem;color:var(--muted)">${o.items.reduce((s,i)=>s+i.qty,0)} items</span>
-    <span class="itot">${fp(o.total)}</span>
-    <button class="ipbtn" onclick="event.stopPropagation();viewInv('${o.id}')">🖨️ PRINT</button>
-  </div>`).join('');
-}
-function viewInv(id){
-  const o=orders.find(o=>o.id===id);if(!o)return;
-  document.getElementById('inv-inner').innerHTML=`
-    <div class="ih"><div class="ibrand">FAYRUZA RESTAURANT</div><div class="iaddr">Jabriya · Block 12 · Jamia Branch, Kuwait</div></div>
-    <div class="img">
-      <div><div class="imk">Invoice</div><div class="imv">INV-${o.id}</div></div>
-      <div><div class="imk">Order</div><div class="imv">${o.number}</div></div>
-      <div><div class="imk">Date</div><div class="imv">${fdl(o.timestamp)}</div></div>
-      <div><div class="imk">Type</div><div class="imv">${tl(o.orderType)}</div></div>
-      ${o.tableNum?`<div><div class="imk">Table</div><div class="imv">${o.tableNum}</div></div>`:''}
-      <div><div class="imk">Payment</div><div class="imv">${pl(o.payMethod)}</div></div>
+
+function closeModal() { document.getElementById('order-modal').classList.remove('open'); currentOrderId = null; }
+
+function renderAnalytics() {
+  const revenue = allOrders.filter(o=>o.status==='done').reduce((s,o)=>s+(o.total||0),0);
+  const avg = allOrders.length ? allOrders.reduce((s,o)=>s+(o.total||0),0)/allOrders.length : 0;
+  document.getElementById('an-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-icon">📋</div><div class="stat-lbl">Total Orders</div><div class="stat-val">${allOrders.length}</div></div>
+    <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-lbl">Total Revenue</div><div class="stat-val">${fmt(revenue)}</div></div>
+    <div class="stat-card"><div class="stat-icon">📊</div><div class="stat-lbl">Avg Order</div><div class="stat-val">${fmt(avg)}</div></div>`;
+  const sc = {new:0,preparing:0,ready:0,done:0,cancelled:0};
+  allOrders.forEach(o => { if(sc[o.status]!==undefined) sc[o.status]++; });
+  document.getElementById('an-body').innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-bottom:18px">
+      ${Object.entries(sc).map(([s,c]) => `<div style="text-align:center;padding:11px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid var(--border)"><div class="sbadge s-${s}" style="display:inline-flex;margin-bottom:7px">${s.toUpperCase()}</div><div style="font-family:'Bebas Neue';font-size:1.7rem">${c}</div></div>`).join('')}
     </div>
-    <table class="iit"><thead><tr><th>ITEM</th><th>QTY</th><th>PRICE</th><th>TOTAL</th></tr></thead><tbody>
-      ${o.items.map(i=>`<tr><td>${i.emoji} ${i.name}</td><td style="color:#888">x${i.qty}</td><td style="color:#888">${fp(i.price)}</td><td>${fp(i.price*i.qty)}</td></tr>`).join('')}
-    </tbody></table>
-    <div class="itots">
-      <div class="itr"><span>Subtotal</span><span>${fp(o.subtotal)}</span></div>
-      ${o.discount>0?`<div class="itr" style="color:green"><span>Discount</span><span>- ${fp(o.discount)}</span></div>`:''}
-      <div class="itr"><span>Taxes (0%)</span><span>0 Fils</span></div>
-      <div class="itr grand"><span>TOTAL</span><span>${fp(o.total)}</span></div>
-    </div>
-    ${o.notes?`<div style="margin-top:14px;padding:10px;background:#f9f9f9;border-radius:6px;font-size:0.82rem;color:#666"><strong>Notes:</strong> ${o.notes}</div>`:''}
-    <div class="ifoo">Thank you for dining at Fayruza Restaurant!<br>Jabriya · Block 12 · Jamia Branch</div>`;
-  document.getElementById('inv-modal').classList.add('open');
+    ${allOrders.slice(0,30).map(o => `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);font-family:'Barlow Condensed';gap:8px;flex-wrap:wrap"><span style="font-size:.8rem;color:var(--muted)">${fmtDate(o.created_at)} ${fmtTime(o.created_at)}</span><span style="font-size:.82rem">${o.order_id||o.id}</span><span class="sbadge s-${o.status}" style="font-size:.62rem">${(o.status||'').toUpperCase()}</span><span style="font-family:'Bebas Neue';color:var(--teal)">${fmt(o.total)}</span></div>`).join('')||'<div style="text-align:center;padding:28px;color:var(--muted)">No orders yet</div>'}`;
 }
-function closeInv(){document.getElementById('inv-modal').classList.remove('open');}
-function showPage(id,el){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
-  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
-  if(el)el.classList.add('active');
-  document.getElementById('ptitle').textContent={dashboard:'DASHBOARD',orders:'ORDERS',invoices:'INVOICES'}[id]||id.toUpperCase();
+
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  btn.classList.add('active');
+  const titles = {dashboard:'DASHBOARD',orders:'ORDERS',analytics:'ANALYTICS'};
+  document.getElementById('page-title').textContent = titles[name]||name.toUpperCase();
+  if (name==='orders') renderOrdersTable();
+  if (name==='analytics') renderAnalytics();
+  closeSidebarMobile();
 }
-function updateDate(){document.getElementById('tdate').textContent=new Date().toLocaleString('en-KW',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});}
-loadAll(); updateDate();
-setInterval(updateDate,60000); setInterval(loadAll,30000);
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+function closeSidebarMobile() { if(window.innerWidth<900) document.getElementById('sidebar').classList.remove('open'); }
+function updateClock() {
+  const now = new Date();
+  const t = now.toLocaleTimeString('en-KW',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const d = now.toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short'});
+  const sc = document.getElementById('sb-clock');
+  const tt = document.getElementById('tb-time');
+  if (sc) sc.textContent = t;
+  if (tt) tt.textContent = d + ' · ' + t;
+}
+
+loadAll();
+subscribeRealtime();
+updateClock();
+setInterval(updateClock, 1000);
+setInterval(loadAll, 30000);
 </script>
 </body>
 </html>

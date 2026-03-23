@@ -1415,36 +1415,69 @@ function coRecalc() {
     '<div class="co-total-line"><span class="tl">TAX</span><span class="tv">&mdash;</span></div>' +
     '<div class="co-total-line grand"><span class="tl">TOTAL</span><span class="tv">' + fmt(total) + '</span></div>';
 }
-function placeOrder() {
+// ══ SUPABASE CONFIG ══
+var SB_URL  = 'https://zbsdmtjtypzfqrjuvpts.supabase.co';
+var SB_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpic2RtdGp0eXB6ZnFyanV2cHRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyNTQ2ODcsImV4cCI6MjA4OTgzMDY4N30.qeoSk8L7SQbsKetUEbm5Koe0iIIVlkhKkaaUG9qVrxo';
+
+async function placeOrder() {
   if (cart.length === 0) return;
+
+  // Disable button to prevent double-tap
+  var btn = document.querySelector('.co-sticky-btn button');
+  if (btn) { btn.textContent = 'PLACING ORDER...'; btn.disabled = true; }
+
   var sub = cartTotal();
-  var dv = parseFloat(document.getElementById('co-disc') ? document.getElementById('co-disc').value : 0) || 0;
+  var dv = parseFloat((document.getElementById('co-disc') || {}).value) || 0;
   var da = discType === 'pct' ? sub * (dv / 100) : Math.min(dv, sub);
   var total = Math.max(0, sub - da);
   var oid = 'ORD-' + Date.now().toString().slice(-6);
-  var order = {
-    id: oid, timestamp: Date.now(),
-    items: cart.map(function(c) { return Object.assign({}, c); }),
-    subtotal: sub, discountAmt: da, discountType: discType, tax: 0, total: total,
-    paymentMethod: (document.getElementById('co-payment') || {}).value || 'cash',
-    orderType: (document.getElementById('co-type') || {}).value || 'dinein',
-    tableNumber: (document.getElementById('co-table') || {}).value || '',
-    customerName: (document.getElementById('co-name') || {}).value || '',
-    notes: (document.getElementById('co-notes') || {}).value || '',
-    status: 'new'
-  };
-  var existing = [];
-  try { existing = JSON.parse(localStorage.getItem('fayruza_orders') || '[]'); } catch(e) {}
-  existing.unshift(order);
-  localStorage.setItem('fayruza_orders', JSON.stringify(existing));
 
-  var cvId = document.getElementById('cv-id');
-  var cvTotal = document.getElementById('cv-total');
-  if (cvId) cvId.textContent = oid;
-  if (cvTotal) cvTotal.textContent = fmt(total);
-  document.getElementById('confirm-view').classList.add('open');
-  cart = []; updateFab();
+  var order = {
+    order_id:       oid,
+    items:          cart.map(function(c) { return Object.assign({}, c); }),
+    subtotal:       sub,
+    discount_amt:   da,
+    discount_type:  discType,
+    tax:            0,
+    total:          total,
+    payment_method: (document.getElementById('co-payment') || {}).value || 'cash',
+    order_type:     (document.getElementById('co-type') || {}).value || 'dinein',
+    table_number:   (document.getElementById('co-table') || {}).value || '',
+    customer_name:  (document.getElementById('co-name') || {}).value || '',
+    notes:          (document.getElementById('co-notes') || {}).value || '',
+    status:         'new'
+  };
+
+  try {
+    var res = await fetch(SB_URL + '/rest/v1/orders', {
+      method: 'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'apikey':        SB_KEY,
+        'Authorization': 'Bearer ' + SB_KEY,
+        'Prefer':        'return=minimal'
+      },
+      body: JSON.stringify(order)
+    });
+
+    if (!res.ok) {
+      var err = await res.text();
+      throw new Error(err);
+    }
+
+    var cvId = document.getElementById('cv-id');
+    var cvTotal = document.getElementById('cv-total');
+    if (cvId) cvId.textContent = oid;
+    if (cvTotal) cvTotal.textContent = fmt(total);
+    document.getElementById('confirm-view').classList.add('open');
+    cart = []; updateFab();
+
+  } catch(e) {
+    alert('Could not place order. Please try again.\n' + e.message);
+    if (btn) { btn.textContent = 'PLACE ORDER'; btn.disabled = false; }
+  }
 }
+
 function goBackToMenu() {
   document.getElementById('confirm-view').classList.remove('open');
   document.getElementById('checkout-view').classList.remove('open');
