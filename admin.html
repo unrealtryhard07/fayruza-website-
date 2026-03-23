@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fayruza Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--red:#1F9578;--orange:#167A62;--yellow:#4DC4A3;--dark:#0A0F0D;--dark2:#0D1410;--card:#141A17;--text:#EDF5F2;--muted:#7A9990;--border:rgba(77,196,163,0.12);--pending:#f59e0b;--preparing:#3b82f6;--ready:#8b5cf6;--completed:#10b981;--cancelled:#ef4444;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--dark2);color:var(--text);font-family:'Barlow',sans-serif;display:flex;}
+.sidebar{width:220px;background:var(--dark);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;height:100vh;overflow-y:auto;}
+.sb-brand{padding:22px 20px 16px;border-bottom:1px solid var(--border);}
+.sb-name{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:3px;background:linear-gradient(90deg,var(--red),var(--yellow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sb-sub{font-family:'Barlow Condensed',sans-serif;font-size:0.68rem;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-top:2px;}
+.live{display:inline-flex;align-items:center;gap:5px;font-size:0.65rem;letter-spacing:2px;color:var(--yellow);font-family:'Barlow Condensed',sans-serif;font-weight:700;margin-top:8px;}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--yellow);animation:pulse 1.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.nav{padding:14px 12px;}
+.nav-lbl{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.65rem;letter-spacing:4px;text-transform:uppercase;color:var(--muted);padding:0 8px;margin-bottom:6px;}
+.ni{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:background 0.15s;margin-bottom:2px;}
+.ni:hover{background:rgba(77,196,163,0.07);}
+.ni.active{background:rgba(31,149,120,0.2);}
+.ni.active .nl{color:var(--yellow);}
+.ni-icon{font-size:1rem;width:20px;text-align:center;}
+.nl{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:0.85rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);}
+.nbadge{margin-left:auto;background:var(--red);color:white;font-family:'Bebas Neue',sans-serif;font-size:0.7rem;min-width:20px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 5px;}
+.sb-foot{margin-top:auto;padding:14px 12px;border-top:1px solid var(--border);}
+.sb-link{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;color:var(--muted);text-decoration:none;transition:background 0.15s;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:0.78rem;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;}
+.sb-link:hover{background:rgba(255,255,255,0.05);color:var(--text);}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{background:var(--dark);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.topbar-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:4px;}
+.tr{display:flex;align-items:center;gap:12px;}
+.tdate{font-family:'Barlow Condensed',sans-serif;font-size:0.82rem;letter-spacing:2px;color:var(--muted);}
+.rbtn{background:rgba(77,196,163,0.1);border:1px solid var(--border);color:var(--yellow);padding:7px 14px;border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:0.8rem;letter-spacing:2px;cursor:pointer;transition:background 0.2s;}
+.rbtn:hover{background:rgba(77,196,163,0.18);}
+.content{flex:1;overflow-y:auto;padding:24px;}
+::-webkit-scrollbar{width:5px;} ::-webkit-scrollbar-track{background:var(--dark2);} ::-webkit-scrollbar-thumb{background:var(--orange);border-radius:3px;}
+.page{display:none;} .page.active{display:block;}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;position:relative;overflow:hidden;}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--red),var(--yellow));}
+.kpi-lbl{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.68rem;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+.kpi-val{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:1px;line-height:1;}
+.kpi-sub{font-size:0.78rem;color:var(--muted);margin-top:4px;font-family:'Barlow Condensed',sans-serif;}
+.kpi-ico{position:absolute;right:16px;top:18px;font-size:1.8rem;opacity:0.2;}
+.dgrid{display:grid;grid-template-columns:2fr 1fr;gap:16px;}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;}
+.ph{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.pt{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:3px;}
+.pa{font-family:'Barlow Condensed',sans-serif;font-size:0.75rem;letter-spacing:2px;color:var(--yellow);cursor:pointer;text-transform:uppercase;}
+.pb{padding:16px;}
+table.ot{width:100%;border-collapse:collapse;}
+.ot th{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);padding:0 10px 10px;text-align:left;border-bottom:1px solid var(--border);}
+.ot td{padding:11px 10px;border-bottom:1px solid rgba(255,255,255,0.03);font-size:0.88rem;}
+.ot tr:last-child td{border-bottom:none;}
+.ot tr:hover td{background:rgba(255,255,255,0.02);}
+.sb{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-family:'Bebas Neue',sans-serif;font-size:0.7rem;letter-spacing:1px;white-space:nowrap;}
+.sp{background:rgba(245,158,11,.15);color:var(--pending);border:1px solid rgba(245,158,11,.3);}
+.sg{background:rgba(59,130,246,.15);color:var(--preparing);border:1px solid rgba(59,130,246,.3);}
+.sr{background:rgba(139,92,246,.15);color:var(--ready);border:1px solid rgba(139,92,246,.3);}
+.sc{background:rgba(16,185,129,.15);color:var(--completed);border:1px solid rgba(16,185,129,.3);}
+.sx{background:rgba(239,68,68,.15);color:var(--cancelled);border:1px solid rgba(239,68,68,.3);}
+.ti{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+.ti:last-child{border-bottom:none;}
+.orders-fb{display:flex;align-items:center;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+.fb{padding:7px 14px;border-radius:20px;border:1px solid rgba(77,196,163,0.2);background:rgba(255,255,255,0.03);font-family:'Bebas Neue',sans-serif;font-size:0.75rem;letter-spacing:2px;color:var(--muted);cursor:pointer;transition:all 0.15s;}
+.fb.active{background:rgba(31,149,120,0.2);border-color:var(--yellow);color:var(--yellow);}
+.si{margin-left:auto;background:rgba(255,255,255,0.04);border:1px solid rgba(77,196,163,0.15);border-radius:8px;color:var(--text);font-family:'Barlow',sans-serif;font-size:0.85rem;padding:7px 14px;min-width:180px;}
+.si:focus{outline:none;border-color:var(--yellow);}
+.oc{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:10px;}
+.och{padding:14px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.04);}
+.on{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--yellow);}
+.ot2{font-size:0.78rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;}
+.otot{font-family:'Bebas Neue',sans-serif;font-size:1rem;margin-left:auto;}
+.exp{color:var(--muted);font-size:0.85rem;transition:transform 0.2s;}
+.exp.open{transform:rotate(180deg);}
+.ocb{padding:14px 18px;display:none;}
+.ocb.open{display:block;}
+.oir{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.03);}
+.oir:last-child{border-bottom:none;}
+.oin{flex:1;color:var(--text);font-weight:600;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;font-size:0.82rem;}
+.oip{color:var(--yellow);font-family:'Barlow Condensed',sans-serif;font-weight:700;}
+.ometa{display:flex;gap:16px;flex-wrap:wrap;margin:12px 0;font-family:'Barlow Condensed',sans-serif;font-size:0.8rem;color:var(--muted);}
+.ometa strong{color:var(--text);}
+.onotes{background:rgba(255,255,255,0.03);border-radius:6px;padding:8px 12px;font-size:0.82rem;color:var(--muted);margin-bottom:12px;}
+.sa{display:flex;gap:7px;flex-wrap:wrap;}
+.sab{padding:7px 13px;border-radius:6px;border:none;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:0.72rem;letter-spacing:2px;color:white;transition:opacity 0.2s;}
+.sab:hover{opacity:0.8;}
+.sab.cur{outline:2px solid white;outline-offset:2px;}
+.sab.sap{background:var(--pending);}.sab.sag{background:var(--preparing);}.sab.sar{background:var(--ready);}.sab.sac{background:var(--completed);}.sab.sax{background:var(--cancelled);}
+.sab.sai{background:rgba(77,196,163,0.15);color:var(--yellow);border:1px solid rgba(77,196,163,0.3);}
+.inv-list{display:flex;flex-direction:column;gap:8px;}
+.ir{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:border-color 0.2s;}
+.ir:hover{border-color:rgba(77,196,163,0.3);}
+.inum{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--yellow);min-width:80px;}
+.idate{font-family:'Barlow Condensed',sans-serif;font-size:0.82rem;color:var(--muted);flex:1;}
+.itot{font-family:'Bebas Neue',sans-serif;font-size:1rem;}
+.ipbtn{background:rgba(77,196,163,0.1);border:1px solid rgba(77,196,163,0.2);color:var(--yellow);padding:5px 12px;border-radius:5px;font-family:'Bebas Neue',sans-serif;font-size:0.7rem;letter-spacing:2px;cursor:pointer;transition:background 0.2s;flex-shrink:0;}
+.ipbtn:hover{background:rgba(77,196,163,0.2);}
+#inv-modal{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.85);display:none;align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto;}
+#inv-modal.open{display:flex;}
+.ip{background:white;color:#111;border-radius:8px;width:100%;max-width:480px;padding:32px 28px;font-family:'Barlow',sans-serif;position:relative;}
+.iclose{position:absolute;top:12px;right:12px;background:#f0f0f0;border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;}
+.ih{text-align:center;padding-bottom:16px;border-bottom:2px dashed #ccc;margin-bottom:16px;}
+.ibrand{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:4px;color:#1F9578;}
+.iaddr{font-size:0.82rem;color:#666;margin-top:4px;}
+.img{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;font-size:0.85rem;}
+.imk{color:#888;font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;}
+.imv{font-weight:600;}
+table.iit{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:0.85rem;}
+.iit th{text-align:left;padding:6px 0;border-bottom:1px solid #ddd;font-size:0.75rem;text-transform:uppercase;color:#888;letter-spacing:1px;}
+.iit td{padding:8px 0;border-bottom:1px solid #f0f0f0;}
+.iit td:last-child{text-align:right;font-weight:600;}
+.itots{border-top:2px dashed #ccc;padding-top:12px;}
+.itr{display:flex;justify-content:space-between;padding:4px 0;font-size:0.85rem;}
+.itr.grand{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:#1F9578;border-top:1px solid #ccc;margin-top:6px;padding-top:8px;}
+.ifoo{text-align:center;margin-top:20px;font-size:0.78rem;color:#999;}
+.pbtn{display:block;width:100%;margin-top:16px;padding:12px;background:#1F9578;color:white;border:none;border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:3px;cursor:pointer;}
+.empty{text-align:center;padding:60px 20px;color:var(--muted);}
+.empty-ico{font-size:3rem;margin-bottom:16px;}
+.empty-msg{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:3px;}
+@media print{body>*:not(#inv-modal){display:none!important;} #inv-modal{display:flex!important;background:white;padding:0;} .iclose,.pbtn{display:none!important;} .ip{box-shadow:none;margin:0;}}
+</style>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-name">FAYRUZA</div>
+    <div class="sb-sub">Restaurant Admin</div>
+    <div class="live"><span class="dot"></span>LIVE</div>
+  </div>
+  <div class="nav">
+    <div class="nav-lbl">Main</div>
+    <div class="ni active" onclick="showPage('dashboard',this)"><span class="ni-icon">📊</span><span class="nl">Dashboard</span></div>
+    <div class="ni" onclick="showPage('orders',this)"><span class="ni-icon">🧾</span><span class="nl">Orders</span><span class="nbadge" id="pbadge" style="display:none">0</span></div>
+    <div class="ni" onclick="showPage('invoices',this)"><span class="ni-icon">📄</span><span class="nl">Invoices</span></div>
+  </div>
+  <div class="sb-foot">
+    <a href="index.html" class="sb-link">🍔 Menu Website</a>
+    <a href="checkout.html" class="sb-link">🛒 New Order</a>
+  </div>
+</div>
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="ptitle">DASHBOARD</div>
+    <div class="tr">
+      <div class="tdate" id="tdate"></div>
+      <button class="rbtn" onclick="loadAll()">↻ REFRESH</button>
+    </div>
+  </div>
+  <div class="content">
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="kpi-grid">
+        <div class="kpi"><span class="kpi-ico">🧾</span><div class="kpi-lbl">Total Orders</div><div class="kpi-val" id="k1">0</div><div class="kpi-sub">All time</div></div>
+        <div class="kpi"><span class="kpi-ico">💰</span><div class="kpi-lbl">Revenue</div><div class="kpi-val" id="k2">—</div><div class="kpi-sub">Completed orders</div></div>
+        <div class="kpi"><span class="kpi-ico">⏳</span><div class="kpi-lbl">Pending</div><div class="kpi-val" id="k3">0</div><div class="kpi-sub">Need attention</div></div>
+        <div class="kpi"><span class="kpi-ico">📦</span><div class="kpi-lbl">Avg Order</div><div class="kpi-val" id="k4">—</div><div class="kpi-sub">Per order</div></div>
+      </div>
+      <div class="dgrid">
+        <div class="panel">
+          <div class="ph"><div class="pt">RECENT ORDERS</div><span class="pa" onclick="showPage('orders',document.querySelectorAll('.ni')[1])">View All →</span></div>
+          <div class="pb"><table class="ot"><thead><tr><th>ORDER</th><th>TYPE</th><th>ITEMS</th><th>TOTAL</th><th>STATUS</th></tr></thead><tbody id="dtbody"><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px">No orders yet</td></tr></tbody></table></div>
+        </div>
+        <div class="panel">
+          <div class="ph"><div class="pt">TOP ITEMS</div></div>
+          <div class="pb" id="topitems"><div style="text-align:center;padding:24px;color:var(--muted);font-size:0.85rem">No data yet</div></div>
+        </div>
+      </div>
+    </div>
+    <!-- ORDERS -->
+    <div class="page" id="page-orders">
+      <div class="orders-fb">
+        <button class="fb active" onclick="filt('all',this)">ALL</button>
+        <button class="fb" onclick="filt('pending',this)">PENDING</button>
+        <button class="fb" onclick="filt('preparing',this)">PREPARING</button>
+        <button class="fb" onclick="filt('ready',this)">READY</button>
+        <button class="fb" onclick="filt('completed',this)">COMPLETED</button>
+        <input type="text" class="si" id="osearch" placeholder="🔍 Search..." oninput="renderOrders()">
+      </div>
+      <div id="ocards"><div class="empty"><div class="empty-ico">🧾</div><div class="empty-msg">No orders yet</div></div></div>
+    </div>
+    <!-- INVOICES -->
+    <div class="page" id="page-invoices">
+      <div class="inv-list" id="invlist"><div class="empty"><div class="empty-ico">📄</div><div class="empty-msg">No invoices yet</div></div></div>
+    </div>
+  </div>
+</div>
+<div id="inv-modal">
+  <div class="ip">
+    <button class="iclose" onclick="closeInv()">✕</button>
+    <div id="inv-inner"></div>
+    <button class="pbtn" onclick="window.print()">🖨️ PRINT INVOICE</button>
+  </div>
+</div>
+<script>
+let orders=[], cf='all';
+function fp(v){if(!v||v<=0)return'0 Fils';if(v<1)return Math.round(v*1000)+' Fils';return v.toFixed(3)+' KD';}
+function fd(s){const d=new Date(s);return d.toLocaleDateString('en-KW',{day:'2-digit',month:'short'})+' '+d.toLocaleTimeString('en-KW',{hour:'2-digit',minute:'2-digit'});}
+function fdl(s){return new Date(s).toLocaleString('en-KW',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});}
+function tl(t){return{dinein:'🪑 Dine In',takeaway:'🛍️ Takeaway',delivery:'🛵 Delivery'}[t]||t;}
+function pl(p){return{cash:'💵 Cash',knet:'💳 KNET',card:'🏦 Credit'}[p]||p;}
+function sc(s){return{pending:'sp',preparing:'sg',ready:'sr',completed:'sc',cancelled:'sx'}[s]||'sp';}
+function loadAll(){
+  orders=JSON.parse(localStorage.getItem('fayruza_orders')||'[]');
+  renderDash(); renderOrders(); renderInvoices();
+  const p=orders.filter(o=>o.status==='pending').length;
+  const b=document.getElementById('pbadge');
+  b.textContent=p; b.style.display=p>0?'flex':'none';
+}
+function renderDash(){
+  const comp=orders.filter(o=>o.status==='completed');
+  const rev=comp.reduce((s,o)=>s+o.total,0);
+  const avg=orders.length?orders.reduce((s,o)=>s+o.total,0)/orders.length:0;
+  document.getElementById('k1').textContent=orders.length;
+  document.getElementById('k2').textContent=fp(rev);
+  document.getElementById('k3').textContent=orders.filter(o=>o.status==='pending').length;
+  document.getElementById('k4').textContent=fp(avg);
+  const tb=document.getElementById('dtbody');
+  if(!orders.length){tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px">No orders yet</td></tr>';return;}
+  tb.innerHTML=orders.slice(0,8).map(o=>`<tr>
+    <td style="font-family:'Bebas Neue',sans-serif;color:var(--yellow);letter-spacing:1px">${o.number}</td>
+    <td style="font-size:0.85rem;color:var(--muted)">${tl(o.orderType)}</td>
+    <td style="color:var(--muted);font-size:0.8rem">${o.items.reduce((s,i)=>s+i.qty,0)} items</td>
+    <td style="font-family:'Bebas Neue',sans-serif">${fp(o.total)}</td>
+    <td><span class="sb ${sc(o.status)}">${o.status.toUpperCase()}</span></td>
+  </tr>`).join('');
+  const ic={};
+  orders.forEach(o=>o.items.forEach(i=>{if(!ic[i.name])ic[i.name]={name:i.name,emoji:i.emoji,c:0};ic[i.name].c+=i.qty;}));
+  const top=Object.values(ic).sort((a,b)=>b.c-a.c).slice(0,7);
+  document.getElementById('topitems').innerHTML=top.length?top.map(i=>`<div class="ti"><span style="font-size:1.3rem">${i.emoji}</span><span style="flex:1;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.88rem;text-transform:uppercase">${i.name}</span><span style="font-family:'Bebas Neue',sans-serif;color:var(--yellow)">x${i.c}</span></div>`).join(''):'<div style="text-align:center;padding:24px;color:var(--muted);font-size:0.85rem">No items yet</div>';
+}
+function filt(f,btn){
+  cf=f;
+  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderOrders();
+}
+function renderOrders(){
+  const q=(document.getElementById('osearch')?.value||'').toLowerCase();
+  let fl=orders;
+  if(cf!=='all')fl=fl.filter(o=>o.status===cf);
+  if(q)fl=fl.filter(o=>o.number.toLowerCase().includes(q)||o.items.some(i=>i.name.toLowerCase().includes(q)));
+  const c=document.getElementById('ocards');
+  if(!fl.length){c.innerHTML=`<div class="empty"><div class="empty-ico">🔍</div><div class="empty-msg">${!orders.length?'No orders yet':'No matches'}</div></div>`;return;}
+  c.innerHTML=fl.map(o=>`<div class="oc">
+    <div class="och" onclick="tog('${o.id}')">
+      <span class="on">${o.number}</span>
+      <span class="sb ${sc(o.status)}">${o.status.toUpperCase()}</span>
+      <span style="font-size:0.9rem">${tl(o.orderType)}</span>
+      ${o.tableNum?`<span style="font-size:0.78rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif">T${o.tableNum}</span>`:''}
+      <span class="ot2">${fd(o.timestamp)}</span>
+      <span class="otot">${fp(o.total)}</span>
+      <span class="exp" id="exp-${o.id}">▼</span>
+    </div>
+    <div class="ocb" id="body-${o.id}">
+      <div style="margin-bottom:12px">${o.items.map(i=>`<div class="oir"><span style="font-size:1.1rem">${i.emoji}</span><span class="oin">${i.name}</span><span style="color:var(--muted);font-size:0.82rem">x${i.qty}</span><span class="oip">${fp(i.price*i.qty)}</span></div>`).join('')}</div>
+      <div class="ometa">
+        <span>Payment: <strong>${pl(o.payMethod)}</strong></span>
+        ${o.discount>0?`<span>Discount: <strong>- ${fp(o.discount)}</strong></span>`:''}
+        <span>Subtotal: <strong>${fp(o.subtotal)}</strong></span>
+        <span>Total: <strong>${fp(o.total)}</strong></span>
+      </div>
+      ${o.notes?`<div class="onotes">📝 ${o.notes}</div>`:''}
+      <div class="sa">
+        <button class="sab sap ${o.status==='pending'?'cur':''}" onclick="setS('${o.id}','pending')">PENDING</button>
+        <button class="sab sag ${o.status==='preparing'?'cur':''}" onclick="setS('${o.id}','preparing')">PREPARING</button>
+        <button class="sab sar ${o.status==='ready'?'cur':''}" onclick="setS('${o.id}','ready')">READY</button>
+        <button class="sab sac ${o.status==='completed'?'cur':''}" onclick="setS('${o.id}','completed')">COMPLETED</button>
+        <button class="sab sax ${o.status==='cancelled'?'cur':''}" onclick="setS('${o.id}','cancelled')">CANCEL</button>
+        <button class="sab sai" onclick="viewInv('${o.id}')">🖨️ INVOICE</button>
+      </div>
+    </div>
+  </div>`).join('');
+}
+function tog(id){
+  document.getElementById('body-'+id).classList.toggle('open');
+  document.getElementById('exp-'+id).classList.toggle('open');
+}
+function setS(id,status){
+  const i=orders.findIndex(o=>o.id===id);if(i===-1)return;
+  orders[i].status=status;
+  localStorage.setItem('fayruza_orders',JSON.stringify(orders));
+  renderOrders(); renderDash();
+  const p=orders.filter(o=>o.status==='pending').length;
+  const b=document.getElementById('pbadge');
+  b.textContent=p; b.style.display=p>0?'flex':'none';
+}
+function renderInvoices(){
+  const c=document.getElementById('invlist');
+  if(!orders.length){c.innerHTML='<div class="empty"><div class="empty-ico">📄</div><div class="empty-msg">No invoices yet</div></div>';return;}
+  c.innerHTML=orders.map(o=>`<div class="ir" onclick="viewInv('${o.id}')">
+    <span class="inum">INV-${o.id}</span>
+    <span class="sb ${sc(o.status)}">${o.status.toUpperCase()}</span>
+    <span class="idate">${fdl(o.timestamp)}</span>
+    <span style="font-family:'Barlow Condensed',sans-serif;font-size:0.82rem;color:var(--muted)">${o.items.reduce((s,i)=>s+i.qty,0)} items</span>
+    <span class="itot">${fp(o.total)}</span>
+    <button class="ipbtn" onclick="event.stopPropagation();viewInv('${o.id}')">🖨️ PRINT</button>
+  </div>`).join('');
+}
+function viewInv(id){
+  const o=orders.find(o=>o.id===id);if(!o)return;
+  document.getElementById('inv-inner').innerHTML=`
+    <div class="ih"><div class="ibrand">FAYRUZA RESTAURANT</div><div class="iaddr">Jabriya · Block 12 · Jamia Branch, Kuwait</div></div>
+    <div class="img">
+      <div><div class="imk">Invoice</div><div class="imv">INV-${o.id}</div></div>
+      <div><div class="imk">Order</div><div class="imv">${o.number}</div></div>
+      <div><div class="imk">Date</div><div class="imv">${fdl(o.timestamp)}</div></div>
+      <div><div class="imk">Type</div><div class="imv">${tl(o.orderType)}</div></div>
+      ${o.tableNum?`<div><div class="imk">Table</div><div class="imv">${o.tableNum}</div></div>`:''}
+      <div><div class="imk">Payment</div><div class="imv">${pl(o.payMethod)}</div></div>
+    </div>
+    <table class="iit"><thead><tr><th>ITEM</th><th>QTY</th><th>PRICE</th><th>TOTAL</th></tr></thead><tbody>
+      ${o.items.map(i=>`<tr><td>${i.emoji} ${i.name}</td><td style="color:#888">x${i.qty}</td><td style="color:#888">${fp(i.price)}</td><td>${fp(i.price*i.qty)}</td></tr>`).join('')}
+    </tbody></table>
+    <div class="itots">
+      <div class="itr"><span>Subtotal</span><span>${fp(o.subtotal)}</span></div>
+      ${o.discount>0?`<div class="itr" style="color:green"><span>Discount</span><span>- ${fp(o.discount)}</span></div>`:''}
+      <div class="itr"><span>Taxes (0%)</span><span>0 Fils</span></div>
+      <div class="itr grand"><span>TOTAL</span><span>${fp(o.total)}</span></div>
+    </div>
+    ${o.notes?`<div style="margin-top:14px;padding:10px;background:#f9f9f9;border-radius:6px;font-size:0.82rem;color:#666"><strong>Notes:</strong> ${o.notes}</div>`:''}
+    <div class="ifoo">Thank you for dining at Fayruza Restaurant!<br>Jabriya · Block 12 · Jamia Branch</div>`;
+  document.getElementById('inv-modal').classList.add('open');
+}
+function closeInv(){document.getElementById('inv-modal').classList.remove('open');}
+function showPage(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  if(el)el.classList.add('active');
+  document.getElementById('ptitle').textContent={dashboard:'DASHBOARD',orders:'ORDERS',invoices:'INVOICES'}[id]||id.toUpperCase();
+}
+function updateDate(){document.getElementById('tdate').textContent=new Date().toLocaleString('en-KW',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});}
+loadAll(); updateDate();
+setInterval(updateDate,60000); setInterval(loadAll,30000);
+</script>
+</body>
+</html>
