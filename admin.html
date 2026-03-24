@@ -174,6 +174,10 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
   <div class="topbar">
     <div class="tb-title" id="page-title">DASHBOARD</div>
     <div class="tb-right">
+      <div style="display:flex;align-items:center;gap:5px;font-family:'Barlow Condensed';font-size:.72rem;letter-spacing:1px;color:var(--muted)">
+        <span id="rt-status" title="Realtime status" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#555;transition:background .5s"></span>
+        LIVE
+      </div>
       <div class="tb-time" id="tb-time"></div>
       <a href="index.html" class="tb-link">🍔 MENU SITE</a>
     </div>
@@ -511,12 +515,29 @@ function renderAll() {
 }
 
 function subscribeRealtime() {
-  sb.channel('orders-rt')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
-      showToast('🔔 New activity — refreshing…');
-      loadAll();
+  // Primary: Supabase Realtime (requires Replication enabled on orders table)
+  const channel = sb.channel('orders-rt');
+  channel
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, function(payload) {
+      loadAll(); // instant reload on any order change
+      if (payload.eventType === 'INSERT') {
+        showToast('🔔 New order received!');
+        // Flash the page title briefly
+        var orig = document.title;
+        document.title = '🔔 NEW ORDER — ' + orig;
+        setTimeout(function() { document.title = orig; }, 4000);
+      }
     })
-    .subscribe();
+    .subscribe(function(status) {
+      var el = document.getElementById('rt-status');
+      if (status === 'SUBSCRIBED') {
+        if (el) { el.style.background='#2ecc71'; el.title='Realtime: Connected'; }
+      } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+        if (el) { el.style.background='var(--red)'; el.title='Realtime: Error — using 3s poll'; }
+        // Reconnect after 5s
+        setTimeout(function() { channel.unsubscribe(); subscribeRealtime(); }, 5000);
+      }
+    });
 }
 
 function renderStats() {
@@ -1951,7 +1972,7 @@ initAuth();
 initNotifications();
 updateClock();
 setInterval(updateClock, 1000);
-setInterval(loadAll, 30000);
+setInterval(loadAll, 3000);
 </script>
 </body>
 </html>

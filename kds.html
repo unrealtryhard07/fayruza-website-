@@ -282,12 +282,23 @@ async function bumpOrder(id, newStatus) {
   }
 }
 
-// Realtime subscription
-sb.channel('kds-orders')
-  .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, function() {
+// Realtime subscription — requires Replication enabled on orders table in Supabase
+function subscribeKDS() {
+  const ch = sb.channel('kds-orders-' + Date.now()); // unique channel name avoids stale subs
+  ch.on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, function() {
     loadOrders();
   })
-  .subscribe();
+  .subscribe(function(status) {
+    const dot = document.querySelector('.live-dot');
+    if (status === 'SUBSCRIBED') {
+      if (dot) { dot.style.background = '#2ecc71'; dot.title = 'Realtime connected'; }
+    } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+      if (dot) { dot.style.background = 'var(--orange)'; dot.title = 'Realtime error — polling every 3s'; }
+      setTimeout(function() { ch.unsubscribe(); subscribeKDS(); }, 5000);
+    }
+  });
+}
+subscribeKDS();
 
 // Clock
 function updateClock() {
@@ -302,7 +313,7 @@ setInterval(renderGrid, 60000);
 
 // Initial load
 loadOrders();
-setInterval(loadOrders, 30000); // fallback poll
+setInterval(loadOrders, 3000); // 3s fallback poll
 </script>
 </body>
 </html>
