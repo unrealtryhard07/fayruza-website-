@@ -568,6 +568,11 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* ── Meal toggle ── */
+.meal-toggle-row{display:flex;gap:6px;margin-top:8px;}
+.meal-opt{flex:1;padding:6px 4px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.72rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:1.5px solid rgba(31,149,120,.25);background:rgba(31,149,120,.06);color:var(--muted);transition:all .15s;-webkit-tap-highlight-color:transparent;}
+.meal-opt.sel{background:var(--red);border-color:var(--red);color:#fff;}
+
 /* ── ATC button ── */
 .atc-btn{display:flex;align-items:center;justify-content:center;margin-top:10px;width:100%;background:var(--red);color:#fff;border:none;border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:1.5px;padding:9px 10px;cursor:pointer;transition:background .2s,transform .15s;-webkit-tap-highlight-color:transparent;position:relative;z-index:5;}
 .atc-btn:active{transform:scale(.95);background:var(--orange);}
@@ -1113,7 +1118,6 @@ window.addEventListener('popstate', () => {
           <select class="co-sel" id="co-type" onchange="coTableToggle()">
             <option value="dinein">Dine In</option>
             <option value="takeaway">Takeaway</option>
-            <option value="delivery">Delivery</option>
           </select>
         </div>
         <div id="co-table-wrap">
@@ -1132,12 +1136,7 @@ window.addEventListener('popstate', () => {
     </div>
     <div class="co-sec">
       <div class="co-sec-ttl">Pricing</div>
-      <label class="co-lbl">Discount</label>
-      <div class="co-disc-row">
-        <input class="co-inp" id="co-disc" type="number" min="0" step="0.001" placeholder="0.000" oninput="coRecalc()" style="margin-bottom:0">
-        <button class="co-disc-tog" id="co-disc-tog" onclick="coToggleDisc()">KD</button>
-      </div>
-      <div id="co-totals" style="margin-top:10px"></div>
+      <div id="co-totals"></div>
     </div>
   </div>
   <div class="co-place-wrap">
@@ -1202,10 +1201,15 @@ function renderItem(item, delay) {
       '</div>';
   } else {
     ph = '<div class="ic-price">'+item.price+' <span class="ic-price-kd">KD</span></div>';
-    if (item.meal) ph += '<span class="ic-meal">+ Meal: '+item.meal+' KD</span>';
+    if (item.meal) {
+      ph += '<div class="meal-toggle-row">'+
+        '<button class="meal-opt meal-opt-item sel" data-type="item">Burger Only</button>'+
+        '<button class="meal-opt meal-opt-meal" data-type="meal">+ Meal '+item.meal+' KD</button>'+
+        '</div>';
+    }
   }
   var idx = g_save(item);
-  return '<div class="item-card" style="'+style+'">'+
+  return '<div class="item-card" style="'+style+'" data-idx="'+idx+'">'+
     (item.badge ? '<div class="ic-badge">'+item.badge+'</div>' : '')+
     '<span class="ic-emoji">'+item.e+'</span>'+
     '<div class="ic-name">'+item.n+'</div>'+
@@ -1218,6 +1222,7 @@ function renderItem(item, delay) {
 function g_atc(btn, idx) {
   var item = G_ITEMS[idx];
   if (!item) return;
+  // Size picker for drinks
   if (item.sml) {
     g_sizeItem = item; g_sizeKey = 's';
     var t = document.getElementById('size-title');
@@ -1229,7 +1234,8 @@ function g_atc(btn, idx) {
         {k:'m',l:'Medium',p:parseFloat(item.sml.m)},
         {k:'l',l:'Large', p:parseFloat(item.sml.l)}
       ].map(function(sz){
-        return '<div class="size-opt'+(sz.k===g_sizeKey?' sel':'')+'" onclick="g_pickSize('+JSON.stringify(sz.k)+',this)">'+
+        // Use single quotes around the key — NOT JSON.stringify which uses double quotes
+        return '<div class="size-opt'+(sz.k===g_sizeKey?' sel':'')+"\" onclick=\"g_pickSize('"+sz.k+"',this)\">"+
           '<span class="size-opt-l">'+sz.l+'</span>'+
           '<div class="size-opt-p">'+money(sz.p)+'</div>'+
           '</div>';
@@ -1238,8 +1244,15 @@ function g_atc(btn, idx) {
     openSize();
     return;
   }
-  var price = item.fils ? item.fils/1000 : parseFloat(item.price||0);
-  pushCart({id:item.n, name:item.n, emoji:item.e, price:price});
+  // Meal toggle — check which option is selected on this card
+  var card = btn.closest('[data-idx]');
+  var mealSel = card && card.querySelector('.meal-opt-meal.sel');
+  var price = item.fils ? item.fils/1000
+            : mealSel && item.meal ? parseFloat(item.meal)
+            : parseFloat(item.price||0);
+  var name  = item.n + (mealSel && item.meal ? ' (Meal)' : '');
+  var cid   = item.n + (mealSel && item.meal ? '_meal' : '');
+  pushCart({id:cid, name:name, emoji:item.e, price:price});
   btn.textContent = '✓ ADDED';
   btn.classList.add('added');
   setTimeout(function(){ btn.textContent='+ ADD TO CART'; btn.classList.remove('added'); }, 1300);
@@ -1311,6 +1324,16 @@ function g_pickSize(k, el) {
   document.querySelectorAll('.size-opt').forEach(function(e){e.classList.remove('sel');});
   el.classList.add('sel');
 }
+
+// Meal toggle — delegated click on .meal-opt buttons
+document.addEventListener('click', function(e) {
+  var opt = e.target.closest('.meal-opt');
+  if (!opt) return;
+  var row = opt.closest('.meal-toggle-row');
+  if (!row) return;
+  row.querySelectorAll('.meal-opt').forEach(function(b){b.classList.remove('sel');});
+  opt.classList.add('sel');
+});
 function confirmSize() {
   if (!g_sizeItem) return;
   var price = parseFloat(g_sizeItem.sml[g_sizeKey]);
@@ -1347,29 +1370,25 @@ function coToggleDisc() {
   coRecalc();
 }
 function coRecalc() {
-  var sub=cartSum(), dv=parseFloat((document.getElementById('co-disc')||{}).value)||0;
-  var da = g_disc==='pct' ? sub*(dv/100) : Math.min(dv,sub);
-  var total=Math.max(0,sub-da);
+  var sub=cartSum();
   var el=document.getElementById('co-totals');
   if (!el) return;
   el.innerHTML=
     '<div class="co-tot-line"><span class="tl">SUBTOTAL</span><span class="tv">'+money(sub)+'</span></div>'+
-    (da>0?'<div class="co-tot-line"><span class="tl">DISCOUNT</span><span class="tv" style="color:#ff6b6b">&minus; '+money(da)+'</span></div>':'')+
     '<div class="co-tot-line"><span class="tl">TAX</span><span class="tv">&mdash;</span></div>'+
-    '<div class="co-tot-line grand"><span class="tl">TOTAL</span><span class="tv">'+money(total)+'</span></div>';
+    '<div class="co-tot-line grand"><span class="tl">TOTAL</span><span class="tv">'+money(sub)+'</span></div>';
 }
 
 async function placeOrder() {
   if (cart.length===0) return;
   var btn=document.getElementById('co-place-btn');
   if (btn) { btn.textContent='PLACING...'; btn.disabled=true; }
-  var sub=cartSum(), dv=parseFloat((document.getElementById('co-disc')||{}).value)||0;
-  var da=g_disc==='pct'?sub*(dv/100):Math.min(dv,sub);
-  var total=Math.max(0,sub-da);
+  var sub=cartSum();
+  var total=sub;
   var oid='ORD-'+Date.now().toString().slice(-6);
   var order={
     order_id:oid, items:cart.map(function(c){return Object.assign({},c);}),
-    subtotal:sub, discount_amt:da, discount_type:g_disc, tax:0, total:total,
+    subtotal:sub, discount_amt:0, discount_type:'kd', tax:0, total:total,
     payment_method:(document.getElementById('co-payment')||{}).value||'cash',
     order_type:(document.getElementById('co-type')||{}).value||'dinein',
     table_number:(document.getElementById('co-table')||{}).value||'',
