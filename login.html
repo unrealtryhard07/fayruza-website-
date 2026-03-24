@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fayruza Admin — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--green:#1F9578;--teal:#4DC4A3;--dark:#0A0F0D;--dark2:#0E1511;--border:rgba(255,255,255,.07);--text:#EDF5F2;--muted:#7A9990;--red:#ff4757;}
+body{background:var(--dark);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(31,149,120,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(31,149,120,.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;}
+body::after{content:'';position:fixed;top:-20%;left:50%;transform:translateX(-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(31,149,120,.18) 0%,transparent 70%);pointer-events:none;}
+
+.login-box{position:relative;z-index:1;background:var(--dark2);border:1px solid var(--border);border-radius:20px;padding:44px 40px;width:100%;max-width:400px;box-shadow:0 32px 80px rgba(0,0,0,.6);}
+.brand{text-align:center;margin-bottom:36px;}
+.brand-name{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:6px;background:linear-gradient(90deg,var(--teal),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.brand-sub{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:5px;text-transform:uppercase;color:var(--muted);margin-top:4px;}
+.field{margin-bottom:18px;}
+.field label{font-family:'Barlow Condensed',sans-serif;font-size:.68rem;letter-spacing:4px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:8px;}
+.field input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:.95rem;padding:13px 16px;border-radius:10px;outline:none;transition:border-color .2s;}
+.field input:focus{border-color:var(--green);}
+.field input::placeholder{color:rgba(255,255,255,.2);}
+.login-btn{width:100%;margin-top:8px;padding:15px;background:var(--green);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:3px;border:none;border-radius:10px;cursor:pointer;transition:background .2s,transform .15s;}
+.login-btn:hover{background:#167A62;}
+.login-btn:active{transform:scale(.98);}
+.login-btn:disabled{background:#2a3a35;cursor:not-allowed;}
+.error-msg{background:rgba(255,71,87,.1);border:1px solid rgba(255,71,87,.3);color:var(--red);font-family:'Barlow Condensed',sans-serif;font-size:.85rem;letter-spacing:1px;padding:12px 16px;border-radius:8px;margin-top:16px;display:none;text-align:center;}
+.error-msg.show{display:block;}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:8px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.footer-note{text-align:center;margin-top:28px;font-family:'Barlow Condensed',sans-serif;font-size:.75rem;letter-spacing:2px;color:rgba(255,255,255,.12);text-transform:uppercase;}
+</style>
+</head>
+<body>
+<div class="login-box">
+  <div class="brand">
+    <div class="brand-name">FAYRUZA</div>
+    <div class="brand-sub">Admin Panel</div>
+  </div>
+  <div class="field">
+    <label>Username</label>
+    <input type="text" id="username" placeholder="Enter username" autocomplete="username" autocapitalize="none" autofocus>
+  </div>
+  <div class="field">
+    <label>Password</label>
+    <input type="password" id="password" placeholder="Enter password" autocomplete="current-password">
+  </div>
+  <button class="login-btn" id="login-btn" onclick="doLogin()">SIGN IN</button>
+  <div class="error-msg" id="error-msg"></div>
+  <div class="footer-note">Fayruza Restaurant · Jabriya</div>
+</div>
+<script>
+var SB_URL = 'https://zbsdmtjtypzfqrjuvpts.supabase.co';
+var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpic2RtdGp0eXB6ZnFyanV2cHRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyNTQ2ODcsImV4cCI6MjA4OTgzMDY4N30.qeoSk8L7SQbsKetUEbm5Koe0iIIVlkhKkaaUG9qVrxo';
+
+// Already logged in → skip login
+(function() {
+  try {
+    var s = JSON.parse(localStorage.getItem('fayruza_admin') || 'null');
+    if (s && s.username && (Date.now() - s.ts) < 43200000) window.location.replace('admin.html');
+  } catch(e) {}
+})();
+
+// SHA-256 of plain password (matches what we store in Supabase)
+async function sha256(str) {
+  var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+}
+
+// Role → default page permissions
+function buildPerms(role, overrides) {
+  var defaults = {
+    owner:   { dashboard:true,  orders:true,  reports:true,  products:true  },
+    manager: { dashboard:true,  orders:true,  reports:true,  products:false },
+    staff:   { dashboard:false, orders:true,  reports:false, products:false }
+  };
+  var base = defaults[role] || defaults['staff'];
+  return Object.assign({}, base, overrides || {});
+}
+
+// Enter key support
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') doLogin();
+});
+
+async function doLogin() {
+  var btn   = document.getElementById('login-btn');
+  var errEl = document.getElementById('error-msg');
+  var username = (document.getElementById('username').value || '').trim().toLowerCase();
+  var password = document.getElementById('password').value;
+
+  errEl.classList.remove('show');
+  if (!username || !password) {
+    errEl.textContent = 'Please enter username and password.';
+    errEl.classList.add('show'); return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>SIGNING IN...';
+
+  try {
+    // Hash password (SHA-256 of password only)
+    var hash = await sha256(password);
+
+    // Fetch matching active user
+    var res = await fetch(
+      SB_URL + '/rest/v1/admin_users?select=*&username=eq.' + encodeURIComponent(username) + '&is_active=eq.true&limit=1',
+      { headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY } }
+    );
+    if (!res.ok) throw new Error('Network error');
+    var users = await res.json();
+
+    if (!users.length || users[0].password_hash !== hash) {
+      errEl.textContent = 'Invalid username or password.';
+      errEl.classList.add('show');
+      btn.disabled = false; btn.textContent = 'SIGN IN';
+      return;
+    }
+
+    var user = users[0];
+    var session = {
+      id:        user.id,
+      username:  user.username,
+      full_name: user.full_name,
+      role:      user.role,
+      perms:     buildPerms(user.role, user.permissions),
+      ts:        Date.now()
+    };
+    localStorage.setItem('fayruza_admin', JSON.stringify(session));
+
+    // Update last_login async
+    fetch(SB_URL + '/rest/v1/admin_users?id=eq.' + user.id, {
+      method: 'PATCH',
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ last_login: new Date().toISOString() })
+    });
+
+    window.location.replace('admin.html');
+
+  } catch(e) {
+    errEl.textContent = 'Login failed. Please try again.';
+    errEl.classList.add('show');
+    btn.disabled = false; btn.textContent = 'SIGN IN';
+  }
+}
+</script>
+</body>
+</html>
