@@ -1,0 +1,37 @@
+{
+  "name": "Fayruza Restaurant",
+  "short_name": "Fayruza",
+  "description": "Order from Fayruza Restaurant — Jabriya, Kuwait",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0A0F0D",
+  "theme_color": "#1F9578",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "View Menu",
+      "url": "/index.html",
+      "description": "Browse our menu"
+    },
+    {
+      "name": "Admin Panel",
+      "url": "/login.html",
+      "description": "Staff admin access"
+    }
+  ],
+  "categories": ["food", "restaurants"]
+}

@@ -155,6 +155,8 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
     <button class="nb" id="nav-shifts" onclick="showPage('shifts',this)"><span class="ic">🕐</span> Shifts</button>
     <button class="nb" id="nav-users" onclick="showPage('users',this)"><span class="ic">👥</span> Users</button>
     <div class="sb-sec">SITE</div>
+    <a href="kds.html" target="_blank" class="nb"><span class="ic">🍳</span> Kitchen Display</a>
+    <button class="nb" id="nav-notif" onclick="requestNotifPermission()"><span class="ic">🔔</span> Notifications <span id="notif-status" style="font-size:.65rem;margin-left:4px;color:var(--muted)">OFF</span></button>
     <a href="index.html" class="nb"><span class="ic">🍔</span> View Menu</a>
   </div>
   <div class="sb-foot">
@@ -238,6 +240,7 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
           <option value="all" selected>All Time</option>
         </select>
         <button class="btn-refresh" onclick="renderReport()">↻</button>
+        <button onclick="printDailyReport()" style="background:rgba(31,149,120,.1);border:1px solid rgba(31,149,120,.25);color:var(--teal);font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:2px;padding:6px 14px;border-radius:6px;cursor:pointer">🖨 DAILY REPORT</button>
       </div>
       <div id="rpt-body"></div>
     </div>
@@ -430,6 +433,16 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
       </div>
       <div id="pm-price-fields">
         <!-- Populated by setPriceType -->
+      </div>
+      <!-- Image URL field -->
+      <div style="margin-top:10px">
+        <label style="font-family:'Barlow Condensed';font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Photo URL (optional)</label>
+        <input type="url" id="pm-image" placeholder="https://... paste image link or leave blank"
+          style="width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:.85rem;padding:8px 11px;border-radius:6px;outline:none">
+        <div style="font-family:'Barlow Condensed';font-size:.67rem;color:var(--muted);margin-top:4px;letter-spacing:1px">Upload image to imgur.com or imgbb.com → paste the direct link here</div>
+        <div id="pm-img-preview" style="margin-top:8px;display:none">
+          <img id="pm-img-thumb" src="" style="height:70px;border-radius:6px;object-fit:cover;border:1px solid var(--border)">
+        </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
         <div>
@@ -1272,6 +1285,10 @@ function openProductModal(id, defaultCat) {
     document.getElementById('pm-name-ar').value = p.name_ar || '';
     document.getElementById('pm-badge').value = p.badge || '';
     if (hiddenEl) hiddenEl.checked = !!p.is_hidden;
+    // Image URL
+    const imgEl = document.getElementById('pm-image');
+    if (imgEl) imgEl.value = p.image_url || '';
+    pm_previewImage(p.image_url);
 
     // Detect price type
     if (p.fils) {
@@ -1297,6 +1314,8 @@ function openProductModal(id, defaultCat) {
     // New product
     titleEl.textContent = 'ADD PRODUCT';
     if (delBtn) delBtn.style.display = 'none';
+    const imgElN = document.getElementById('pm-image'); if (imgElN) imgElN.value = '';
+    pm_previewImage('');
     if (defaultCat) {
       document.getElementById('pm-cat').value = defaultCat;
       pm_catChange();
@@ -1330,6 +1349,7 @@ async function saveProd() {
     name_ar: (document.getElementById('pm-name-ar')||{}).value?.trim() || '',
     badge: (document.getElementById('pm-badge')||{}).value?.trim() || null,
     is_hidden: !!(document.getElementById('pm-hidden')||{}).checked,
+    image_url: (document.getElementById('pm-image')||{}).value?.trim() || null,
     price: null, meal_price: null, fils: null, sml_s: null, sml_m: null, sml_l: null,
   };
 
@@ -1376,6 +1396,209 @@ async function deleteProd() {
 /* ══════════════════════════════════════════
    AUTH + ROLE-BASED ACCESS
 ══════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   PUSH NOTIFICATIONS
+══════════════════════════════════════════ */
+function initNotifications() {
+  if (!('Notification' in window)) return;
+  const el = document.getElementById('notif-status');
+  if (Notification.permission === 'granted') { if(el) el.textContent = '✓ ON'; if(el) el.style.color = 'var(--teal)'; }
+  else if (Notification.permission === 'denied') { if(el) el.textContent = 'BLOCKED'; }
+}
+
+function requestNotifPermission() {
+  if (!('Notification' in window)) { showToast('⚠ Notifications not supported in this browser'); return; }
+  if (Notification.permission === 'granted') { showToast('✓ Notifications already enabled'); return; }
+  Notification.requestPermission().then(function(perm) {
+    const el = document.getElementById('notif-status');
+    if (perm === 'granted') {
+      if(el) { el.textContent = '✓ ON'; el.style.color = 'var(--teal)'; }
+      showToast('✓ Notifications enabled! You will be alerted on new orders.');
+      new Notification('Fayruza Admin', { body: '🔔 Notifications are now active!', icon: '/icon-192.png' });
+    } else {
+      if(el) el.textContent = 'BLOCKED';
+      showToast('⚠ Notifications blocked — enable in browser settings');
+    }
+  });
+}
+
+function notifyNewOrder(order) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  const typeL = { dinein: 'Dine In', takeaway: 'Takeaway' };
+  new Notification('🔔 New Order — ' + (order.order_id || '#'+order.id), {
+    body: (typeL[order.order_type] || order.order_type || '') +
+          (order.table_number ? ' · Table ' + order.table_number : '') +
+          ' · KD ' + parseFloat(order.total||0).toFixed(3),
+    icon: '/icon-192.png',
+    tag: 'order-' + order.id,
+    requireInteraction: true
+  });
+}
+
+// Hook into realtime to fire notifications
+const _origSubRT = subscribeRealtime;
+subscribeRealtime = function() {
+  _origSubRT();
+  // Also watch for new orders specifically for notification
+  sb.channel('notif-orders')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, function(payload) {
+      if (payload.new && payload.new.status === 'new') notifyNewOrder(payload.new);
+    })
+    .subscribe();
+};
+
+/* ══════════════════════════════════════════
+   IMAGE PREVIEW HELPER (product modal)
+══════════════════════════════════════════ */
+function pm_previewImage(url) {
+  const preview = document.getElementById('pm-img-preview');
+  const thumb   = document.getElementById('pm-img-thumb');
+  if (!preview || !thumb) return;
+  if (url && url.trim()) {
+    thumb.src = url.trim();
+    preview.style.display = 'block';
+    thumb.onerror = function() { preview.style.display = 'none'; };
+  } else {
+    preview.style.display = 'none';
+    thumb.src = '';
+  }
+}
+// Live preview as user types
+document.addEventListener('input', function(e) {
+  if (e.target && e.target.id === 'pm-image') pm_previewImage(e.target.value);
+});
+
+/* ══════════════════════════════════════════
+   DAILY CLOSING REPORT (PDF/Print)
+══════════════════════════════════════════ */
+function printDailyReport() {
+  const todayOrders = allOrders.filter(o => isToday(o.created_at));
+  if (!todayOrders.length) { showToast('⚠ No orders today'); return; }
+
+  const done      = todayOrders.filter(o => o.status === 'done');
+  const all       = todayOrders;
+  const revenue   = all.reduce((s,o) => s + (o.total||0), 0);
+  const subtotal  = all.reduce((s,o) => s + (o.subtotal||0), 0);
+  const discounts = all.reduce((s,o) => s + (o.discount_amt||0), 0);
+
+  // Payment breakdown
+  const byPay = {};
+  all.forEach(function(o) {
+    const m = o.payment_method || 'cash';
+    byPay[m] = (byPay[m]||0) + (o.total||0);
+  });
+
+  // Top items
+  const itemCounts = {};
+  all.forEach(function(o) {
+    (o.items||[]).forEach(function(i) {
+      const k = i.name;
+      if (!itemCounts[k]) itemCounts[k] = { qty:0, rev:0 };
+      itemCounts[k].qty += i.qty||1;
+      itemCounts[k].rev += (i.price||0)*(i.qty||1);
+    });
+  });
+  const topItems = Object.entries(itemCounts)
+    .sort((a,b) => b[1].qty - a[1].qty).slice(0, 10);
+
+  // Order type breakdown
+  const byType = {};
+  all.forEach(function(o) { const t=o.order_type||'dinein'; byType[t]=(byType[t]||0)+1; });
+
+  const dateStr = new Date().toLocaleDateString('en-GB', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const fmt3 = v => 'KD ' + parseFloat(v||0).toFixed(3);
+  const payLabels = { cash:'Cash', knet:'KNET', card:'Credit Card' };
+  const typeLabels = { dinein:'Dine In', takeaway:'Takeaway', delivery:'Delivery' };
+
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Daily Report — ${dateStr}</title>
+<style>
+  @page { size: A4; margin: 15mm; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: 'Courier New', monospace; font-size: 10pt; color: #111; background: #fff; }
+  h1 { font-size: 18pt; text-align: center; letter-spacing: 4px; margin-bottom: 2mm; }
+  h2 { font-size: 12pt; letter-spacing: 2px; margin: 6mm 0 3mm; border-bottom: 1px solid #ccc; padding-bottom: 1.5mm; }
+  .center { text-align: center; }
+  .date { text-align: center; font-size: 9pt; color: #555; margin-bottom: 4mm; }
+  .divider { border: none; border-top: 1px dashed #aaa; margin: 4mm 0; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 4mm; }
+  th { text-align: left; font-size: 8pt; letter-spacing: 1px; border-bottom: 1px solid #ccc; padding: 2mm 1mm; }
+  td { padding: 1.5mm 1mm; font-size: 9.5pt; border-bottom: 1px solid #eee; }
+  .right { text-align: right; }
+  .bold { font-weight: bold; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 4mm; margin: 4mm 0; }
+  .kpi { border: 1px solid #ddd; border-radius: 3mm; padding: 3mm; text-align: center; }
+  .kpi-val { font-size: 16pt; font-weight: bold; }
+  .kpi-lbl { font-size: 7.5pt; color: #777; letter-spacing: 1px; text-transform: uppercase; margin-top: 1mm; }
+  .grand { font-weight: bold; font-size: 11pt; }
+  .footer { margin-top: 10mm; text-align: center; font-size: 8pt; color: #888; border-top: 1px solid #ccc; padding-top: 3mm; }
+</style>
+</head>
+<body>
+<h1>FAYRUZA RESTAURANT</h1>
+<div class="date">${dateStr} · Daily Closing Report</div>
+<hr class="divider">
+
+<div class="kpi-grid">
+  <div class="kpi"><div class="kpi-val">${all.length}</div><div class="kpi-lbl">Total Orders</div></div>
+  <div class="kpi"><div class="kpi-val">${fmt3(revenue)}</div><div class="kpi-lbl">Total Revenue</div></div>
+  <div class="kpi"><div class="kpi-val">${fmt3(revenue / (all.length||1))}</div><div class="kpi-lbl">Avg Order Value</div></div>
+</div>
+
+<h2>REVENUE SUMMARY</h2>
+<table>
+  <tr><td>Gross Subtotal</td><td class="right">${fmt3(subtotal)}</td></tr>
+  <tr><td>Discounts Given</td><td class="right" style="color:#cc0000">- ${fmt3(discounts)}</td></tr>
+  <tr class="grand"><td>NET REVENUE</td><td class="right">${fmt3(revenue)}</td></tr>
+</table>
+
+<h2>PAYMENT BREAKDOWN</h2>
+<table>
+  <thead><tr><th>METHOD</th><th class="right">AMOUNT</th><th class="right">ORDERS</th></tr></thead>
+  <tbody>
+  ${Object.entries(byPay).map(([m,v]) =>
+    `<tr><td>${payLabels[m]||m}</td><td class="right">${fmt3(v)}</td>
+    <td class="right">${all.filter(o=>(o.payment_method||'cash')===m).length}</td></tr>`
+  ).join('')}
+  </tbody>
+</table>
+
+<h2>ORDER TYPE BREAKDOWN</h2>
+<table>
+  <thead><tr><th>TYPE</th><th class="right">COUNT</th></tr></thead>
+  <tbody>
+  ${Object.entries(byType).map(([t,c]) =>
+    `<tr><td>${typeLabels[t]||t}</td><td class="right">${c}</td></tr>`).join('')}
+  </tbody>
+</table>
+
+<h2>TOP 10 ITEMS</h2>
+<table>
+  <thead><tr><th>#</th><th>ITEM</th><th class="right">QTY SOLD</th><th class="right">REVENUE</th></tr></thead>
+  <tbody>
+  ${topItems.map(([name,d],i) =>
+    `<tr><td>${i+1}</td><td>${name}</td><td class="right">${d.qty}</td><td class="right">${fmt3(d.rev)}</td></tr>`
+  ).join('')}
+  </tbody>
+</table>
+
+<div class="footer">
+  Generated: ${new Date().toLocaleString()} · Fayruza Restaurant Admin · fayruza-website.vercel.app
+</div>
+
+<script>window.onload = function() { window.print(); window.onafterprint = function() { window.close(); }; }<\/script>
+</body>
+</html>`;
+
+  const w = window.open('','_blank','width=800,height=900');
+  if (!w) { showToast('⚠ Allow popups to print'); return; }
+  w.document.write(html);
+  w.document.close();
+}
+
 var ADMIN_SESSION = null;
 
 function initAuth() {
@@ -1723,7 +1946,9 @@ async function deleteUser() {
 loadAll();
 subscribeRealtime();
 loadProducts();
+loadUsers();
 initAuth();
+initNotifications();
 updateClock();
 setInterval(updateClock, 1000);
 setInterval(loadAll, 30000);
