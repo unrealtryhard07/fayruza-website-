@@ -868,7 +868,7 @@ function animBgFor(animClass) {
 async function loadMenuFromSupabase() {
   // Show loading state on cards grid
   var grid = document.getElementById('cards-grid');
-  if (grid) grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:2px">LOADING MENU...</div>';
+  if (grid) grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-family:sans-serif;letter-spacing:2px">LOADING MENU...</div>';
 
   try {
     var res = await fetch(_SB_URL + '/rest/v1/products?select=*&is_hidden=eq.false&order=category_sort.asc,sort_order.asc', {
