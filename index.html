@@ -745,319 +745,260 @@ body {
 
 <script>
 /* ══════════════════════════════════════════
-   MENU DATA
+   DYNAMIC MENU — loaded from Supabase products table
 ══════════════════════════════════════════ */
-const MENU = [
-  {
-    id: 'burgers',
-    name: 'Burgers',
-    nameAr: 'برجر',
-    emoji: '🍔',
-    animClass: 'burgers',
-    count: 16,
-    subcats: [
-      {
-        label: '🍔 SIGNATURE BURGERS',
-        items: [
-          { e:'🍔', n:'Zinger Burger',          ar:'برجر زنجر',         price:'0.900', meal:'1.400', badge:'🔥 HOT' },
-          { e:'👑', n:'King Burger',             ar:'كنغ برجر',          price:'0.750', meal:'1.250' },
-          { e:'🍗', n:'Chicken Fillet Burger',   ar:'برجر دجاج فيليه',   price:'0.750', meal:'1.250' },
-          { e:'🌶️', n:'Khaleej Burger',          ar:'برجر خليج',         price:'0.850', meal:'1.350' },
-          { e:'🍔', n:'Zinger Double Burger',    ar:'برجر زنجر دبل',     price:'1.300', meal:'1.750', badge:'🔥 DOUBLE' },
-          { e:'🍗', n:'Chicken Double Burger',   ar:'برجر دجاج دبل',     price:'1.000', meal:'1.500', badge:'🔥 DOUBLE' },
-          { e:'🍔', n:'Hamburger Chicken',       ar:'همبرجر دجاج',       price:'0.750', meal:'1.250' },
-          { e:'⚡', n:'Hamburger Super',          ar:'همبرجر سوبر',       price:'0.850', meal:'1.350' },
-          { e:'🥩', n:'Hamburger Meat',          ar:'همبرجر لحم',        price:'0.750', meal:'1.250' },
-          { e:'🍗', n:'Chicken Burger',          ar:'برجر دجاج',         price:'0.750', meal:'1.250' },
-          { e:'🌮', n:'Mexico Chicken Francy',   ar:'مكسيكو دجاج فرنسي', price:'0.750', meal:'1.250' },
-          { e:'👻', n:'Shabah Meal',             ar:'وجبة شبح',          price:'0.750', meal:'1.250' },
-          { e:'💫', n:'Ladeda Meal',             ar:'وجبة لذيذا',        price:'0.750', meal:'1.250' },
-          { e:'🍗', n:'Chicken Fillet Francy',   ar:'دجاج فيليه فرنسي',  price:'0.750', meal:'1.250' },
-          { e:'⚡', n:'Chicken Zinger Francy',   ar:'دجاج زنجر فرنسي',   price:'0.900', meal:'1.400' },
-          { e:'🥩', n:'Beef Supreme',            ar:'لحم سريم',          price:'1.000', meal:'1.350', badge:'🥩 BEEF' },
-        ]
-      }
-    ]
-  },
-  {
-    id: 'rolls',
-    name: 'Rolls & Club',
-    nameAr: 'رولز وكلوب',
-    emoji: '🌯',
-    animClass: 'rolls',
-    count: 10,
-    subcats: [
-      {
-        label: '🌯 ROLLS & CLUB MEALS',
-        items: [
-          { e:'🌯', n:'King Roll',          ar:'كينغ رول',       price:'0.750' },
-          { e:'🌯', n:'Francisco Roll',     ar:'فرانسيسكو رول',  price:'0.850' },
-          { e:'🍱', n:'Twister Meal',       ar:'وجبة تويستر',    price:'0.950', meal:'1.500' },
-          { e:'🍽️', n:'Talayani',           ar:'تلاياني',        price:'0.750', meal:'1.250' },
-          { e:'🥚', n:'Club Egg Meal',      ar:'وجبة كلوب بيض',  price:'1.000' },
-          { e:'🍗', n:'Club Chicken Meal',  ar:'وجبة كلوب دجاج', price:'1.500' },
-          { e:'🥩', n:'Beef Club Meal',     ar:'وجبة كلوب لحم',  price:'1.750', badge:'🥩 BEEF' },
-          { e:'🍟', n:'Nuggets Meal',       ar:'وجبة ناجتس',     price:'1.250' },
-          { e:'🥔', n:'Potato Chips',       ar:'بطاط شيبس',      price:'0.750', meal:'1.250' },
-          { e:'✨', n:'King Chips Special', ar:'رقائق كينغ الخاصة', price:'1.250' },
-        ]
-      }
-    ]
-  },
-  {
-    id: 'chapathi',
-    name: 'Chapathi',
-    nameAr: 'شباتي',
-    emoji: '🫓',
-    animClass: 'chapathi',
-    count: 8,
-    subcats: [
-      {
-        label: '🫓 CHAPATHI SANDWICHES — سندويش شباتي',
-        items: [
-          { e:'🫓', n:'Rashid',    ar:'راشد',   fils: 400 },
-          { e:'🫓', n:'Halloum',   ar:'حلوم',   fils: 350 },
-          { e:'🎮', n:'Pubg',      ar:'بوبجي',  fils: 500 },
-          { e:'🍫', n:'Nutella',   ar:'نوتيلا', fils: 250 },
-          { e:'🫓', n:'Azeez',     ar:'عزيز',   fils: 400 },
-          { e:'🫓', n:'Askari',    ar:'عسكري',  fils: 400 },
-          { e:'☕', n:'Karak Tea', ar:'شاي كرك', fils: 250 },
-          { e:'☕', n:'Coffee',    ar:'نسكافي',  fils: 250 },
-        ]
-      }
-    ]
-  },
-  {
-    id: 'biryani',
-    name: 'Biryani',
-    nameAr: 'برياني',
-    emoji: '🍛',
-    animClass: 'biryani',
-    count: 10,
-    subcats: [
-      {
-        label: '🍛 BIRYANI',
-        items: [
-          { e:'🍛', n:'Chicken Biryani',       ar:'برياني دجاج',      price:'1.250' },
-          { e:'🍛', n:'Mutton Biryani',         ar:'برياني لحم',       price:'2.000' },
-          { e:'🍛', n:'Beef Biryani',           ar:'برياني لحم بقر',   price:'1.500' },
-          { e:'🍛', n:'Chicken 65 Biryani',     ar:'برياني دجاج 65',   price:'1.750', badge:'🔥 SPECIAL' },
-          { e:'🍛', n:'Chicken Fry Biryani',    ar:'برياني دجاج مقلي', price:'1.750' },
-          { e:'🍛', n:'Chicken Majboos',        ar:'مجبوس دجاج',       price:'1.750' },
-          { e:'🐟', n:'Pomfret Biryani',        ar:'برياني سمك زبيدي', price:'2.500' },
-          { e:'🐟', n:'Sheri',                  ar:'شيري',             price:'2.000' },
-          { e:'🐟', n:'Tilapia Biryani',        ar:'برياني سمك بلطي',  price:'1.750' },
-          { e:'🦐', n:'Prawns Biryani',         ar:'برياني ربيان',     price:'2.000' },
-        ]
-      }
-    ]
-  },
-  {
-    id: 'rice',
-    name: 'Rice & Specials',
-    nameAr: 'أرز وأكلات',
-    emoji: '🍚',
-    animClass: 'rice',
-    count: 5,
-    subcats: [
-      {
-        label: '🍚 RICE & SPECIALS',
-        items: [
-          { e:'🍚', n:'Chicken 65 Boneless With Rice', ar:'رز مع بونلس دجاج 65',  price:'2.400' },
-          { e:'🌶️', n:'Chicken Chilly With Rice',      ar:'دجاج حار مع الارز',    price:'2.250', badge:'🌶️ SPICY' },
-          { e:'🍚', n:'Chicken Fried Rice',             ar:'ارز مقلي دجاج',        price:'1.500' },
-          { e:'🥦', n:'Veg Fried Rice',                ar:'ارز مقلي خضار',        price:'1.250' },
-          { e:'🍳', n:'Egg Fried Rice',                ar:'ارز مقلي بيض',         price:'1.250' },
-        ]
-      }
-    ]
-  },
-  {
-    id: 'noodles',
-    name: 'Noodles & Mains',
-    nameAr: 'نودلز ومقبلات',
-    emoji: '🍜',
-    animClass: 'noodles',
-    count: 9,
-    subcats: [
-      {
-        label: '🍜 NOODLES',
-        items: [
-          { e:'🍜', n:'Chicken Noodles', ar:'نودلز دجاج', price:'1.750' },
-          { e:'🍜', n:'Egg Noodles',     ar:'نودلز بيض',  price:'1.500' },
-          { e:'🍜', n:'Veg Noodles',     ar:'نودلز خضار', price:'1.500' },
-        ]
-      },
-      {
-        label: '🍲 INDIAN MAINS',
-        items: [
-          { e:'🍛', n:'Butter Chicken',        ar:'دجاج بالزبدة',    price:'1.750' },
-          { e:'🌶️', n:'Chicken Chilly Chinese', ar:'دجاج تشيلي صينيه', price:'1.500', badge:'🌶️ SPICY' },
-          { e:'🍲', n:'Chicken Manchurian',    ar:'دجاج مانشوريان',   price:'1.500' },
-          { e:'🍗', n:'Chicken 65',            ar:'دجاج 65',          price:'1.250', badge:'🔥 SPECIAL' },
-          { e:'🧀', n:'Paneer Butter Masala',  ar:'بانير زبدة مسالا', price:'1.500' },
-          { e:'🥦', n:'Gobi 65',              ar:'قرنبيط 65',         price:'1.250' },
-        ]
-      }
-    ]
-  },
-  {
-    id: 'soups',
-    name: 'Soups',
-    nameAr: 'شوربات',
-    emoji: '🥣',
-    animClass: 'soups',
-    count: 6,
-    subcats: [
-      {
-        label: '🥣 SOUPS — شوربات',
-        items: [
-          { e:'🥣', n:'Veg Soup',     ar:'حساء الخضار',    price:'0.900' },
-          { e:'🥣', n:'Mix Soup',     ar:'مزيج الحساء',    price:'0.900' },
-          { e:'🥣', n:'Paneer Soup',  ar:'حساء بانير',     price:'0.900' },
-          { e:'🥣', n:'Egg Soup',     ar:'شوربة البيض',    price:'0.900' },
-          { e:'🍗', n:'Chicken Soup', ar:'حساء الدجاج',    price:'1.000' },
-          { e:'🥩', n:'Mutton Soup',  ar:'شوربة لحم الضأن',price:'1.000' },
-        ]
-      }
-    ]
-  },
-  {
-    id: 'juices',
-    name: 'Juices & Drinks',
-    nameAr: 'عصائر ومشروبات',
-    emoji: '🥤',
-    animClass: 'juices',
-    count: 14,
-    subcats: [
-      {
-        label: '🥤 SPECIAL DRINKS',
-        items: [
-          { e:'🍹', n:'Mojito', ar:'موهيتو', price:'0.750' },
-        ]
-      },
-      {
-        label: '🍊 FRESH JUICES — S / M / L',
-        items: [
-          { e:'🥑', n:'Avocado Juice',      ar:'عصير افوكادو',  sml:{s:'1.000',m:'1.250',l:'1.500'} },
-          { e:'🌺', n:'Awargulb',           ar:'عصير عوار قلب', sml:{s:'0.750',m:'1.000',l:'1.250'} },
-          { e:'🍹', n:'Cocktail',           ar:'كوكتيل',        sml:{s:'1.000',m:'1.250',l:'1.500'} },
-          { e:'🌹', n:'Samadi',             ar:'صمدي',          sml:{s:'1.000',m:'1.250',l:'1.500'} },
-          { e:'🍨', n:'Falooda',            ar:'فالودا',        sml:{s:'1.000',m:'1.250',l:'1.500'} },
-          { e:'🍋', n:'Lemon Mint',         ar:'ليمون نعناع',   sml:{s:'0.500',m:'0.750',l:'1.000'} },
-          { e:'🥭', n:'Mango Juice',        ar:'عصير مانجو',    sml:{s:'0.750',m:'1.000',l:'1.250'} },
-          { e:'🍊', n:'Orange Juice',       ar:'عصير برتقال',   sml:{s:'0.750',m:'1.000',l:'1.250'} },
-          { e:'🍓', n:'Strawberry Juice',   ar:'عصير فراولة',   sml:{s:'0.750',m:'1.000',l:'1.250'} },
-          { e:'🍌', n:'Banana Milk Juice',  ar:'عصير موز حليب', sml:{s:'0.500',m:'0.750',l:'1.000'} },
-          { e:'🍪', n:'Oreo Milk Shake',    ar:'اورويو ميلك شيك',sml:{s:'0.750',m:'1.000',l:'1.250'} },
-          { e:'🍫', n:'Snickers Milk Shake',ar:'سنيكرز ميلك شيك',sml:{s:'0.750',m:'1.000',l:'1.250'} },
-          { e:'☕', n:'Cold Coffee',        ar:'نسكافيه بارد',  sml:{s:'0.750',m:'1.000',l:'1.250'} },
-        ]
-      }
-    ]
-  },
+var MENU = []; // populated by loadMenuFromSupabase()
+
+var _SB_URL = 'https://zbsdmtjtypzfqrjuvpts.supabase.co';
+var _SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpic2RtdGp0eXB6ZnFyanV2cHRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyNTQ2ODcsImV4cCI6MjA4OTgzMDY4N30.qeoSk8L7SQbsKetUEbm5Koe0iIIVlkhKkaaUG9qVrxo';
+// Hardcoded fallback (used if Supabase is unavailable)
+var MENU_HARDCODED = [
+  {id:'burgers',name:'Burgers',nameAr:'برجر',emoji:'🍔',animClass:'burgers',count:16,subcats:[{label:'🍔 SIGNATURE BURGERS',items:[
+    {e:'🍔',n:'Zinger Burger',ar:'برجر زنجر',price:'0.900',meal:'1.400',badge:'🔥 HOT'},
+    {e:'👑',n:'King Burger',ar:'كنغ برجر',price:'0.750',meal:'1.250'},
+    {e:'🍗',n:'Chicken Fillet Burger',ar:'برجر دجاج فيليه',price:'0.750',meal:'1.250'},
+    {e:'🌶️',n:'Khaleej Burger',ar:'برجر خليج',price:'0.850',meal:'1.350'},
+    {e:'🍔',n:'Zinger Double Burger',ar:'برجر زنجر دبل',price:'1.300',meal:'1.750',badge:'🔥 DOUBLE'},
+    {e:'🍗',n:'Chicken Double Burger',ar:'برجر دجاج دبل',price:'1.000',meal:'1.500',badge:'🔥 DOUBLE'},
+    {e:'🍔',n:'Hamburger Chicken',ar:'همبرجر دجاج',price:'0.750',meal:'1.250'},
+    {e:'⚡',n:'Hamburger Super',ar:'همبرجر سوبر',price:'0.850',meal:'1.350'},
+    {e:'🥩',n:'Hamburger Meat',ar:'همبرجر لحم',price:'0.750',meal:'1.250'},
+    {e:'🍗',n:'Chicken Burger',ar:'برجر دجاج',price:'0.750',meal:'1.250'},
+    {e:'🌮',n:'Mexico Chicken Francy',ar:'مكسيكو دجاج فرنسي',price:'0.750',meal:'1.250'},
+    {e:'👻',n:'Shabah Meal',ar:'وجبة شبح',price:'0.750',meal:'1.250'},
+    {e:'💫',n:'Ladeda Meal',ar:'وجبة لذيذا',price:'0.750',meal:'1.250'},
+    {e:'🍗',n:'Chicken Fillet Francy',ar:'دجاج فيليه فرنسي',price:'0.750',meal:'1.250'},
+    {e:'⚡',n:'Chicken Zinger Francy',ar:'دجاج زنجر فرنسي',price:'0.900',meal:'1.400'},
+    {e:'🥩',n:'Beef Supreme',ar:'لحم سريم',price:'1.000',meal:'1.350',badge:'🥩 BEEF'}
+  ]}]},
+  {id:'rolls',name:'Rolls & Club',nameAr:'رولز وكلوب',emoji:'🌯',animClass:'rolls',count:10,subcats:[{label:'🌯 ROLLS & CLUB MEALS',items:[
+    {e:'🌯',n:'King Roll',ar:'كينغ رول',price:'0.750'},
+    {e:'🌯',n:'Francisco Roll',ar:'فرانسيسكو رول',price:'0.850'},
+    {e:'🍱',n:'Twister Meal',ar:'وجبة تويستر',price:'0.950',meal:'1.500'},
+    {e:'🍽️',n:'Talayani',ar:'تلاياني',price:'0.750',meal:'1.250'},
+    {e:'🥚',n:'Club Egg Meal',ar:'وجبة كلوب بيض',price:'1.000'},
+    {e:'🍗',n:'Club Chicken Meal',ar:'وجبة كلوب دجاج',price:'1.500'},
+    {e:'🥩',n:'Beef Club Meal',ar:'وجبة كلوب لحم',price:'1.750',badge:'🥩 BEEF'},
+    {e:'🍟',n:'Nuggets Meal',ar:'وجبة ناجتس',price:'1.250'},
+    {e:'🥔',n:'Potato Chips',ar:'بطاط شيبس',price:'0.750',meal:'1.250'},
+    {e:'✨',n:'King Chips Special',ar:'رقائق كينغ الخاصة',price:'1.250'}
+  ]}]},
+  {id:'chapathi',name:'Chapathi',nameAr:'شباتي',emoji:'🫓',animClass:'chapathi',count:8,subcats:[{label:'🫓 CHAPATHI SANDWICHES',items:[
+    {e:'🫓',n:'Rashid',ar:'راشد',fils:400},{e:'🫓',n:'Halloum',ar:'حلوم',fils:350},
+    {e:'🎮',n:'Pubg',ar:'بوبجي',fils:500},{e:'🍫',n:'Nutella',ar:'نوتيلا',fils:250},
+    {e:'🫓',n:'Azeez',ar:'عزيز',fils:400},{e:'🫓',n:'Askari',ar:'عسكري',fils:400},
+    {e:'☕',n:'Karak Tea',ar:'شاي كرك',fils:250},{e:'☕',n:'Coffee',ar:'نسكافي',fils:250}
+  ]}]},
+  {id:'biryani',name:'Biryani',nameAr:'برياني',emoji:'🍛',animClass:'biryani',count:10,subcats:[{label:'🍛 BIRYANI',items:[
+    {e:'🍛',n:'Chicken Biryani',ar:'برياني دجاج',price:'1.250'},
+    {e:'🍛',n:'Mutton Biryani',ar:'برياني لحم',price:'2.000'},
+    {e:'🍛',n:'Beef Biryani',ar:'برياني لحم بقر',price:'1.500'},
+    {e:'🍛',n:'Chicken 65 Biryani',ar:'برياني دجاج 65',price:'1.750',badge:'🔥 SPECIAL'},
+    {e:'🍛',n:'Chicken Fry Biryani',ar:'برياني دجاج مقلي',price:'1.750'},
+    {e:'🍛',n:'Chicken Majboos',ar:'مجبوس دجاج',price:'1.750'},
+    {e:'🐟',n:'Pomfret Biryani',ar:'برياني سمك زبيدي',price:'2.500'},
+    {e:'🐟',n:'Sheri',ar:'شيري',price:'2.000'},
+    {e:'🐟',n:'Tilapia Biryani',ar:'برياني سمك بلطي',price:'1.750'},
+    {e:'🦐',n:'Prawns Biryani',ar:'برياني ربيان',price:'2.000'}
+  ]}]},
+  {id:'rice',name:'Rice & Specials',nameAr:'أرز وأكلات',emoji:'🍚',animClass:'rice',count:5,subcats:[{label:'🍚 RICE & SPECIALS',items:[
+    {e:'🍚',n:'Chicken 65 Boneless With Rice',ar:'رز مع بونلس دجاج 65',price:'2.400'},
+    {e:'🌶️',n:'Chicken Chilly With Rice',ar:'دجاج حار مع الارز',price:'2.250',badge:'🌶️ SPICY'},
+    {e:'🍚',n:'Chicken Fried Rice',ar:'ارز مقلي دجاج',price:'1.500'},
+    {e:'🥦',n:'Veg Fried Rice',ar:'ارز مقلي خضار',price:'1.250'},
+    {e:'🍳',n:'Egg Fried Rice',ar:'ارز مقلي بيض',price:'1.250'}
+  ]}]},
+  {id:'noodles',name:'Noodles & Mains',nameAr:'نودلز ومقبلات',emoji:'🍜',animClass:'noodles',count:9,subcats:[
+    {label:'🍜 NOODLES',items:[
+      {e:'🍜',n:'Chicken Noodles',ar:'نودلز دجاج',price:'1.750'},
+      {e:'🍜',n:'Egg Noodles',ar:'نودلز بيض',price:'1.500'},
+      {e:'🍜',n:'Veg Noodles',ar:'نودلز خضار',price:'1.500'}
+    ]},
+    {label:'🍲 INDIAN MAINS',items:[
+      {e:'🍛',n:'Butter Chicken',ar:'دجاج بالزبدة',price:'1.750'},
+      {e:'🌶️',n:'Chicken Chilly Chinese',ar:'دجاج تشيلي صينيه',price:'1.500',badge:'🌶️ SPICY'},
+      {e:'🍲',n:'Chicken Manchurian',ar:'دجاج مانشوريان',price:'1.500'},
+      {e:'🍗',n:'Chicken 65',ar:'دجاج 65',price:'1.250',badge:'🔥 SPECIAL'},
+      {e:'🧀',n:'Paneer Butter Masala',ar:'بانير زبدة مسالا',price:'1.500'},
+      {e:'🥦',n:'Gobi 65',ar:'قرنبيط 65',price:'1.250'}
+    ]}
+  ]},
+  {id:'soups',name:'Soups',nameAr:'شوربات',emoji:'🥣',animClass:'soups',count:6,subcats:[{label:'🥣 SOUPS',items:[
+    {e:'🥣',n:'Veg Soup',ar:'حساء الخضار',price:'0.900'},
+    {e:'🥣',n:'Mix Soup',ar:'مزيج الحساء',price:'0.900'},
+    {e:'🥣',n:'Paneer Soup',ar:'حساء بانير',price:'0.900'},
+    {e:'🥣',n:'Egg Soup',ar:'شوربة البيض',price:'0.900'},
+    {e:'🍗',n:'Chicken Soup',ar:'حساء الدجاج',price:'1.000'},
+    {e:'🥩',n:'Mutton Soup',ar:'شوربة لحم الضأن',price:'1.000'}
+  ]}]},
+  {id:'juices',name:'Juices & Drinks',nameAr:'عصائر ومشروبات',emoji:'🥤',animClass:'juices',count:14,subcats:[
+    {label:'🥤 SPECIAL DRINKS',items:[{e:'🍹',n:'Mojito',ar:'موهيتو',price:'0.750'}]},
+    {label:'🍊 FRESH JUICES — S / M / L',items:[
+      {e:'🥑',n:'Avocado Juice',ar:'عصير افوكادو',sml:{s:'1.000',m:'1.250',l:'1.500'}},
+      {e:'🌺',n:'Awargulb',ar:'عصير عوار قلب',sml:{s:'0.750',m:'1.000',l:'1.250'}},
+      {e:'🍹',n:'Cocktail',ar:'كوكتيل',sml:{s:'1.000',m:'1.250',l:'1.500'}},
+      {e:'🌹',n:'Samadi',ar:'صمدي',sml:{s:'1.000',m:'1.250',l:'1.500'}},
+      {e:'🍨',n:'Falooda',ar:'فالودا',sml:{s:'1.000',m:'1.250',l:'1.500'}},
+      {e:'🍋',n:'Lemon Mint',ar:'ليمون نعناع',sml:{s:'0.500',m:'0.750',l:'1.000'}},
+      {e:'🥭',n:'Mango Juice',ar:'عصير مانجو',sml:{s:'0.750',m:'1.000',l:'1.250'}},
+      {e:'🍊',n:'Orange Juice',ar:'عصير برتقال',sml:{s:'0.750',m:'1.000',l:'1.250'}},
+      {e:'🍓',n:'Strawberry Juice',ar:'عصير فراولة',sml:{s:'0.750',m:'1.000',l:'1.250'}},
+      {e:'🍌',n:'Banana Milk Juice',ar:'عصير موز حليب',sml:{s:'0.500',m:'0.750',l:'1.000'}},
+      {e:'🍪',n:'Oreo Milk Shake',ar:'اورويو ميلك شيك',sml:{s:'0.750',m:'1.000',l:'1.250'}},
+      {e:'🍫',n:'Snickers Milk Shake',ar:'سنيكرز ميلك شيك',sml:{s:'0.750',m:'1.000',l:'1.250'}},
+      {e:'☕',n:'Cold Coffee',ar:'نسكافيه بارد',sml:{s:'0.750',m:'1.000',l:'1.250'}}
+    ]}
+  ]}
 ];
 
-/* ══════════════════════════════════════════
-   BUILD CATEGORY CARDS
-══════════════════════════════════════════ */
+
+
+const CAT_ANIM_META = {
+  burgers:'burgers', rolls:'rolls', chapathi:'chapathi', biryani:'biryani',
+  rice:'rice', noodles:'noodles', soups:'soups', juices:'juices'
+};
+
+function animBgFor(animClass) {
+  if (animClass === 'soups') return '<div class="anim-bg soups"><div class="soup-ripple"></div><div class="soup-ripple"></div><div class="soup-ripple"></div></div>';
+  if (animClass === 'juices') return '<div class="anim-bg juices"><div class="juice-orb"></div><div class="juice-orb"></div><div class="juice-orb"></div></div>';
+  if (animClass === 'noodles') return '<div class="anim-bg noodles"><svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg"><path class="noodle-line" d="M-10 25 Q 30 10, 60 25 Q 90 40, 130 25" stroke="rgba(77,196,163,0.8)" stroke-width="2.5" fill="none"/><path class="noodle-line" d="M-10 45 Q 30 30, 60 45 Q 90 60, 130 45" stroke="rgba(31,149,120,0.6)" stroke-width="2" fill="none"/><path class="noodle-line" d="M-10 65 Q 30 50, 60 65 Q 90 80, 130 65" stroke="rgba(77,196,163,0.5)" stroke-width="1.5" fill="none"/></svg></div>';
+  return '<div class="anim-bg ' + animClass + '"></div>';
+}
+
+async function loadMenuFromSupabase() {
+  // Show loading state on cards grid
+  var grid = document.getElementById('cards-grid');
+  if (grid) grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:2px">LOADING MENU...</div>';
+
+  try {
+    var res = await fetch(_SB_URL + '/rest/v1/products?select=*&is_hidden=eq.false&order=category_sort.asc,sort_order.asc', {
+      headers: { 'apikey': _SB_KEY, 'Authorization': 'Bearer ' + _SB_KEY }
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var products = await res.json();
+
+    if (!products.length) throw new Error('No products found');
+
+    // Group by category
+    var catMap = {};
+    products.forEach(function(p) {
+      if (!catMap[p.category_id]) {
+        catMap[p.category_id] = {
+          id: p.category_id,
+          name: p.category_name || p.category_id,
+          nameAr: p.category_name_ar || '',
+          emoji: p.category_emoji || '🍽️',
+          animClass: p.category_anim_class || p.category_id,
+          sort: p.category_sort || 0,
+          items: []
+        };
+      }
+      catMap[p.category_id].items.push(p);
+    });
+
+    // Convert to MENU array sorted by category_sort
+    MENU = Object.values(catMap).sort(function(a,b){return a.sort - b.sort;});
+    MENU.forEach(function(cat) { cat.count = cat.items.length; });
+
+    buildCards();
+
+  } catch(e) {
+    console.warn('Supabase load failed, using fallback:', e.message);
+    // Fallback to hardcoded data
+    MENU = MENU_HARDCODED;
+    buildCards();
+  }
+}
+
 function buildCards() {
-  const grid = document.getElementById('cards-grid');
+  var grid = document.getElementById('cards-grid');
+  if (!grid) return;
   grid.innerHTML = '';
-  MENU.forEach(cat => {
-    const card = document.createElement('div');
+  MENU.forEach(function(cat) {
+    var card = document.createElement('div');
     card.className = 'cat-card';
-    card.onclick = () => openCategory(cat.id);
-
-    let animBgHTML = '';
-    if (cat.animClass === 'soups') {
-      animBgHTML = `<div class="anim-bg soups">
-        <div class="soup-ripple"></div>
-        <div class="soup-ripple"></div>
-        <div class="soup-ripple"></div>
-      </div>`;
-    } else if (cat.animClass === 'juices') {
-      animBgHTML = `<div class="anim-bg juices">
-        <div class="juice-orb"></div>
-        <div class="juice-orb"></div>
-        <div class="juice-orb"></div>
-      </div>`;
-    } else if (cat.animClass === 'noodles') {
-      animBgHTML = `<div class="anim-bg noodles">
-        <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path class="noodle-line" d="M-10 25 Q 30 10, 60 25 Q 90 40, 130 25" stroke="rgba(77,196,163,0.8)" stroke-width="2.5" fill="none"/>
-          <path class="noodle-line" d="M-10 45 Q 30 30, 60 45 Q 90 60, 130 45" stroke="rgba(31,149,120,0.6)" stroke-width="2" fill="none"/>
-          <path class="noodle-line" d="M-10 65 Q 30 50, 60 65 Q 90 80, 130 65" stroke="rgba(77,196,163,0.5)" stroke-width="1.5" fill="none"/>
-        </svg>
-      </div>`;
-    } else {
-      animBgHTML = `<div class="anim-bg ${cat.animClass}"></div>`;
-    }
-
-    card.innerHTML = `
-      ${animBgHTML}
-      <span class="card-emoji">${cat.emoji}</span>
-      <div class="card-count">${cat.count} ITEMS</div>
-      <div class="card-arrow">→</div>
-      <div class="card-name">${cat.name}</div>
-      <div class="card-name-ar">${cat.nameAr}</div>
-    `;
+    card.onclick = function() { openCategory(cat.id); };
+    card.innerHTML =
+      animBgFor(cat.animClass) +
+      '<span class="card-emoji">' + cat.emoji + '</span>' +
+      '<div class="card-count">' + cat.count + ' ITEMS</div>' +
+      '<div class="card-arrow">→</div>' +
+      '<div class="card-name">' + cat.name + '</div>' +
+      '<div class="card-name-ar">' + cat.nameAr + '</div>';
     grid.appendChild(card);
   });
 }
 
-/* ══════════════════════════════════════════
-   BUILD ITEM CARD HTML
-══════════════════════════════════════════ */
 /* renderItem defined in cart script */
 
-/* ══════════════════════════════════════════
-   NAVIGATION
-══════════════════════════════════════════ */
 function openCategory(id) {
-  const cat = MENU.find(c => c.id === id);
+  var cat = MENU.find(function(c){return c.id===id;});
   if (!cat) return;
 
-  // Update header
   document.getElementById('cat-header-name').textContent = cat.name.toUpperCase();
   document.getElementById('cat-header-emoji').textContent = cat.emoji;
 
-  // Build items
-  const container = document.getElementById('items-container');
-  let html = '';
-  let delay = 0;
-  cat.subcats.forEach(sub => {
-    html += `<div class="subcat-label"><span>${sub.label}</span></div>`;
-    html += `<div class="items-grid">`;
-    sub.items.forEach(item => {
+  var container = document.getElementById('items-container');
+  var html = '';
+  var delay = 0;
+
+  // Products from Supabase are flat — render directly
+  if (cat.items) {
+    // From Supabase: flat array of products
+    html += '<div class="items-grid">';
+    cat.items.forEach(function(p) {
+      // Convert Supabase product to legacy item format
+      var item = {
+        e: p.emoji || '🍽️',
+        n: p.name,
+        ar: p.name_ar || '',
+        badge: p.badge || null
+      };
+      if (p.fils) {
+        item.fils = p.fils;
+      } else if (p.sml_s) {
+        item.sml = { s: String(p.sml_s), m: String(p.sml_m), l: String(p.sml_l) };
+      } else {
+        item.price = String(p.price || 0);
+        if (p.meal_price) item.meal = String(p.meal_price);
+      }
       html += renderItem(item, delay);
       delay += 40;
     });
-    html += `</div>`;
-  });
-  container.innerHTML = html;
+    html += '</div>';
+  } else if (cat.subcats) {
+    // Legacy hardcoded format
+    cat.subcats.forEach(function(sub) {
+      html += '<div class="subcat-label"><span>' + sub.label + '</span></div>';
+      html += '<div class="items-grid">';
+      sub.items.forEach(function(item) {
+        html += renderItem(item, delay);
+        delay += 40;
+      });
+      html += '</div>';
+    });
+  }
 
-  // Slide in
-  const catView = document.getElementById('cat-view');
+  container.innerHTML = html;
+  var catView = document.getElementById('cat-view');
   catView.scrollTop = 0;
   catView.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
 
 function goHome() {
-  const catView = document.getElementById('cat-view');
-  catView.classList.remove('open');
+  document.getElementById('cat-view').classList.remove('open');
   document.body.style.overflow = '';
 }
 
-// Handle browser back gesture / button
-window.addEventListener('popstate', () => {
-  const catView = document.getElementById('cat-view');
-  if (catView.classList.contains('open')) goHome();
+window.addEventListener('popstate', function() {
+  var cv = document.getElementById('cat-view');
+  if (cv.classList.contains('open')) goHome();
 });
 
-/* init in cart script below */
+/* init in cart script below — calls loadMenuFromSupabase() */
 </script>
+
 
 <!-- CART FAB -->
 <button class="cart-fab" id="cart-fab" onclick="openCart()" style="display:none">
@@ -1423,7 +1364,7 @@ function backToMenu() {
   if (btn) { btn.textContent='PLACE ORDER'; btn.disabled=false; }
 }
 
-buildCards();
+loadMenuFromSupabase();
 </script>
 
 </body>
