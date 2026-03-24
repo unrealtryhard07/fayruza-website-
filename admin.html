@@ -305,9 +305,8 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
         <div>
           <label style="font-family:'Barlow Condensed';font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Role</label>
           <select id="um-role" class="status-sel">
-            <option value="cashier">Cashier — Orders only</option>
-            <option value="viewer">Viewer — Read only</option>
-            <option value="manager">Manager — Most pages</option>
+            <option value="staff">Staff — Orders only</option>
+            <option value="manager">Manager — Dashboard, Orders, Reports</option>
             <option value="owner">Owner — Full access</option>
           </select>
         </div>
@@ -316,9 +315,8 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
       <div style="background:rgba(31,149,120,.06);border:1px solid rgba(31,149,120,.15);border-radius:8px;padding:12px 14px;font-family:'Barlow Condensed';font-size:.8rem;color:var(--muted);line-height:1.6">
         <strong style="color:var(--teal);display:block;margin-bottom:4px">Role Permissions:</strong>
         🔵 <b>Owner</b> — All pages + manage users<br>
-        🟢 <b>Manager</b> — Dashboard, Orders, Reports, Products<br>
-        🟡 <b>Cashier</b> — Dashboard + Orders only<br>
-        ⚪ <b>Viewer</b> — Dashboard + Reports (read-only)
+        🟢 <b>Manager</b> — Dashboard, Orders, Reports<br>
+        🟡 <b>Staff</b> — Orders only
       </div>
     </div>
     <div class="mfoot">
@@ -842,7 +840,7 @@ function showPage(name, btn) {
   document.querySelectorAll('.nb').forEach(n => n.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
   btn.classList.add('active');
-  const titles = {dashboard:'DASHBOARD', orders:'ORDERS', reports:'REPORTS', products:'PRODUCTS'};
+  const titles = {dashboard:'DASHBOARD', orders:'ORDERS', reports:'REPORTS', products:'PRODUCTS', users:'TEAM USERS'};
   document.getElementById('page-title').textContent = titles[name]||name.toUpperCase();
   if (name==='orders') renderOrdersTable();
   if (name==='reports') renderReport();
@@ -1176,22 +1174,32 @@ function initAuth() {
   if (userEl) userEl.textContent = ADMIN_SESSION.full_name || ADMIN_SESSION.username;
   if (roleEl) roleEl.textContent = ADMIN_SESSION.role.toUpperCase();
 
-  // Hide nav items the user doesn't have access to
+  // Build perms — users tab only for owner
   var perms = ADMIN_SESSION.perms || {};
+  if (ADMIN_SESSION.role !== 'owner') perms.users = false;
+
+  // Hide nav items the user doesn't have access to
   var navMap = {
     dashboard: document.querySelector('[onclick*="dashboard"]'),
     orders:    document.querySelector('[onclick*="orders"]'),
     reports:   document.querySelector('[onclick*="reports"]'),
     products:  document.querySelector('[onclick*="products"]'),
+    users:     document.querySelector('[onclick*="users"]'),
   };
+  // Also hide section headers if all items under them are hidden
   Object.keys(navMap).forEach(function(page) {
     if (navMap[page] && perms[page] === false) {
       navMap[page].style.display = 'none';
     }
   });
+  // Hide TEAM section header if users hidden
+  var teamSec = document.getElementById('nav-team-sec');
+  if (teamSec && perms.users === false) teamSec.style.display = 'none';
+  var menuSec = document.getElementById('nav-menu-sec');
+  if (menuSec && perms.products === false) menuSec.style.display = 'none';
 
   // Start on first accessible page
-  var firstPage = ['dashboard','orders','reports','products'].find(function(p) {
+  var firstPage = ['dashboard','orders','reports','products','users'].find(function(p) {
     return perms[p] !== false;
   }) || 'orders';
 
@@ -1204,11 +1212,12 @@ function initAuth() {
   var pg = document.getElementById('page-' + firstPage);
   if (pg) pg.classList.add('active');
 
-  var titles = {dashboard:'DASHBOARD', orders:'ORDERS', reports:'REPORTS', products:'PRODUCTS'};
+  var titles = {dashboard:'DASHBOARD', orders:'ORDERS', reports:'REPORTS', products:'PRODUCTS', users:'USERS'};
   document.getElementById('page-title').textContent = titles[firstPage] || firstPage.toUpperCase();
 
   if (firstPage === 'reports') renderReport();
   if (firstPage === 'products') loadProducts();
+  if (firstPage === 'users') loadUsers();
 }
 
 function doLogout() {
@@ -1225,8 +1234,129 @@ showPage = function(name, btn) {
     return;
   }
   _origShowPage(name, btn);
+  if (name === 'users') loadUsers();
 };
 
+/* ══════════════════════════════════════════
+   USERS PAGE
+══════════════════════════════════════════ */
+let allUsers = [];
+let editingUserId = null;
+
+async function loadUsers() {
+  try {
+    const res = await fetch(SB_URL + '/rest/v1/admin_users?select=*&order=created_at.asc', {
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+    });
+    if (!res.ok) throw new Error(res.status);
+    allUsers = await res.json();
+    renderUsersTable();
+  } catch(e) { showToast('⚠ Could not load users: ' + e.message); }
+}
+
+const roleColors = { owner:'#ff9f43', manager:'var(--teal)', staff:'var(--muted)' };
+const roleLabels = { owner:'👑 Owner', manager:'🟢 Manager', staff:'🟡 Staff' };
+
+function renderUsersTable() {
+  const tbody = document.getElementById('users-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = allUsers.map(u => `
+    <tr>
+      <td><span style="font-family:'Barlow Condensed';font-weight:700;font-size:.9rem">${u.full_name}</span></td>
+      <td style="font-family:'Barlow Condensed';color:var(--muted)">@${u.username}</td>
+      <td><span style="font-family:'Bebas Neue';font-size:.78rem;letter-spacing:1px;padding:3px 10px;border-radius:20px;background:rgba(31,149,120,.1);color:${roleColors[u.role]||'var(--muted)'}">${roleLabels[u.role]||u.role}</span></td>
+      <td style="font-size:.78rem;color:var(--muted)">${u.last_login ? fmtDate(u.last_login)+' '+fmtTime(u.last_login) : 'Never'}</td>
+      <td>${u.is_active
+        ? '<span style="font-family:\'Bebas Neue\';font-size:.7rem;letter-spacing:1px;color:var(--teal);background:rgba(31,149,120,.1);padding:3px 8px;border-radius:3px">ACTIVE</span>'
+        : '<span style="font-family:\'Bebas Neue\';font-size:.7rem;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,.05);padding:3px 8px;border-radius:3px">INACTIVE</span>'}</td>
+      <td><button onclick="openUserModal(${u.id})" style="background:rgba(31,149,120,.1);border:1px solid rgba(31,149,120,.25);color:var(--teal);font-family:'Bebas Neue';font-size:.75rem;letter-spacing:1px;padding:4px 10px;border-radius:5px;cursor:pointer">✏ EDIT</button></td>
+    </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:28px">No users yet</td></tr>';
+}
+
+function openUserModal(id) {
+  editingUserId = id;
+  const delBtn = document.getElementById('um-del-btn');
+  const pwHint = document.getElementById('um-pw-hint');
+  ['um-name','um-username','um-password'].forEach(i => { const el=document.getElementById(i); if(el) el.value=''; });
+  document.getElementById('um-role').value = 'staff';
+  if (id) {
+    const u = allUsers.find(x => x.id === id);
+    if (!u) return;
+    document.getElementById('um-title').textContent = 'EDIT USER';
+    if (delBtn) delBtn.style.display = 'block';
+    if (pwHint) pwHint.textContent = '(leave blank to keep)';
+    document.getElementById('um-name').value = u.full_name || '';
+    document.getElementById('um-username').value = u.username || '';
+    document.getElementById('um-role').value = u.role || 'staff';
+  } else {
+    document.getElementById('um-title').textContent = 'ADD USER';
+    if (delBtn) delBtn.style.display = 'none';
+    if (pwHint) pwHint.textContent = '(required)';
+  }
+  document.getElementById('user-modal').classList.add('open');
+}
+
+function closeUserModal() {
+  document.getElementById('user-modal').classList.remove('open');
+  editingUserId = null;
+}
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+async function saveUser() {
+  const fullName = (document.getElementById('um-name')||{}).value?.trim();
+  const username = (document.getElementById('um-username')||{}).value?.trim().toLowerCase();
+  const password = (document.getElementById('um-password')||{}).value;
+  const role     = (document.getElementById('um-role')||{}).value;
+  if (!fullName || !username) { showToast('⚠ Name and username are required'); return; }
+  if (!editingUserId && !password) { showToast('⚠ Password is required for new users'); return; }
+  const record = { full_name: fullName, username, role };
+  if (password) record.password_hash = await sha256(password);
+  try {
+    let res;
+    if (editingUserId) {
+      res = await fetch(SB_URL + '/rest/v1/admin_users?id=eq.' + editingUserId, {
+        method: 'PATCH',
+        headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        body: JSON.stringify(record)
+      });
+    } else {
+      record.is_active = true;
+      res = await fetch(SB_URL + '/rest/v1/admin_users', {
+        method: 'POST',
+        headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        body: JSON.stringify(record)
+      });
+    }
+    if (!res.ok) throw new Error(await res.text());
+    showToast(editingUserId ? '✓ User updated' : '✓ User added');
+    closeUserModal();
+    await loadUsers();
+  } catch(e) { showToast('⚠ ' + e.message); }
+}
+
+async function deleteUser() {
+  if (!editingUserId) return;
+  if (ADMIN_SESSION && editingUserId === ADMIN_SESSION.id) { showToast('⚠ Cannot delete your own account'); return; }
+  if (!confirm('Delete this user permanently?')) return;
+  try {
+    const res = await fetch(SB_URL + '/rest/v1/admin_users?id=eq.' + editingUserId, {
+      method: 'DELETE',
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+    });
+    if (!res.ok) throw new Error(await res.text());
+    showToast('🗑 User deleted');
+    closeUserModal();
+    await loadUsers();
+  } catch(e) { showToast('⚠ ' + e.message); }
+}
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
 loadAll();
 subscribeRealtime();
 loadProducts();

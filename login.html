@@ -71,9 +71,9 @@ async function sha256(str) {
 // Role → default page permissions
 function buildPerms(role, overrides) {
   var defaults = {
-    owner:   { dashboard:true,  orders:true,  reports:true,  products:true  },
-    manager: { dashboard:true,  orders:true,  reports:true,  products:false },
-    staff:   { dashboard:false, orders:true,  reports:false, products:false }
+    owner:   { dashboard:true,  orders:true,  reports:true,  products:true,  users:true  },
+    manager: { dashboard:true,  orders:true,  reports:true,  products:false, users:false },
+    staff:   { dashboard:false, orders:true,  reports:false, products:false, users:false }
   };
   var base = defaults[role] || defaults['staff'];
   return Object.assign({}, base, overrides || {});
