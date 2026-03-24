@@ -569,8 +569,8 @@ body {
 }
 
 /* ── Meal toggle ── */
-.meal-toggle-row{display:flex;gap:6px;margin-top:8px;}
-.meal-opt{flex:1;padding:6px 4px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.72rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:1.5px solid rgba(31,149,120,.25);background:rgba(31,149,120,.06);color:var(--muted);transition:all .15s;-webkit-tap-highlight-color:transparent;}
+.meal-toggle-row{display:flex;gap:5px;margin-top:8px;}
+.meal-opt{flex:1;padding:7px 4px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.7rem;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;border:1.5px solid rgba(31,149,120,.25);background:rgba(31,149,120,.06);color:var(--muted);transition:all .15s;-webkit-tap-highlight-color:transparent;line-height:1.3;}
 .meal-opt.sel{background:var(--red);border-color:var(--red);color:#fff;}
 
 /* ── ATC button ── */
@@ -1143,9 +1143,15 @@ function renderItem(item, delay) {
   } else {
     ph = '<div class="ic-price">'+item.price+' <span class="ic-price-kd">KD</span></div>';
     if (item.meal) {
-      ph += '<div class="meal-toggle-row">'+
-        '<button class="meal-opt meal-opt-item sel" data-type="item">Burger Only</button>'+
-        '<button class="meal-opt meal-opt-meal" data-type="meal">+ Meal '+item.meal+' KD</button>'+
+      var baseKD = parseFloat(item.price).toFixed(3);
+      var mealKD = parseFloat(item.meal).toFixed(3);
+      ph += '<div class="meal-toggle-row">' +
+        '<button class="meal-opt meal-opt-item sel" data-type="item">' +
+          'Solo &nbsp;' + baseKD + ' KD' +
+        '</button>' +
+        '<button class="meal-opt meal-opt-meal" data-type="meal">' +
+          '+ Meal &nbsp;' + mealKD + ' KD' +
+        '</button>' +
         '</div>';
     }
   }
