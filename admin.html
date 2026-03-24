@@ -152,6 +152,7 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
     <div class="sb-sec" id="nav-menu-sec">MENU</div>
     <button class="nb" id="nav-products" onclick="showPage('products',this)"><span class="ic">🍽️</span> Products</button>
     <div class="sb-sec" id="nav-team-sec">TEAM</div>
+    <button class="nb" id="nav-shifts" onclick="showPage('shifts',this)"><span class="ic">🕐</span> Shifts</button>
     <button class="nb" id="nav-users" onclick="showPage('users',this)"><span class="ic">👥</span> Users</button>
     <div class="sb-sec">SITE</div>
     <a href="index.html" class="nb"><span class="ic">🍔</span> View Menu</a>
@@ -242,6 +243,59 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
     </div>
 
     <!-- USERS PAGE -->
+    <!-- SHIFTS PAGE -->
+    <div class="page" id="page-shifts">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+
+        <!-- START SHIFT -->
+        <div class="panel">
+          <div class="ph"><div class="ph-title">🟢 START SHIFT</div></div>
+          <div style="padding:18px">
+            <label style="font-family:'Barlow Condensed';font-size:.68rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Staff Member</label>
+            <select id="shift-start-user" class="status-sel" style="margin-bottom:12px">
+              <option value="">Select staff...</option>
+            </select>
+            <label style="font-family:'Barlow Condensed';font-size:.68rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Opening Cash in Box (KD)</label>
+            <input type="number" id="shift-open-cash" min="0" step="0.001" placeholder="0.000"
+              style="width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:'Barlow Condensed';font-size:1rem;padding:10px 12px;border-radius:8px;outline:none;margin-bottom:14px">
+            <button onclick="startShift()" style="width:100%;padding:12px;background:var(--green);color:#fff;font-family:'Bebas Neue';font-size:1rem;letter-spacing:2px;border:none;border-radius:8px;cursor:pointer">▶ START SHIFT</button>
+          </div>
+        </div>
+
+        <!-- END SHIFT -->
+        <div class="panel">
+          <div class="ph"><div class="ph-title">🔴 END SHIFT</div></div>
+          <div style="padding:18px">
+            <label style="font-family:'Barlow Condensed';font-size:.68rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Active Shift</label>
+            <select id="shift-end-select" class="status-sel" style="margin-bottom:12px">
+              <option value="">Select active shift...</option>
+            </select>
+            <label style="font-family:'Barlow Condensed';font-size:.68rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Closing Cash in Box (KD)</label>
+            <input type="number" id="shift-close-cash" min="0" step="0.001" placeholder="0.000"
+              style="width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:'Barlow Condensed';font-size:1rem;padding:10px 12px;border-radius:8px;outline:none;margin-bottom:14px">
+            <button onclick="endShift()" style="width:100%;padding:12px;background:rgba(255,71,87,.15);color:var(--red);font-family:'Bebas Neue';font-size:1rem;letter-spacing:2px;border:1px solid rgba(255,71,87,.3);border-radius:8px;cursor:pointer">⏹ END SHIFT</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SHIFT LOG -->
+      <div class="panel">
+        <div class="ph">
+          <div class="ph-title">SHIFT LOG</div>
+          <div class="ph-actions">
+            <button class="btn-filter active" onclick="filterShifts('all',this)">All</button>
+            <button class="btn-filter" onclick="filterShifts('active',this)">Active</button>
+            <button class="btn-filter" onclick="filterShifts('closed',this)">Closed</button>
+            <button class="btn-refresh" onclick="loadShifts()">↻</button>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table><thead><tr><th>STAFF</th><th>STARTED</th><th>ENDED</th><th>OPEN CASH</th><th>CASH ORDERS</th><th>EXPECTED</th><th>CLOSE CASH</th><th>VARIANCE</th><th>STATUS</th></tr></thead>
+          <tbody id="shifts-tbody"></tbody></table>
+        </div>
+      </div>
+    </div>
+
     <div class="page" id="page-users">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
         <div style="font-family:'Barlow Condensed';font-size:.75rem;letter-spacing:3px;color:var(--muted);text-transform:uppercase">Manage team access and roles</div>
@@ -575,11 +629,27 @@ function openOrder(id) {
       ${(order.discount_amt>0)?`<div class="tot-row"><span class="l">Discount</span><span class="v" style="color:var(--red)">– ${fmt(order.discount_amt)}</span></div>`:''}
       <div class="tot-row"><span class="l">Tax</span><span class="v">—</span></div>
       <div class="tot-row grand"><span class="l">TOTAL</span><span class="v">${fmt(order.total)}</span></div>
+      ${order.payment_method === 'cash' ? `
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+        <div style="font-family:'Barlow Condensed';font-size:.68rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">CASH CHANGE CALCULATOR</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="flex:1">
+            <div style="font-family:'Barlow Condensed';font-size:.65rem;letter-spacing:2px;color:var(--muted);margin-bottom:4px">CUSTOMER PAID (KD)</div>
+            <input type="number" id="cash-paid" min="0" step="0.001" placeholder="0.000"
+              oninput="calcChange(${order.total})"
+              style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(31,149,120,.3);color:var(--text);font-family:'Barlow Condensed';font-size:1rem;padding:8px 10px;border-radius:6px;outline:none">
+          </div>
+          <div style="flex:1;text-align:center">
+            <div style="font-family:'Barlow Condensed';font-size:.65rem;letter-spacing:2px;color:var(--muted);margin-bottom:4px">CHANGE TO GIVE</div>
+            <div id="cash-change" style="font-family:'Bebas Neue';font-size:1.5rem;color:var(--teal)">—</div>
+          </div>
+        </div>
+      </div>` : ''}
     </div>`;
   document.getElementById('m-foot').innerHTML = `
     <button class="btn-pri" onclick="window.print()">🖨 PRINT</button>
     <button class="btn-ghost" onclick="closeModal()">CLOSE</button>
-    <button class="btn-dng" onclick="deleteOrder('${order.id}')">🗑 DELETE</button>`;
+    ${ADMIN_SESSION && ADMIN_SESSION.role === 'owner' ? `<button class="btn-dng" onclick="deleteOrder('${order.id}')">🗑 DELETE</button>` : ''}`;
   document.getElementById('order-modal').classList.add('open');
 }
 
@@ -603,6 +673,16 @@ async function deleteOrder(id) {
 }
 
 function closeModal() { document.getElementById('order-modal').classList.remove('open'); currentOrderId = null; }
+
+function calcChange(total) {
+  var paid = parseFloat(document.getElementById('cash-paid').value) || 0;
+  var change = paid - total;
+  var el = document.getElementById('cash-change');
+  if (!el) return;
+  if (paid <= 0) { el.textContent = '—'; el.style.color = 'var(--teal)'; return; }
+  if (change < 0) { el.textContent = 'SHORT ' + fmt(Math.abs(change)); el.style.color = 'var(--red)'; }
+  else { el.textContent = fmt(change); el.style.color = 'var(--teal)'; }
+}
 
 /* ── Apply discount from modal ── */
 async function applyDiscount(val) {
@@ -1184,6 +1264,7 @@ function initAuth() {
     orders:    document.querySelector('[onclick*="orders"]'),
     reports:   document.querySelector('[onclick*="reports"]'),
     products:  document.querySelector('[onclick*="products"]'),
+    shifts:    document.querySelector('[onclick*="shifts"]'),
     users:     document.querySelector('[onclick*="users"]'),
   };
   // Also hide section headers if all items under them are hidden
@@ -1212,7 +1293,7 @@ function initAuth() {
   var pg = document.getElementById('page-' + firstPage);
   if (pg) pg.classList.add('active');
 
-  var titles = {dashboard:'DASHBOARD', orders:'ORDERS', reports:'REPORTS', products:'PRODUCTS', users:'USERS'};
+  var titles = {dashboard:'DASHBOARD', orders:'ORDERS', reports:'REPORTS', products:'PRODUCTS', shifts:'SHIFTS', users:'USERS'};
   document.getElementById('page-title').textContent = titles[firstPage] || firstPage.toUpperCase();
 
   if (firstPage === 'reports') renderReport();
@@ -1235,7 +1316,151 @@ showPage = function(name, btn) {
   }
   _origShowPage(name, btn);
   if (name === 'users') loadUsers();
+  if (name === 'shifts') { loadShifts(); populateShiftUserSelect(); }
 };
+
+/* ══════════════════════════════════════════
+   SHIFTS
+══════════════════════════════════════════ */
+let allShifts = [];
+let shiftFilter = 'all';
+
+async function loadShifts() {
+  try {
+    const res = await fetch(SB_URL + '/rest/v1/shifts?select=*&order=started_at.desc&limit=100', {
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+    });
+    if (!res.ok) throw new Error(res.status);
+    allShifts = await res.json();
+    renderShiftsTable();
+    populateActiveShifts();
+  } catch(e) { showToast('⚠ Could not load shifts: ' + e.message); }
+}
+
+function populateShiftUserSelect() {
+  const sel = document.getElementById('shift-start-user');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Select staff...</option>' +
+    allUsers.map(u => `<option value="${u.id}" data-name="${u.full_name}">${u.full_name} (@${u.username})</option>`).join('');
+}
+
+function populateActiveShifts() {
+  const sel = document.getElementById('shift-end-select');
+  if (!sel) return;
+  const active = allShifts.filter(s => s.status === 'active');
+  sel.innerHTML = active.length
+    ? '<option value="">Select active shift...</option>' + active.map(s =>
+        `<option value="${s.id}">${s.staff_name} — started ${fmtTime(s.started_at)}</option>`).join('')
+    : '<option value="">No active shifts</option>';
+}
+
+function filterShifts(f, btn) {
+  shiftFilter = f;
+  document.querySelectorAll('#page-shifts .btn-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderShiftsTable();
+}
+
+function renderShiftsTable() {
+  const tbody = document.getElementById('shifts-tbody');
+  if (!tbody) return;
+  let shifts = allShifts;
+  if (shiftFilter === 'active') shifts = shifts.filter(s => s.status === 'active');
+  if (shiftFilter === 'closed') shifts = shifts.filter(s => s.status === 'closed');
+  if (!shifts.length) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:28px">No shifts yet</td></tr>';
+    return;
+  }
+  tbody.innerHTML = shifts.map(s => {
+    const variance = s.closing_cash != null
+      ? s.closing_cash - (s.opening_cash + (s.cash_orders_total || 0))
+      : null;
+    const varColor = variance === null ? 'var(--muted)' : variance >= 0 ? 'var(--teal)' : 'var(--red)';
+    return `<tr>
+      <td style="font-family:'Barlow Condensed';font-weight:700">${s.staff_name}</td>
+      <td style="font-size:.78rem;color:var(--muted)">${fmtDate(s.started_at)}<br>${fmtTime(s.started_at)}</td>
+      <td style="font-size:.78rem;color:var(--muted)">${s.ended_at ? fmtDate(s.ended_at)+'<br>'+fmtTime(s.ended_at) : '—'}</td>
+      <td class="amt">${fmt(s.opening_cash)}</td>
+      <td class="amt">${fmt(s.cash_orders_total || 0)}</td>
+      <td class="amt">${fmt((s.opening_cash || 0) + (s.cash_orders_total || 0))}</td>
+      <td class="amt">${s.closing_cash != null ? fmt(s.closing_cash) : '—'}</td>
+      <td style="font-family:'Bebas Neue';font-size:1rem;color:${varColor}">${
+        variance === null ? '—' : (variance >= 0 ? '+' : '') + fmt(variance)}</td>
+      <td>${s.status === 'active'
+        ? '<span style="font-family:\'Bebas Neue\';font-size:.7rem;letter-spacing:1px;color:var(--teal);background:rgba(31,149,120,.1);padding:3px 8px;border-radius:3px">ACTIVE</span>'
+        : '<span style="font-family:\'Bebas Neue\';font-size:.7rem;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,.05);padding:3px 8px;border-radius:3px">CLOSED</span>'}</td>
+    </tr>`;
+  }).join('');
+}
+
+async function startShift() {
+  const userSel = document.getElementById('shift-start-user');
+  const userId = userSel?.value;
+  const staffName = userSel?.options[userSel.selectedIndex]?.getAttribute('data-name');
+  const openingCash = parseFloat(document.getElementById('shift-open-cash')?.value) || 0;
+  if (!userId) { showToast('⚠ Please select a staff member'); return; }
+
+  // Check no active shift for this user
+  const existing = allShifts.find(s => s.user_id == userId && s.status === 'active');
+  if (existing) { showToast('⚠ This staff already has an active shift'); return; }
+
+  try {
+    const res = await fetch(SB_URL + '/rest/v1/shifts', {
+      method: 'POST',
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({
+        user_id: parseInt(userId),
+        staff_name: staffName,
+        opening_cash: openingCash,
+        started_at: new Date().toISOString(),
+        status: 'active'
+      })
+    });
+    if (!res.ok) throw new Error(await res.text());
+    showToast('✓ Shift started for ' + staffName);
+    document.getElementById('shift-open-cash').value = '';
+    userSel.value = '';
+    await loadShifts();
+  } catch(e) { showToast('⚠ ' + e.message); }
+}
+
+async function endShift() {
+  const shiftId = document.getElementById('shift-end-select')?.value;
+  const closingCash = parseFloat(document.getElementById('shift-close-cash')?.value);
+  if (!shiftId) { showToast('⚠ Please select an active shift'); return; }
+  if (isNaN(closingCash)) { showToast('⚠ Please enter closing cash amount'); return; }
+
+  // Calculate cash orders during this shift
+  const shift = allShifts.find(s => String(s.id) === String(shiftId));
+  if (!shift) return;
+  const cashOrders = allOrders.filter(o =>
+    o.payment_method === 'cash' &&
+    new Date(o.created_at) >= new Date(shift.started_at)
+  );
+  const cashTotal = cashOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+
+  try {
+    const res = await fetch(SB_URL + '/rest/v1/shifts?id=eq.' + shiftId, {
+      method: 'PATCH',
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({
+        closing_cash: closingCash,
+        cash_orders_total: cashTotal,
+        ended_at: new Date().toISOString(),
+        status: 'closed'
+      })
+    });
+    if (!res.ok) throw new Error(await res.text());
+    const expected = (shift.opening_cash || 0) + cashTotal;
+    const variance = closingCash - expected;
+    const msg = variance >= 0
+      ? `✓ Shift closed. Surplus: ${fmt(variance)}`
+      : `⚠ Shift closed. Short by: ${fmt(Math.abs(variance))}`;
+    showToast(msg);
+    document.getElementById('shift-close-cash').value = '';
+    await loadShifts();
+  } catch(e) { showToast('⚠ ' + e.message); }
+}
 
 /* ══════════════════════════════════════════
    USERS PAGE
@@ -1251,6 +1476,7 @@ async function loadUsers() {
     if (!res.ok) throw new Error(res.status);
     allUsers = await res.json();
     renderUsersTable();
+    populateShiftUserSelect();
   } catch(e) { showToast('⚠ Could not load users: ' + e.message); }
 }
 
