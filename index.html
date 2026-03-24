@@ -454,7 +454,6 @@ body {
   content: ''; position: absolute; inset: 0;
   background: linear-gradient(135deg, rgba(31,149,120,0.05), transparent);
   opacity: 0; transition: opacity 0.2s;
-  pointer-events: none;
 }
 .item-card:hover::before { opacity: 1; }
 
@@ -1128,6 +1127,7 @@ window.addEventListener('popstate', function() {
   <div class="cv-id" id="cv-id"></div>
   <div class="cv-total" id="cv-total"></div>
   <div class="cv-msg">Your order has been received!<br>We'll prepare it shortly 🍽</div>
+  <a id="cv-track-link" href="status.html" style="display:inline-block;margin-top:16px;padding:12px 32px;background:rgba(31,149,120,.15);border:1px solid rgba(31,149,120,.35);color:var(--teal);font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:3px;border-radius:10px;text-decoration:none">📍 TRACK MY ORDER</a>
   <button class="cv-back" onclick="backToMenu()">BACK TO MENU</button>
 </div>
 
@@ -1472,6 +1472,8 @@ async function placeOrder() {
     });
     if (!res.ok) throw new Error(await res.text());
     document.getElementById('cv-id').textContent = oid;
+    var trackLink = document.getElementById('cv-track-link');
+    if (trackLink) trackLink.href = 'status.html?order=' + oid;
     document.getElementById('cv-total').textContent = money(total);
     document.getElementById('confirm-view').classList.add('open');
     cart=[]; updateFAB();

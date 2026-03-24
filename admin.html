@@ -150,6 +150,7 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
     <div class="sb-sec">REPORTS</div>
     <button class="nb" id="nav-reports" onclick="showPage('reports',this)"><span class="ic">📈</span> Reports</button>
     <div class="sb-sec" id="nav-menu-sec">MENU</div>
+    <button class="nb" id="nav-categories" onclick="showPage('categories',this)"><span class="ic">📂</span> Categories</button>
     <button class="nb" id="nav-products" onclick="showPage('products',this)"><span class="ic">🍽️</span> Products</button>
     <div class="sb-sec" id="nav-team-sec">TEAM</div>
     <button class="nb" id="nav-shifts" onclick="showPage('shifts',this)"><span class="ic">🕐</span> Shifts</button>
@@ -316,6 +317,21 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
         </div>
       </div>
     </div>
+    <!-- CATEGORIES PAGE -->
+    <div class="page" id="page-categories">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+        <div style="font-family:'Barlow Condensed';font-size:.75rem;letter-spacing:3px;color:var(--muted);text-transform:uppercase">Manage menu categories — add, edit, reorder</div>
+        <button onclick="openCatModal(null)" style="background:var(--green);color:white;border:none;font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:2px;padding:9px 20px;border-radius:8px;cursor:pointer">＋ ADD CATEGORY</button>
+      </div>
+      <div class="panel">
+        <div class="ph"><div class="ph-title">CATEGORIES</div><button class="btn-refresh" onclick="loadCategories()">↻ REFRESH</button></div>
+        <div class="tbl-wrap">
+          <table><thead><tr><th>EMOJI</th><th>NAME (EN)</th><th>NAME (AR)</th><th>ID</th><th>SORT</th><th>STATUS</th><th>ACTIONS</th></tr></thead>
+          <tbody id="cat-tbody"></tbody></table>
+        </div>
+      </div>
+    </div>
+
     <div class="page" id="page-products">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px">
         <div style="display:flex;gap:8px;flex-wrap:wrap" id="prod-cat-filters">
@@ -465,6 +481,59 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
       <button class="btn-pri" onclick="saveProd()">SAVE PRODUCT</button>
       <button class="btn-ghost" onclick="closeProdModal()">CANCEL</button>
       <button class="btn-dng" id="pm-del-btn" onclick="deleteProd()" style="display:none">🗑 DELETE</button>
+    </div>
+  </div>
+</div>
+
+<!-- CATEGORY MODAL -->
+<div class="modal-bg" id="cat-modal">
+  <div class="modal" style="max-width:460px">
+    <div class="mh">
+      <div><div class="mh-title" id="cm-title">ADD CATEGORY</div></div>
+      <button class="mc" onclick="closeCatModal()">✕</button>
+    </div>
+    <div class="mbody">
+      <div style="display:grid;grid-template-columns:80px 1fr;gap:10px;margin-bottom:12px">
+        <div>
+          <label style="font-family:'Barlow Condensed';font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Emoji</label>
+          <input type="text" id="cm-emoji" placeholder="🍔" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-size:1.6rem;padding:7px 11px;border-radius:6px;outline:none;width:100%;text-align:center">
+        </div>
+        <div>
+          <label style="font-family:'Barlow Condensed';font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Category ID (no spaces)</label>
+          <input type="text" id="cm-id" placeholder="e.g. desserts" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:.92rem;padding:8px 11px;border-radius:6px;outline:none;width:100%">
+          <div style="font-family:'Barlow Condensed';font-size:.62rem;color:var(--muted);margin-top:3px;letter-spacing:1px">Lowercase letters only, no spaces</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div>
+          <label style="font-family:'Barlow Condensed';font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Name (English)</label>
+          <input type="text" id="cm-name" placeholder="e.g. Desserts" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:.92rem;padding:8px 11px;border-radius:6px;outline:none;width:100%">
+        </div>
+        <div>
+          <label style="font-family:'Barlow Condensed';font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Name (Arabic)</label>
+          <input type="text" id="cm-name-ar" placeholder="مثلاً: حلويات" dir="rtl" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:.92rem;padding:8px 11px;border-radius:6px;outline:none;width:100%">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div>
+          <label style="font-family:'Barlow Condensed';font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Sort Order</label>
+          <input type="number" id="cm-sort" min="0" placeholder="0" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:.92rem;padding:8px 11px;border-radius:6px;outline:none;width:100%">
+        </div>
+        <div style="display:flex;align-items:flex-end;padding-bottom:2px">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-family:'Barlow Condensed';font-size:.88rem;color:var(--muted)">
+            <input type="checkbox" id="cm-active" checked style="width:18px;height:18px;cursor:pointer;accent-color:var(--green)">
+            Active (visible on menu)
+          </label>
+        </div>
+      </div>
+      <div style="background:rgba(255,212,59,.06);border:1px solid rgba(255,212,59,.15);border-radius:8px;padding:10px 14px;font-family:'Barlow Condensed';font-size:.78rem;color:var(--muted)">
+        💡 After adding a category, go to <b>Products → Add Product</b> — the new category will appear in the dropdown automatically.
+      </div>
+    </div>
+    <div class="mfoot">
+      <button class="btn-pri" onclick="saveCat()">SAVE CATEGORY</button>
+      <button class="btn-ghost" onclick="closeCatModal()">CANCEL</button>
+      <button class="btn-dng" id="cm-del-btn" onclick="deleteCat()" style="display:none">🗑 DELETE</button>
     </div>
   </div>
 </div>
@@ -1285,6 +1354,9 @@ function openProductModal(id, defaultCat) {
   const titleEl = document.getElementById('pm-title');
   const delBtn = document.getElementById('pm-del-btn');
 
+  // Rebuild category dropdown from live DB data
+  rebuildCatDropdown();
+
   // Reset form
   ['pm-cat','pm-emoji','pm-name','pm-name-ar','pm-badge'].forEach(i => {
     const el = document.getElementById(i); if (el) el.value = '';
@@ -1674,7 +1746,7 @@ function initAuth() {
   var pg = document.getElementById('page-' + firstPage);
   if (pg) pg.classList.add('active');
 
-  var titles = {dashboard:'DASHBOARD', orders:'ORDERS', reports:'REPORTS', products:'PRODUCTS', shifts:'SHIFTS', users:'USERS'};
+  var titles = {dashboard:'DASHBOARD', orders:'ORDERS', reports:'REPORTS', categories:'CATEGORIES', products:'PRODUCTS', shifts:'SHIFTS', users:'USERS'};
   document.getElementById('page-title').textContent = titles[firstPage] || firstPage.toUpperCase();
 
   if (firstPage === 'reports') renderReport();
@@ -1698,6 +1770,7 @@ showPage = function(name, btn) {
   _origShowPage(name, btn);
   if (name === 'users') loadUsers();
   if (name === 'shifts') { loadShifts(); populateShiftUserSelect(); }
+  if (name === 'categories') loadCategories();
 };
 
 /* ══════════════════════════════════════════
@@ -1962,12 +2035,178 @@ async function deleteUser() {
 }
 
 /* ══════════════════════════════════════════
+   CATEGORIES
+══════════════════════════════════════════ */
+var allCategories = [];
+var editingCatId = null;  // db row id (bigint)
+
+async function loadCategories() {
+  try {
+    const { data, error } = await sb.from('categories').select('*').order('sort_order');
+    if (error) throw error;
+    allCategories = data || [];
+    renderCatsTable();
+    // Rebuild product category dropdown from DB
+    rebuildCatDropdown();
+  } catch(e) {
+    showToast('⚠ Could not load categories: ' + e.message);
+    // Fall back to hardcoded CAT_META
+    allCategories = Object.entries(CAT_META).map(([id, m]) => ({
+      id: null, category_id: id, name: m.name, name_ar: m.ar||'',
+      emoji: m.emoji, anim_class: m.anim, sort_order: m.sort, is_active: true
+    }));
+    renderCatsTable();
+    rebuildCatDropdown();
+  }
+}
+
+function rebuildCatDropdown() {
+  const sel = document.getElementById('pm-cat');
+  if (!sel) return;
+  const active = allCategories.filter(c => c.is_active);
+  sel.innerHTML = '<option value="">Select category...</option>' +
+    active.map(c =>
+      `<option value="${c.category_id}">${c.emoji || ''} ${c.name}</option>`
+    ).join('');
+}
+
+function renderCatsTable() {
+  const tbody = document.getElementById('cat-tbody');
+  if (!tbody) return;
+  if (!allCategories.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:28px">No categories yet</td></tr>';
+    return;
+  }
+  tbody.innerHTML = allCategories.map(c => `
+    <tr style="opacity:${c.is_active ? 1 : .45}">
+      <td style="font-size:1.4rem">${c.emoji || '🍽️'}</td>
+      <td><span style="font-family:'Barlow Condensed';font-weight:700;font-size:.9rem;text-transform:uppercase">${c.name}</span></td>
+      <td style="color:var(--muted);font-size:.85rem">${c.name_ar || '—'}</td>
+      <td><span style="font-family:'Bebas Neue';font-size:.78rem;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,.06);padding:2px 8px;border-radius:4px">${c.category_id}</span></td>
+      <td style="font-family:'Bebas Neue';color:var(--muted)">${c.sort_order}</td>
+      <td>${c.is_active
+        ? '<span style="font-family:Bebas Neue,sans-serif;font-size:.7rem;letter-spacing:1px;color:var(--teal);background:rgba(31,149,120,.1);padding:3px 8px;border-radius:3px">ACTIVE</span>'
+        : '<span style="font-family:Bebas Neue,sans-serif;font-size:.7rem;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,.05);padding:3px 8px;border-radius:3px">HIDDEN</span>'}</td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button onclick="openCatModal(${c.id})" style="background:rgba(31,149,120,.1);border:1px solid rgba(31,149,120,.25);color:var(--teal);font-family:'Bebas Neue',sans-serif;font-size:.75rem;letter-spacing:1px;padding:4px 10px;border-radius:5px;cursor:pointer">✏ EDIT</button>
+          <button onclick="toggleCatActive(${c.id},${!c.is_active})" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--muted);font-family:Bebas Neue,sans-serif;font-size:.75rem;letter-spacing:1px;padding:4px 10px;border-radius:5px;cursor:pointer">${c.is_active ? '🙈 HIDE' : '👁 SHOW'}</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function openCatModal(dbId) {
+  editingCatId = dbId;
+  const titleEl = document.getElementById('cm-title');
+  const delBtn  = document.getElementById('cm-del-btn');
+  ['cm-emoji','cm-id','cm-name','cm-name-ar','cm-sort'].forEach(i => {
+    const el = document.getElementById(i); if (el) el.value = '';
+  });
+  document.getElementById('cm-active').checked = true;
+
+  if (dbId) {
+    const c = allCategories.find(x => x.id === dbId);
+    if (!c) return;
+    titleEl.textContent = 'EDIT CATEGORY';
+    if (delBtn) delBtn.style.display = 'block';
+    document.getElementById('cm-emoji').value   = c.emoji || '';
+    document.getElementById('cm-id').value      = c.category_id || '';
+    document.getElementById('cm-id').disabled   = true; // can't change ID
+    document.getElementById('cm-name').value    = c.name || '';
+    document.getElementById('cm-name-ar').value = c.name_ar || '';
+    document.getElementById('cm-sort').value    = c.sort_order || 0;
+    document.getElementById('cm-active').checked = !!c.is_active;
+  } else {
+    titleEl.textContent = 'ADD CATEGORY';
+    if (delBtn) delBtn.style.display = 'none';
+    document.getElementById('cm-id').disabled = false;
+    document.getElementById('cm-sort').value = allCategories.length;
+  }
+  document.getElementById('cat-modal').classList.add('open');
+}
+
+function closeCatModal() {
+  document.getElementById('cat-modal').classList.remove('open');
+  editingCatId = null;
+  const idEl = document.getElementById('cm-id');
+  if (idEl) idEl.disabled = false;
+}
+
+async function saveCat() {
+  const emoji   = (document.getElementById('cm-emoji')||{}).value?.trim() || '🍽️';
+  const catId   = (document.getElementById('cm-id')||{}).value?.trim().toLowerCase().replace(/[^a-z0-9_]/g,'');
+  const name    = (document.getElementById('cm-name')||{}).value?.trim();
+  const nameAr  = (document.getElementById('cm-name-ar')||{}).value?.trim() || '';
+  const sort    = parseInt((document.getElementById('cm-sort')||{}).value) || 0;
+  const active  = !!(document.getElementById('cm-active')||{}).checked;
+
+  if (!catId || !name) { showToast('⚠ Category ID and name are required'); return; }
+
+  const record = {
+    category_id: catId, name, name_ar: nameAr,
+    emoji, anim_class: catId, sort_order: sort, is_active: active
+  };
+
+  try {
+    let error;
+    if (editingCatId) {
+      ({ error } = await sb.from('categories').update(record).eq('id', editingCatId));
+      // Also update all products in this category
+      await sb.from('products').update({
+        category_name: name, category_name_ar: nameAr,
+        category_emoji: emoji, category_sort: sort
+      }).eq('category_id', catId);
+    } else {
+      // Check category_id not already taken
+      const { data: existing } = await sb.from('categories').select('id').eq('category_id', catId).limit(1);
+      if (existing && existing.length) { showToast('⚠ Category ID already exists'); return; }
+      ({ error } = await sb.from('categories').insert([record]));
+    }
+    if (error) throw error;
+    showToast(editingCatId ? '✓ Category updated' : '✓ Category added');
+    closeCatModal();
+    await loadCategories();
+  } catch(e) { showToast('⚠ ' + e.message); }
+}
+
+async function deleteCat() {
+  if (!editingCatId) return;
+  const c = allCategories.find(x => x.id === editingCatId);
+  if (!c) return;
+  // Check if products exist in this category
+  const { data: prods } = await sb.from('products').select('id').eq('category_id', c.category_id).limit(1);
+  if (prods && prods.length) {
+    showToast('⚠ Move or delete all products in this category first');
+    return;
+  }
+  if (!confirm('Delete "' + c.name + '" category permanently?')) return;
+  try {
+    const { error } = await sb.from('categories').delete().eq('id', editingCatId);
+    if (error) throw error;
+    showToast('🗑 Category deleted');
+    closeCatModal();
+    await loadCategories();
+  } catch(e) { showToast('⚠ ' + e.message); }
+}
+
+async function toggleCatActive(dbId, active) {
+  try {
+    const { error } = await sb.from('categories').update({ is_active: active }).eq('id', dbId);
+    if (error) throw error;
+    showToast(active ? '👁 Category visible' : '🙈 Category hidden');
+    await loadCategories();
+  } catch(e) { showToast('⚠ ' + e.message); }
+}
+
+/* ══════════════════════════════════════════
    INIT
 ══════════════════════════════════════════ */
 loadAll();
 subscribeRealtime();
 loadProducts();
 loadUsers();
+loadCategories();
 initAuth();
 initNotifications();
 updateClock();
