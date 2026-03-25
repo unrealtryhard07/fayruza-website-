@@ -50,7 +50,7 @@ body{background:var(--dark);color:var(--text);font-family:Barlow,sans-serif,sans
 .tb-link:hover{background:rgba(31,149,120,.22);}
 .content{padding:22px 26px;flex:1;}
 .page{display:none;}.page.active{display:block;}
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:22px;}
+.stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:13px;margin-bottom:22px;}
 .stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:17px 18px;transition:transform .2s,border-color .2s;}
 .stat-card:hover{border-color:rgba(31,149,120,.3);transform:translateY(-2px);}
 .stat-icon{font-size:1.5rem;margin-bottom:7px;}
@@ -132,11 +132,11 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
 .meal-opt.sel{background:var(--green);border-color:var(--green);color:#fff;}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a2420;border:1px solid rgba(31,149,120,.4);color:var(--text);font-family:Barlow Condensed,sans-serif,sans-serif;font-size:.9rem;letter-spacing:1px;padding:12px 22px;border-radius:10px;z-index:900;transition:transform .3s;white-space:nowrap;}
 .toast.show{transform:translateX(-50%) translateY(0);}
-@media(max-width:900px){:root{--sw:0px;}.sidebar{transform:translateX(-220px);width:220px;}.sidebar.open{transform:translateX(0);}.main{margin-left:0;}.sb-toggle{display:flex;}.stats-grid{grid-template-columns:repeat(2,1fr);}.dash-cols{grid-template-columns:1fr;}.content{padding:14px;}.topbar{padding:14px 14px 14px 58px;}}
-@media(max-width:480px){.stats-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:768px){:root{--sw:0px;}.sidebar{transform:translateX(-220px);width:220px;}.sidebar.open{transform:translateX(0);}.main{margin-left:0;}.sb-toggle{display:flex;}.stats-grid{grid-template-columns:repeat(3,1fr)!important;}.dash-cols{grid-template-columns:1fr;}.content{padding:14px;}.topbar{padding:14px 14px 14px 58px;}}
+@media(max-width:480px){.stats-grid{grid-template-columns:1fr 1fr!important;}}
 /* ── Mobile bottom nav shortcut ── */
 .mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:#0d1a16;border-top:1px solid var(--border);z-index:200;padding:6px 0 env(safe-area-inset-bottom);justify-content:space-around;}
-@media(max-width:768px){
+@media(max-width:600px){
   .mob-nav{display:flex;}
   .main{padding-bottom:60px;}
   /* Make tables scroll horizontally on mobile */
@@ -148,7 +148,7 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
 .mob-btn.active{color:var(--teal);}
 .mob-btn .mico{font-size:1.3rem;line-height:1;}
 
-@media print{.sidebar,.topbar,.mfoot,.mc{display:none!important;}.main{margin-left:0;}.modal-bg{position:static;opacity:1;pointer-events:all;background:none;}.modal{max-height:none;border:none;}}
+@media(min-width:769px) and (max-width:1100px){.stats-grid{grid-template-columns:repeat(3,1fr)!important;}.content{padding:16px 20px;}}@media print{.sidebar,.topbar,.mfoot,.mc{display:none!important;}.main{margin-left:0;}.modal-bg{position:static;opacity:1;pointer-events:all;background:none;}.modal{max-height:none;border:none;}}
 </style>
 
 <!-- Admin PWA -->
@@ -159,7 +159,7 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
 <meta name="apple-mobile-web-app-title" content="Fayruza Admin">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
 </head>
 <body>
 
