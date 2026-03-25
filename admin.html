@@ -24,29 +24,29 @@
 <style>
 :root{--green:#1F9578;--green2:#167A62;--teal:#4DC4A3;--dark:#0A0F0D;--dark2:#0E1511;--dark3:#141A17;--card:#111714;--border:rgba(255,255,255,0.07);--text:#EDF5F2;--muted:#7A9990;--red:#ff4757;--yellow:#ffd43b;--sw:220px;}
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--dark);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;display:flex;}
+body{background:var(--dark);color:var(--text);font-family:Barlow,sans-serif,sans-serif;min-height:100vh;display:flex;}
 .sidebar{width:var(--sw);background:var(--dark2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;transition:transform .3s;}
 .sb-brand{padding:20px 20px 14px;border-bottom:1px solid var(--border);}
-.sb-brand .name{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:3px;background:linear-gradient(90deg,var(--teal),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.sb-brand .sub{font-family:'Barlow Condensed',sans-serif;font-size:.68rem;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-top:2px;}
+.sb-brand .name{font-family:Bebas Neue,sans-serif,sans-serif;font-size:1.4rem;letter-spacing:3px;background:linear-gradient(90deg,var(--teal),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sb-brand .sub{font-family:Barlow Condensed,sans-serif,sans-serif;font-size:.68rem;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-top:2px;}
 .sb-nav{flex:1;padding:12px 10px;overflow-y:auto;}
-.sb-sec{font-family:'Barlow Condensed',sans-serif;font-size:.62rem;letter-spacing:4px;text-transform:uppercase;color:var(--muted);padding:8px 10px 4px;margin-top:4px;}
-.nb{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:.92rem;letter-spacing:1px;color:var(--muted);transition:background .2s,color .2s;margin-bottom:2px;border:none;background:transparent;width:100%;text-align:left;text-decoration:none;}
+.sb-sec{font-family:Barlow Condensed,sans-serif,sans-serif;font-size:.62rem;letter-spacing:4px;text-transform:uppercase;color:var(--muted);padding:8px 10px 4px;margin-top:4px;}
+.nb{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;cursor:pointer;font-family:Barlow Condensed,sans-serif,sans-serif;font-weight:600;font-size:.92rem;letter-spacing:1px;color:var(--muted);transition:background .2s,color .2s;margin-bottom:2px;border:none;background:transparent;width:100%;text-align:left;text-decoration:none;}
 .nb .ic{font-size:1.1rem;width:22px;text-align:center;}
 .nb:hover{background:rgba(31,149,120,.1);color:var(--text);}
 .nb.active{background:rgba(31,149,120,.18);color:var(--teal);}
 .nb .bdg{margin-left:auto;background:var(--red);color:#fff;font-size:.6rem;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 5px;}
-.sb-foot{padding:12px 18px;border-top:1px solid var(--border);font-family:'Barlow Condensed',sans-serif;font-size:.78rem;color:var(--muted);letter-spacing:1px;}
+.sb-foot{padding:12px 18px;border-top:1px solid var(--border);font-family:Barlow Condensed,sans-serif,sans-serif;font-size:.78rem;color:var(--muted);letter-spacing:1px;}
 .sb-clock{font-size:.85rem;color:var(--teal);margin-bottom:2px;}
 .live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#2ecc71;margin-right:6px;animation:pdot 2s ease-in-out infinite;}
 @keyframes pdot{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(.8);}}
 .sb-toggle{display:none;position:fixed;top:14px;left:14px;z-index:200;background:var(--green);color:#fff;border:none;width:40px;height:40px;border-radius:8px;cursor:pointer;font-size:1.2rem;align-items:center;justify-content:center;}
 .main{margin-left:var(--sw);flex:1;min-height:100vh;display:flex;flex-direction:column;}
 .topbar{background:var(--dark2);border-bottom:1px solid var(--border);padding:15px 26px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
-.tb-title{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:3px;}
+.tb-title{font-family:Bebas Neue,sans-serif,sans-serif;font-size:1.5rem;letter-spacing:3px;}
 .tb-right{display:flex;align-items:center;gap:12px;}
-.tb-time{font-family:'Barlow Condensed',sans-serif;font-size:.82rem;color:var(--muted);letter-spacing:1px;}
-.tb-link{background:rgba(31,149,120,.12);border:1px solid rgba(31,149,120,.3);color:var(--teal);font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:2px;padding:7px 14px;border-radius:6px;text-decoration:none;transition:background .2s;}
+.tb-time{font-family:Barlow Condensed,sans-serif,sans-serif;font-size:.82rem;color:var(--muted);letter-spacing:1px;}
+.tb-link{background:rgba(31,149,120,.12);border:1px solid rgba(31,149,120,.3);color:var(--teal);font-family:Bebas Neue,sans-serif,sans-serif;font-size:.82rem;letter-spacing:2px;padding:7px 14px;border-radius:6px;text-decoration:none;transition:background .2s;}
 .tb-link:hover{background:rgba(31,149,120,.22);}
 .content{padding:22px 26px;flex:1;}
 .page{display:none;}.page.active{display:block;}
@@ -54,83 +54,83 @@ body{background:var(--dark);color:var(--text);font-family:'Barlow',sans-serif;mi
 .stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:17px 18px;transition:transform .2s,border-color .2s;}
 .stat-card:hover{border-color:rgba(31,149,120,.3);transform:translateY(-2px);}
 .stat-icon{font-size:1.5rem;margin-bottom:7px;}
-.stat-lbl{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.65rem;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
-.stat-val{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:1px;}
-.stat-sub{font-family:'Barlow Condensed',sans-serif;font-size:.75rem;color:var(--muted);margin-top:3px;}
+.stat-lbl{font-family:Barlow Condensed,sans-serif,sans-serif;font-weight:700;font-size:.65rem;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.stat-val{font-family:Bebas Neue,sans-serif,sans-serif;font-size:1.9rem;letter-spacing:1px;}
+.stat-sub{font-family:Barlow Condensed,sans-serif,sans-serif;font-size:.75rem;color:var(--muted);margin-top:3px;}
 .panel{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:18px;}
 .ph{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
-.ph-title{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:3px;}
+.ph-title{font-family:Bebas Neue,sans-serif,sans-serif;font-size:1.1rem;letter-spacing:3px;}
 .ph-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
-.btn-filter{font-family:'Barlow Condensed',sans-serif;font-size:.75rem;letter-spacing:2px;text-transform:uppercase;padding:6px 13px;border-radius:6px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all .2s;}
+.btn-filter{font-family:Barlow Condensed,sans-serif,sans-serif;font-size:.75rem;letter-spacing:2px;text-transform:uppercase;padding:6px 13px;border-radius:6px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all .2s;}
 .btn-filter:hover{border-color:var(--teal);color:var(--teal);}
 .btn-filter.active{background:var(--green);border-color:var(--green);color:#fff;}
-.btn-refresh{font-family:'Barlow Condensed',sans-serif;font-size:.75rem;letter-spacing:2px;padding:6px 13px;border-radius:6px;cursor:pointer;border:1px solid rgba(31,149,120,.3);background:rgba(31,149,120,.1);color:var(--teal);transition:all .2s;}
+.btn-refresh{font-family:Barlow Condensed,sans-serif,sans-serif;font-size:.75rem;letter-spacing:2px;padding:6px 13px;border-radius:6px;cursor:pointer;border:1px solid rgba(31,149,120,.3);background:rgba(31,149,120,.1);color:var(--teal);transition:all .2s;}
 .btn-refresh:hover{background:rgba(31,149,120,.2);}
-.search-inp{background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:.83rem;padding:6px 11px;border-radius:6px;outline:none;width:170px;transition:border-color .2s;}
+.search-inp{background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text);font-family:Barlow,sans-serif,sans-serif;font-size:.83rem;padding:6px 11px;border-radius:6px;outline:none;width:170px;transition:border-color .2s;}
 .search-inp:focus{border-color:var(--teal);}
 .tbl-wrap{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;}
-th{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.67rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);padding:11px 15px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
-td{padding:12px 15px;border-bottom:1px solid rgba(255,255,255,.03);font-family:'Barlow Condensed',sans-serif;font-size:.88rem;vertical-align:middle;}
+th{font-family:Barlow Condensed,sans-serif,sans-serif;font-weight:700;font-size:.67rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);padding:11px 15px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:12px 15px;border-bottom:1px solid rgba(255,255,255,.03);font-family:Barlow Condensed,sans-serif,sans-serif;font-size:.88rem;vertical-align:middle;}
 tr:last-child td{border-bottom:none;}
 tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
 .new-row td{border-left:3px solid var(--red);}
-.amt{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;color:var(--teal);}
-.sbadge{display:inline-flex;align-items:center;gap:4px;font-family:'Bebas Neue',sans-serif;font-size:.72rem;letter-spacing:1.5px;padding:4px 9px;border-radius:20px;}
+.amt{font-family:Bebas Neue,sans-serif,sans-serif;font-size:1.05rem;color:var(--teal);}
+.sbadge{display:inline-flex;align-items:center;gap:4px;font-family:Bebas Neue,sans-serif,sans-serif;font-size:.72rem;letter-spacing:1.5px;padding:4px 9px;border-radius:20px;}
 .s-new{background:rgba(255,71,87,.15);color:#ff4757;border:1px solid rgba(255,71,87,.3);}
 .s-preparing{background:rgba(255,212,59,.15);color:#ffd43b;border:1px solid rgba(255,212,59,.3);}
 .s-ready{background:rgba(31,149,120,.15);color:var(--teal);border:1px solid rgba(31,149,120,.3);}
 .s-done{background:rgba(255,255,255,.05);color:var(--muted);border:1px solid var(--border);}
 .s-cancelled{background:rgba(120,120,120,.1);color:#666;border:1px solid rgba(120,120,120,.2);}
-.empty-state{text-align:center;padding:56px 20px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:1rem;letter-spacing:1px;}
+.empty-state{text-align:center;padding:56px 20px;color:var(--muted);font-family:Barlow Condensed,sans-serif,sans-serif;font-size:1rem;letter-spacing:1px;}
 .empty-icon{font-size:2.8rem;display:block;margin-bottom:12px;}
 .dash-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;}
 .top-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04);}
 .top-item:last-child{border-bottom:none;}
 .ti-emoji{font-size:1.4rem;flex-shrink:0;}
 .ti-info{flex:1;}
-.ti-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.86rem;text-transform:uppercase;color:var(--text);}
+.ti-name{font-family:Barlow Condensed,sans-serif,sans-serif;font-weight:700;font-size:.86rem;text-transform:uppercase;color:var(--text);}
 .ti-bar-wrap{height:3px;background:rgba(255,255,255,.06);border-radius:2px;margin-top:5px;}
 .ti-bar{height:100%;background:linear-gradient(90deg,var(--green),var(--teal));border-radius:2px;}
-.ti-count{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--teal);flex-shrink:0;}
+.ti-count{font-family:Bebas Neue,sans-serif,sans-serif;font-size:1.1rem;color:var(--teal);flex-shrink:0;}
 .chart-wrap{display:flex;align-items:flex-end;gap:6px;height:110px;padding:0 4px;}
 .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;}
 .bar{width:100%;background:linear-gradient(to top,var(--green),var(--teal));border-radius:4px 4px 0 0;min-height:3px;transition:height .5s ease;}
-.bar-lbl{font-family:'Barlow Condensed',sans-serif;font-size:.62rem;color:var(--muted);text-align:center;letter-spacing:1px;}
+.bar-lbl{font-family:Barlow Condensed,sans-serif,sans-serif;font-size:.62rem;color:var(--muted);text-align:center;letter-spacing:1px;}
 .modal-bg{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s;}
 .modal-bg.open{opacity:1;pointer-events:all;}
 .modal{background:var(--dark3);border:1px solid var(--border);border-radius:16px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;transform:scale(.95);transition:transform .25s;}
 .modal-bg.open .modal{transform:scale(1);}
 .mh{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;}
-.mh-title{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:3px;}
-.mh-sub{font-family:'Barlow Condensed',sans-serif;font-size:.75rem;color:var(--muted);letter-spacing:2px;margin-top:3px;}
+.mh-title{font-family:Bebas Neue,sans-serif,sans-serif;font-size:1.3rem;letter-spacing:3px;}
+.mh-sub{font-family:Barlow Condensed,sans-serif,sans-serif;font-size:.75rem;color:var(--muted);letter-spacing:2px;margin-top:3px;}
 .mc{color:var(--text);background:rgba(255,255,255,.08);border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:.95rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .mbody{padding:18px 22px;}
 .meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
-.meta-item .ml{font-family:'Barlow Condensed',sans-serif;font-size:.63rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
-.meta-item .mv{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.92rem;color:var(--text);}
-.inv-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);font-family:'Barlow Condensed',sans-serif;}
+.meta-item .ml{font-family:Barlow Condensed,sans-serif,sans-serif;font-size:.63rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
+.meta-item .mv{font-family:Barlow Condensed,sans-serif,sans-serif;font-weight:700;font-size:.92rem;color:var(--text);}
+.inv-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);font-family:Barlow Condensed,sans-serif,sans-serif;}
 .inv-item:last-child{border-bottom:none;}
 .inv-item .in{font-size:.87rem;color:var(--text);}
 .inv-item .iq{font-size:.75rem;color:var(--muted);margin-left:6px;}
 .inv-item .ip{font-weight:700;font-size:.87rem;color:var(--teal);}
 .totals-box{background:rgba(0,0,0,.2);border-radius:8px;padding:13px 15px;margin-top:14px;}
-.tot-row{display:flex;justify-content:space-between;font-family:'Barlow Condensed',sans-serif;padding:5px 0;font-size:.86rem;}
+.tot-row{display:flex;justify-content:space-between;font-family:Barlow Condensed,sans-serif,sans-serif;padding:5px 0;font-size:.86rem;}
 .tot-row .l{color:var(--muted);}
 .tot-row .v{font-weight:700;color:var(--text);}
 .tot-row.grand{border-top:1px solid var(--border);margin-top:6px;padding-top:10px;}
 .tot-row.grand .l{font-size:.95rem;color:var(--text);}
 .tot-row.grand .v{font-size:1.05rem;color:var(--teal);}
-.status-sel{background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:.88rem;padding:7px 11px;border-radius:6px;outline:none;cursor:pointer;width:100%;}
+.status-sel{background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow Condensed,sans-serif,sans-serif;font-size:.88rem;padding:7px 11px;border-radius:6px;outline:none;cursor:pointer;width:100%;}
 .mfoot{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:9px;flex-wrap:wrap;}
-.btn-pri{flex:1;padding:10px 16px;background:var(--green);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:2px;border:none;border-radius:8px;cursor:pointer;transition:background .2s;}
+.btn-pri{flex:1;padding:10px 16px;background:var(--green);color:#fff;font-family:Bebas Neue,sans-serif,sans-serif;font-size:.9rem;letter-spacing:2px;border:none;border-radius:8px;cursor:pointer;transition:background .2s;}
 .btn-pri:hover{background:var(--green2);}
-.btn-dng{padding:10px 14px;background:rgba(255,71,87,.12);color:var(--red);font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:2px;border:1px solid rgba(255,71,87,.3);border-radius:8px;cursor:pointer;}
+.btn-dng{padding:10px 14px;background:rgba(255,71,87,.12);color:var(--red);font-family:Bebas Neue,sans-serif,sans-serif;font-size:.9rem;letter-spacing:2px;border:1px solid rgba(255,71,87,.3);border-radius:8px;cursor:pointer;}
 .btn-dng:hover{background:rgba(255,71,87,.22);}
-.btn-ghost{padding:10px 14px;background:transparent;color:var(--muted);font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:2px;border:1px solid var(--border);border-radius:8px;cursor:pointer;}
-.meal-opt{flex:1;padding:7px 8px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.78rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:1.5px solid rgba(31,149,120,.25);background:rgba(31,149,120,.06);color:var(--muted);transition:all .15s;}
+.btn-ghost{padding:10px 14px;background:transparent;color:var(--muted);font-family:Bebas Neue,sans-serif,sans-serif;font-size:.9rem;letter-spacing:2px;border:1px solid var(--border);border-radius:8px;cursor:pointer;}
+.meal-opt{flex:1;padding:7px 8px;border-radius:6px;font-family:Barlow Condensed,sans-serif,sans-serif;font-weight:700;font-size:.78rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:1.5px solid rgba(31,149,120,.25);background:rgba(31,149,120,.06);color:var(--muted);transition:all .15s;}
 .meal-opt.sel{background:var(--green);border-color:var(--green);color:#fff;}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a2420;border:1px solid rgba(31,149,120,.4);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:.9rem;letter-spacing:1px;padding:12px 22px;border-radius:10px;z-index:900;transition:transform .3s;white-space:nowrap;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a2420;border:1px solid rgba(31,149,120,.4);color:var(--text);font-family:Barlow Condensed,sans-serif,sans-serif;font-size:.9rem;letter-spacing:1px;padding:12px 22px;border-radius:10px;z-index:900;transition:transform .3s;white-space:nowrap;}
 .toast.show{transform:translateX(-50%) translateY(0);}
 @media(max-width:900px){:root{--sw:0px;}.sidebar{transform:translateX(-220px);width:220px;}.sidebar.open{transform:translateX(0);}.main{margin-left:0;}.sb-toggle{display:flex;}.stats-grid{grid-template-columns:repeat(2,1fr);}.dash-cols{grid-template-columns:1fr;}.content{padding:14px;}.topbar{padding:14px 14px 14px 58px;}}
 @media(max-width:480px){.stats-grid{grid-template-columns:1fr 1fr;}}
@@ -150,19 +150,25 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
     <div class="sb-sec">REPORTS</div>
     <button class="nb" id="nav-reports" onclick="showPage('reports',this)"><span class="ic">📈</span> Reports</button>
     <div class="sb-sec" id="nav-menu-sec">MENU</div>
+    <button class="nb" id="nav-categories" onclick="showPage('categories',this)"><span class="ic">📂</span> Categories</button>
     <button class="nb" id="nav-products" onclick="showPage('products',this)"><span class="ic">🍽️</span> Products</button>
+    <button class="nb" id="nav-combos" onclick="showPage('combos',this)"><span class="ic">🎁</span> Combos</button>
     <div class="sb-sec" id="nav-team-sec">TEAM</div>
+    <button class="nb" id="nav-shifts" onclick="showPage('shifts',this)"><span class="ic">🕐</span> Shifts</button>
+    <button class="nb" id="nav-customers" onclick="showPage('customers',this)"><span class="ic">👤</span> Customers</button>
     <button class="nb" id="nav-users" onclick="showPage('users',this)"><span class="ic">👥</span> Users</button>
     <div class="sb-sec">SITE</div>
+    <a href="kds.html" target="_blank" class="nb"><span class="ic">🍳</span> Kitchen Display</a>
+    <button class="nb" id="nav-notif" onclick="requestNotifPermission()"><span class="ic">🔔</span> Notifications <span id="notif-status" style="font-size:.65rem;margin-left:4px;color:var(--muted)">OFF</span></button>
     <a href="index.html" class="nb"><span class="ic">🍔</span> View Menu</a>
   </div>
   <div class="sb-foot">
     <div class="sb-clock" id="sb-clock">--:--:--</div>
     <div><span class="live-dot"></span>Live · Jabriya</div>
     <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
-      <div id="sb-user" style="font-family:'Barlow Condensed',sans-serif;font-size:.8rem;color:var(--text);margin-bottom:6px"></div>
-      <div id="sb-role" style="font-family:'Bebas Neue',sans-serif;font-size:.68rem;letter-spacing:2px;color:var(--teal);margin-bottom:8px"></div>
-      <button onclick="doLogout()" style="background:rgba(255,71,87,.1);border:1px solid rgba(255,71,87,.2);color:#ff4757;font-family:'Bebas Neue',sans-serif;font-size:.75rem;letter-spacing:2px;padding:5px 12px;border-radius:5px;cursor:pointer;width:100%">⏏ SIGN OUT</button>
+      <div id="sb-user" style="font-family:Barlow Condensed,sans-serif,sans-serif;font-size:.8rem;color:var(--text);margin-bottom:6px"></div>
+      <div id="sb-role" style="font-family:Bebas Neue,sans-serif,sans-serif;font-size:.68rem;letter-spacing:2px;color:var(--teal);margin-bottom:8px"></div>
+      <button onclick="doLogout()" style="background:rgba(255,71,87,.1);border:1px solid rgba(255,71,87,.2);color:#ff4757;font-family:Bebas Neue,sans-serif,sans-serif;font-size:.75rem;letter-spacing:2px;padding:5px 12px;border-radius:5px;cursor:pointer;width:100%">⏏ SIGN OUT</button>
     </div>
   </div>
 </nav>
@@ -171,7 +177,12 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
   <div class="topbar">
     <div class="tb-title" id="page-title">DASHBOARD</div>
     <div class="tb-right">
+      <div style="display:flex;align-items:center;gap:5px;font-family:Barlow Condensed,sans-serif;font-size:.72rem;letter-spacing:1px;color:var(--muted)">
+        <span id="rt-status" title="Realtime status" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#555;transition:background .5s"></span>
+        LIVE
+      </div>
       <div class="tb-time" id="tb-time"></div>
+      <button onclick="printMenu()" style="background:rgba(31,149,120,.12);border:1px solid rgba(31,149,120,.3);color:var(--teal);font-family:Bebas Neue,sans-serif,sans-serif;font-size:.82rem;letter-spacing:2px;padding:7px 14px;border-radius:6px;cursor:pointer">🖨 PRINT MENU</button>
       <a href="index.html" class="tb-link">🍔 MENU SITE</a>
     </div>
   </div>
@@ -197,6 +208,23 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
       <div class="panel">
         <div class="ph"><div class="ph-title">ORDERS TODAY — HOURLY</div></div>
         <div style="padding:18px 18px 10px"><div class="chart-wrap" id="hourly-chart"></div></div>
+      </div>
+      <!-- Revenue trend charts -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:0">
+        <div class="panel">
+          <div class="ph">
+            <div class="ph-title">7-DAY REVENUE</div>
+            <div style="font-family:Barlow Condensed,sans-serif;font-size:.72rem;color:var(--muted);letter-spacing:1px" id="week-total"></div>
+          </div>
+          <div style="padding:16px 18px 12px"><div class="chart-wrap" id="week-chart"></div></div>
+        </div>
+        <div class="panel">
+          <div class="ph">
+            <div class="ph-title">30-DAY REVENUE</div>
+            <div style="font-family:Barlow Condensed,sans-serif;font-size:.72rem;color:var(--muted);letter-spacing:1px" id="month-total"></div>
+          </div>
+          <div style="padding:16px 18px 12px"><div class="chart-wrap" id="month-chart"></div></div>
+        </div>
       </div>
     </div>
 
@@ -230,22 +258,108 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
         <button class="btn-filter" onclick="showReport('stock',this)">📦 Stock On Hand</button>
         <button class="btn-filter" onclick="showReport('payments',this)">💳 Payments</button>
         <div style="flex:1"></div>
-        <select id="rpt-period" onchange="renderReport()" style="background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:.85rem;padding:6px 12px;border-radius:6px;outline:none;cursor:pointer">
+        <select id="rpt-period" onchange="renderReport()" style="background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text);font-family:Barlow Condensed,sans-serif,sans-serif;font-size:.85rem;padding:6px 12px;border-radius:6px;outline:none;cursor:pointer">
           <option value="today">Today</option>
           <option value="week">This Week</option>
           <option value="month">This Month</option>
           <option value="all" selected>All Time</option>
         </select>
         <button class="btn-refresh" onclick="renderReport()">↻</button>
+        <button onclick="printDailyReport()" style="background:rgba(31,149,120,.1);border:1px solid rgba(31,149,120,.25);color:var(--teal);font-family:Bebas Neue,sans-serif,sans-serif;font-size:.85rem;letter-spacing:2px;padding:6px 14px;border-radius:6px;cursor:pointer">🖨 DAILY REPORT</button>
       </div>
       <div id="rpt-body"></div>
     </div>
 
     <!-- USERS PAGE -->
+    <!-- SHIFTS PAGE -->
+    <div class="page" id="page-shifts">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+
+        <!-- START SHIFT -->
+        <div class="panel">
+          <div class="ph"><div class="ph-title">🟢 START SHIFT</div></div>
+          <div style="padding:18px">
+            <label style="font-family:Barlow Condensed,sans-serif;font-size:.68rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Staff Member</label>
+            <select id="shift-start-user" class="status-sel" style="margin-bottom:12px">
+              <option value="">Select staff...</option>
+            </select>
+            <label style="font-family:Barlow Condensed,sans-serif;font-size:.68rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Opening Cash in Box (KD)</label>
+            <input type="number" id="shift-open-cash" min="0" step="0.001" placeholder="0.000"
+              style="width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow Condensed,sans-serif;font-size:1rem;padding:10px 12px;border-radius:8px;outline:none;margin-bottom:14px">
+            <button onclick="startShift()" style="width:100%;padding:12px;background:var(--green);color:#fff;font-family:Bebas Neue,sans-serif;font-size:1rem;letter-spacing:2px;border:none;border-radius:8px;cursor:pointer">▶ START SHIFT</button>
+          </div>
+        </div>
+
+        <!-- END SHIFT -->
+        <div class="panel">
+          <div class="ph"><div class="ph-title">🔴 END SHIFT</div></div>
+          <div style="padding:18px">
+            <label style="font-family:Barlow Condensed,sans-serif;font-size:.68rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Active Shift</label>
+            <select id="shift-end-select" class="status-sel" style="margin-bottom:12px">
+              <option value="">Select active shift...</option>
+            </select>
+            <label style="font-family:Barlow Condensed,sans-serif;font-size:.68rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Closing Cash in Box (KD)</label>
+            <input type="number" id="shift-close-cash" min="0" step="0.001" placeholder="0.000"
+              style="width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow Condensed,sans-serif;font-size:1rem;padding:10px 12px;border-radius:8px;outline:none;margin-bottom:14px">
+            <button onclick="endShift()" style="width:100%;padding:12px;background:rgba(255,71,87,.15);color:var(--red);font-family:Bebas Neue,sans-serif;font-size:1rem;letter-spacing:2px;border:1px solid rgba(255,71,87,.3);border-radius:8px;cursor:pointer">⏹ END SHIFT</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SHIFT LOG -->
+      <div class="panel">
+        <div class="ph">
+          <div class="ph-title">SHIFT LOG</div>
+          <div class="ph-actions">
+            <button class="btn-filter active" onclick="filterShifts('all',this)">All</button>
+            <button class="btn-filter" onclick="filterShifts('active',this)">Active</button>
+            <button class="btn-filter" onclick="filterShifts('closed',this)">Closed</button>
+            <button class="btn-refresh" onclick="loadShifts()">↻</button>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table><thead><tr><th>STAFF</th><th>STARTED</th><th>ENDED</th><th>OPEN CASH</th><th>CASH ORDERS</th><th>EXPECTED</th><th>CLOSE CASH</th><th>VARIANCE</th><th>STATUS</th></tr></thead>
+          <tbody id="shifts-tbody"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMBOS PAGE -->
+    <div class="page" id="page-combos">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+        <div style="font-family:Barlow Condensed,sans-serif;font-size:.75rem;letter-spacing:3px;color:var(--muted);text-transform:uppercase">Create bundle deals — shown as special items on the menu</div>
+        <button onclick="openComboModal(null)" style="background:var(--green);color:white;border:none;font-family:Bebas Neue,sans-serif,sans-serif;font-size:.95rem;letter-spacing:2px;padding:9px 20px;border-radius:8px;cursor:pointer">＋ ADD COMBO</button>
+      </div>
+      <div class="panel">
+        <div class="ph"><div class="ph-title">COMBO DEALS</div><button class="btn-refresh" onclick="loadCombos()">↻</button></div>
+        <div class="tbl-wrap">
+          <table><thead><tr><th>COMBO</th><th>INCLUDES</th><th>PRICE</th><th>BADGE</th><th>STATUS</th><th>ACTIONS</th></tr></thead>
+          <tbody id="combos-tbody"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- CUSTOMERS PAGE -->
+    <div class="page" id="page-customers">
+      <div class="panel">
+        <div class="ph">
+          <div class="ph-title">CUSTOMER HISTORY</div>
+          <div class="ph-actions">
+            <input class="search-inp" id="cust-search" placeholder="Search name or phone…" oninput="renderCustomersTable()">
+            <button class="btn-refresh" onclick="loadCustomers()">↻</button>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table><thead><tr><th>NAME</th><th>PHONE</th><th>ORDERS</th><th>TOTAL SPENT</th><th>LAST ORDER</th><th>LAST ITEMS</th></tr></thead>
+          <tbody id="customers-tbody"></tbody></table>
+        </div>
+      </div>
+    </div>
+
     <div class="page" id="page-users">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
-        <div style="font-family:'Barlow Condensed';font-size:.75rem;letter-spacing:3px;color:var(--muted);text-transform:uppercase">Manage team access and roles</div>
-        <button onclick="openUserModal(null)" style="background:var(--green);color:white;border:none;font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:2px;padding:9px 20px;border-radius:8px;cursor:pointer">＋ ADD USER</button>
+        <div style="font-family:Barlow Condensed,sans-serif;font-size:.75rem;letter-spacing:3px;color:var(--muted);text-transform:uppercase">Manage team access and roles</div>
+        <button onclick="openUserModal(null)" style="background:var(--green);color:white;border:none;font-family:Bebas Neue,sans-serif,sans-serif;font-size:.95rem;letter-spacing:2px;padding:9px 20px;border-radius:8px;cursor:pointer">＋ ADD USER</button>
       </div>
       <div class="panel">
         <div class="ph"><div class="ph-title">TEAM MEMBERS</div><button class="btn-refresh" onclick="loadUsers()">↻ REFRESH</button></div>
@@ -255,12 +369,27 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
         </div>
       </div>
     </div>
+    <!-- CATEGORIES PAGE -->
+    <div class="page" id="page-categories">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+        <div style="font-family:Barlow Condensed,sans-serif;font-size:.75rem;letter-spacing:3px;color:var(--muted);text-transform:uppercase">Manage menu categories — add, edit, reorder</div>
+        <button onclick="openCatModal(null)" style="background:var(--green);color:white;border:none;font-family:Bebas Neue,sans-serif,sans-serif;font-size:.95rem;letter-spacing:2px;padding:9px 20px;border-radius:8px;cursor:pointer">＋ ADD CATEGORY</button>
+      </div>
+      <div class="panel">
+        <div class="ph"><div class="ph-title">CATEGORIES</div><button class="btn-refresh" onclick="loadCategories()">↻ REFRESH</button></div>
+        <div class="tbl-wrap">
+          <table><thead><tr><th>EMOJI</th><th>NAME (EN)</th><th>NAME (AR)</th><th>ID</th><th>SORT</th><th>STATUS</th><th>ACTIONS</th></tr></thead>
+          <tbody id="cat-tbody"></tbody></table>
+        </div>
+      </div>
+    </div>
+
     <div class="page" id="page-products">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px">
         <div style="display:flex;gap:8px;flex-wrap:wrap" id="prod-cat-filters">
           <button class="btn-filter active" onclick="filterProdCat('all',this)">All</button>
         </div>
-        <button onclick="openProductModal(null)" style="background:var(--green);color:white;border:none;font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:2px;padding:9px 20px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:6px">
+        <button onclick="openProductModal(null)" style="background:var(--green);color:white;border:none;font-family:Bebas Neue,sans-serif,sans-serif;font-size:.95rem;letter-spacing:2px;padding:9px 20px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:6px">
           ＋ ADD PRODUCT
         </button>
       </div>
@@ -289,21 +418,21 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
       <input type="hidden" id="um-id">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
         <div>
-          <label style="font-family:'Barlow Condensed';font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Full Name</label>
-          <input type="text" id="um-name" placeholder="e.g. Ahmed Al-Rashid" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:.9rem;padding:8px 11px;border-radius:6px;outline:none;width:100%">
+          <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Full Name</label>
+          <input type="text" id="um-name" placeholder="e.g. Ahmed Al-Rashid" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow,sans-serif,sans-serif;font-size:.9rem;padding:8px 11px;border-radius:6px;outline:none;width:100%">
         </div>
         <div>
-          <label style="font-family:'Barlow Condensed';font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Username</label>
-          <input type="text" id="um-username" placeholder="e.g. ahmed" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:.9rem;padding:8px 11px;border-radius:6px;outline:none;width:100%">
+          <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Username</label>
+          <input type="text" id="um-username" placeholder="e.g. ahmed" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow,sans-serif,sans-serif;font-size:.9rem;padding:8px 11px;border-radius:6px;outline:none;width:100%">
         </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
         <div>
-          <label style="font-family:'Barlow Condensed';font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Password <span id="um-pw-hint" style="color:var(--muted);font-size:.6rem">(required)</span></label>
-          <input type="password" id="um-password" placeholder="Set password" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:.9rem;padding:8px 11px;border-radius:6px;outline:none;width:100%">
+          <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Password <span id="um-pw-hint" style="color:var(--muted);font-size:.6rem">(required)</span></label>
+          <input type="password" id="um-password" placeholder="Set password" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow,sans-serif,sans-serif;font-size:.9rem;padding:8px 11px;border-radius:6px;outline:none;width:100%">
         </div>
         <div>
-          <label style="font-family:'Barlow Condensed';font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Role</label>
+          <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Role</label>
           <select id="um-role" class="status-sel">
             <option value="staff">Staff — Orders only</option>
             <option value="manager">Manager — Dashboard, Orders, Reports</option>
@@ -312,7 +441,7 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
         </div>
       </div>
       <!-- Role description -->
-      <div style="background:rgba(31,149,120,.06);border:1px solid rgba(31,149,120,.15);border-radius:8px;padding:12px 14px;font-family:'Barlow Condensed';font-size:.8rem;color:var(--muted);line-height:1.6">
+      <div style="background:rgba(31,149,120,.06);border:1px solid rgba(31,149,120,.15);border-radius:8px;padding:12px 14px;font-family:Barlow Condensed,sans-serif;font-size:.8rem;color:var(--muted);line-height:1.6">
         <strong style="color:var(--teal);display:block;margin-bottom:4px">Role Permissions:</strong>
         🔵 <b>Owner</b> — All pages + manage users<br>
         🟢 <b>Manager</b> — Dashboard, Orders, Reports<br>
@@ -338,7 +467,7 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
       <input type="hidden" id="pm-id">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
         <div>
-          <label style="font-family:'Barlow Condensed';font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Category</label>
+          <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Category</label>
           <select id="pm-cat" class="status-sel" onchange="pm_catChange()">
             <option value="">Select category...</option>
             <option value="burgers">🍔 Burgers</option>
@@ -352,22 +481,22 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
           </select>
         </div>
         <div>
-          <label style="font-family:'Barlow Condensed';font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Emoji</label>
+          <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Emoji</label>
           <input type="text" id="pm-emoji" placeholder="🍔" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-size:1.3rem;padding:7px 11px;border-radius:6px;outline:none;width:100%">
         </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
         <div>
-          <label style="font-family:'Barlow Condensed';font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Name (English)</label>
-          <input type="text" id="pm-name" placeholder="Item name" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:.92rem;padding:8px 11px;border-radius:6px;outline:none;width:100%">
+          <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Name (English)</label>
+          <input type="text" id="pm-name" placeholder="Item name" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow,sans-serif,sans-serif;font-size:.92rem;padding:8px 11px;border-radius:6px;outline:none;width:100%">
         </div>
         <div>
-          <label style="font-family:'Barlow Condensed';font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Name (Arabic)</label>
-          <input type="text" id="pm-name-ar" placeholder="اسم العنصر" dir="rtl" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:.92rem;padding:8px 11px;border-radius:6px;outline:none;width:100%">
+          <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Name (Arabic)</label>
+          <input type="text" id="pm-name-ar" placeholder="اسم العنصر" dir="rtl" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow,sans-serif,sans-serif;font-size:.92rem;padding:8px 11px;border-radius:6px;outline:none;width:100%">
         </div>
       </div>
       <!-- Price type selector -->
-      <label style="font-family:'Barlow Condensed';font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:8px">Price Type</label>
+      <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:8px">Price Type</label>
       <div style="display:flex;gap:8px;margin-bottom:14px">
         <button class="meal-opt sel" id="pt-standard" onclick="setPriceType('standard')">Standard (KD)</button>
         <button class="meal-opt" id="pt-meal" onclick="setPriceType('meal')">With Meal Option</button>
@@ -377,13 +506,23 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
       <div id="pm-price-fields">
         <!-- Populated by setPriceType -->
       </div>
+      <!-- Image URL field -->
+      <div style="margin-top:10px">
+        <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Photo URL (optional)</label>
+        <input type="url" id="pm-image" placeholder="https://... paste image link or leave blank"
+          style="width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow,sans-serif,sans-serif;font-size:.85rem;padding:8px 11px;border-radius:6px;outline:none">
+        <div style="font-family:Barlow Condensed,sans-serif;font-size:.67rem;color:var(--muted);margin-top:4px;letter-spacing:1px">Upload image to imgur.com or imgbb.com → paste the direct link here</div>
+        <div id="pm-img-preview" style="margin-top:8px;display:none">
+          <img id="pm-img-thumb" src="" style="height:70px;border-radius:6px;object-fit:cover;border:1px solid var(--border)">
+        </div>
+      </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
         <div>
-          <label style="font-family:'Barlow Condensed';font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Badge (optional)</label>
-          <input type="text" id="pm-badge" placeholder="e.g. 🔥 HOT" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:.88rem;padding:8px 11px;border-radius:6px;outline:none;width:100%">
+          <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Badge (optional)</label>
+          <input type="text" id="pm-badge" placeholder="e.g. 🔥 HOT" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow,sans-serif,sans-serif;font-size:.88rem;padding:8px 11px;border-radius:6px;outline:none;width:100%">
         </div>
         <div style="display:flex;align-items:flex-end;padding-bottom:2px">
-          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-family:'Barlow Condensed';font-size:.88rem;color:var(--muted)">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-family:Barlow Condensed,sans-serif;font-size:.88rem;color:var(--muted)">
             <input type="checkbox" id="pm-hidden" style="width:18px;height:18px;cursor:pointer;accent-color:var(--green)">
             Hide from menu
           </label>
@@ -394,6 +533,110 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
       <button class="btn-pri" onclick="saveProd()">SAVE PRODUCT</button>
       <button class="btn-ghost" onclick="closeProdModal()">CANCEL</button>
       <button class="btn-dng" id="pm-del-btn" onclick="deleteProd()" style="display:none">🗑 DELETE</button>
+    </div>
+  </div>
+</div>
+
+<!-- CATEGORY MODAL -->
+<div class="modal-bg" id="cat-modal">
+  <div class="modal" style="max-width:460px">
+    <div class="mh">
+      <div><div class="mh-title" id="cm-title">ADD CATEGORY</div></div>
+      <button class="mc" onclick="closeCatModal()">✕</button>
+    </div>
+    <div class="mbody">
+      <div style="display:grid;grid-template-columns:80px 1fr;gap:10px;margin-bottom:12px">
+        <div>
+          <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Emoji</label>
+          <input type="text" id="cm-emoji" placeholder="🍔" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-size:1.6rem;padding:7px 11px;border-radius:6px;outline:none;width:100%;text-align:center">
+        </div>
+        <div>
+          <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Category ID (no spaces)</label>
+          <input type="text" id="cm-id" placeholder="e.g. desserts" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow,sans-serif,sans-serif;font-size:.92rem;padding:8px 11px;border-radius:6px;outline:none;width:100%">
+          <div style="font-family:Barlow Condensed,sans-serif;font-size:.62rem;color:var(--muted);margin-top:3px;letter-spacing:1px">Lowercase letters only, no spaces</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div>
+          <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Name (English)</label>
+          <input type="text" id="cm-name" placeholder="e.g. Desserts" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow,sans-serif,sans-serif;font-size:.92rem;padding:8px 11px;border-radius:6px;outline:none;width:100%">
+        </div>
+        <div>
+          <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Name (Arabic)</label>
+          <input type="text" id="cm-name-ar" placeholder="مثلاً: حلويات" dir="rtl" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow,sans-serif,sans-serif;font-size:.92rem;padding:8px 11px;border-radius:6px;outline:none;width:100%">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div>
+          <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Sort Order</label>
+          <input type="number" id="cm-sort" min="0" placeholder="0" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow,sans-serif,sans-serif;font-size:.92rem;padding:8px 11px;border-radius:6px;outline:none;width:100%">
+        </div>
+        <div style="display:flex;align-items:flex-end;padding-bottom:2px">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-family:Barlow Condensed,sans-serif;font-size:.88rem;color:var(--muted)">
+            <input type="checkbox" id="cm-active" checked style="width:18px;height:18px;cursor:pointer;accent-color:var(--green)">
+            Active (visible on menu)
+          </label>
+        </div>
+      </div>
+      <div style="background:rgba(255,212,59,.06);border:1px solid rgba(255,212,59,.15);border-radius:8px;padding:10px 14px;font-family:Barlow Condensed,sans-serif;font-size:.78rem;color:var(--muted)">
+        💡 After adding a category, go to <b>Products → Add Product</b> — the new category will appear in the dropdown automatically.
+      </div>
+    </div>
+    <div class="mfoot">
+      <button class="btn-pri" onclick="saveCat()">SAVE CATEGORY</button>
+      <button class="btn-ghost" onclick="closeCatModal()">CANCEL</button>
+      <button class="btn-dng" id="cm-del-btn" onclick="deleteCat()" style="display:none">🗑 DELETE</button>
+    </div>
+  </div>
+</div>
+
+<!-- COMBO MODAL -->
+<div class="modal-bg" id="combo-modal">
+  <div class="modal" style="max-width:520px">
+    <div class="mh">
+      <div><div class="mh-title" id="combo-title">ADD COMBO</div></div>
+      <button class="mc" onclick="closeComboModal()">✕</button>
+    </div>
+    <div class="mbody">
+      <div style="display:grid;grid-template-columns:80px 1fr;gap:10px;margin-bottom:12px">
+        <div>
+          <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Emoji</label>
+          <input type="text" id="cb-emoji" placeholder="🎁" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-size:1.6rem;padding:7px;border-radius:6px;outline:none;width:100%;text-align:center">
+        </div>
+        <div>
+          <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Combo Name (English)</label>
+          <input type="text" id="cb-name" placeholder="e.g. Family Feast Deal" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow,sans-serif,sans-serif;font-size:.92rem;padding:8px 11px;border-radius:6px;outline:none;width:100%">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div>
+          <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Name (Arabic)</label>
+          <input type="text" id="cb-name-ar" placeholder="عرض العائلة" dir="rtl" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow,sans-serif,sans-serif;font-size:.92rem;padding:8px 11px;border-radius:6px;outline:none;width:100%">
+        </div>
+        <div>
+          <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Combo Price (KD)</label>
+          <input type="number" id="cb-price" min="0" step="0.001" placeholder="0.000" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow,sans-serif,sans-serif;font-size:.92rem;padding:8px 11px;border-radius:6px;outline:none;width:100%">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+        <div>
+          <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Badge (optional)</label>
+          <input type="text" id="cb-badge" placeholder="e.g. 🔥 BEST VALUE" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow,sans-serif,sans-serif;font-size:.88rem;padding:8px 11px;border-radius:6px;outline:none;width:100%">
+        </div>
+        <div>
+          <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Description</label>
+          <input type="text" id="cb-desc" placeholder="Serves 2–3 people" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow,sans-serif,sans-serif;font-size:.88rem;padding:8px 11px;border-radius:6px;outline:none;width:100%">
+        </div>
+      </div>
+      <!-- Included items list -->
+      <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:8px">Included Items</label>
+      <div id="cb-items-list" style="margin-bottom:10px"></div>
+      <button onclick="addComboItemRow()" style="background:rgba(31,149,120,.1);border:1px solid rgba(31,149,120,.25);color:var(--teal);font-family:Bebas Neue,sans-serif,sans-serif;font-size:.82rem;letter-spacing:2px;padding:7px 14px;border-radius:6px;cursor:pointer;width:100%">＋ ADD ITEM TO COMBO</button>
+    </div>
+    <div class="mfoot">
+      <button class="btn-pri" onclick="saveCombo()">SAVE COMBO</button>
+      <button class="btn-ghost" onclick="closeComboModal()">CANCEL</button>
+      <button class="btn-dng" id="cb-del-btn" onclick="deleteCombo()" style="display:none">🗑 DELETE</button>
     </div>
   </div>
 </div>
@@ -433,7 +676,7 @@ async function loadAll() {
 }
 
 function renderAll() {
-  renderStats(); renderRecentOrders(); renderTopItems(); renderHourlyChart();
+  renderStats(); renderRecentOrders(); renderTopItems(); renderHourlyChart(); renderRevenueTrends();
   const active = document.querySelector('.page.active')?.id;
   if (active === 'page-orders') renderOrdersTable();
   if (active === 'page-reports') renderReport();
@@ -444,12 +687,29 @@ function renderAll() {
 }
 
 function subscribeRealtime() {
-  sb.channel('orders-rt')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
-      showToast('🔔 New activity — refreshing…');
-      loadAll();
+  // Primary: Supabase Realtime (requires Replication enabled on orders table)
+  const channel = sb.channel('orders-rt');
+  channel
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, function(payload) {
+      loadAll(); // instant reload on any order change
+      if (payload.eventType === 'INSERT') {
+        showToast('🔔 New order received!');
+        // Flash the page title briefly
+        var orig = document.title;
+        document.title = '🔔 NEW ORDER — ' + orig;
+        setTimeout(function() { document.title = orig; }, 4000);
+      }
     })
-    .subscribe();
+    .subscribe(function(status) {
+      var el = document.getElementById('rt-status');
+      if (status === 'SUBSCRIBED') {
+        if (el) { el.style.background='#2ecc71'; el.title='Realtime: Connected'; }
+      } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+        if (el) { el.style.background='var(--red)'; el.title='Realtime: Error — using 3s poll'; }
+        // Reconnect after 5s
+        setTimeout(function() { channel.unsubscribe(); subscribeRealtime(); }, 5000);
+      }
+    });
 }
 
 function renderStats() {
@@ -471,7 +731,7 @@ function renderRecentOrders() {
   if (!recent.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:28px">No orders yet</td></tr>'; return; }
   tbody.innerHTML = recent.map(o => `
     <tr class="${o.status==='new'?'new-row':''}" onclick="openOrder('${o.id}')">
-      <td><span style="font-family:'Bebas Neue';letter-spacing:1px">${o.order_id||o.id}</span><br><span style="font-size:.7rem;color:var(--muted)">${fmtTime(o.created_at)}</span></td>
+      <td><span style="font-family:Bebas Neue,sans-serif;letter-spacing:1px">${o.order_id||o.id}</span><br><span style="font-size:.7rem;color:var(--muted)">${fmtTime(o.created_at)}</span></td>
       <td>${(o.items||[]).length} item${(o.items||[]).length!==1?'s':''}</td>
       <td class="amt">${fmt(o.total)}</td>
       <td><span class="sbadge s-${o.status}">${(o.status||'').toUpperCase()}</span></td>
@@ -533,7 +793,7 @@ function renderOrdersTable() {
   const typeL = {dinein:'🍽 Dine-In',takeaway:'🥡 Takeaway',delivery:'🚴 Delivery'};
   tbody.innerHTML = orders.map(o => `
     <tr class="${o.status==='new'?'new-row':''}" onclick="openOrder('${o.id}')">
-      <td><span style="font-family:'Bebas Neue';letter-spacing:1px">${o.order_id||o.id}</span></td>
+      <td><span style="font-family:Bebas Neue,sans-serif;letter-spacing:1px">${o.order_id||o.id}</span></td>
       <td style="font-size:.78rem;color:var(--muted)">${fmtDate(o.created_at)}<br>${fmtTime(o.created_at)}</td>
       <td>${o.customer_name||'<span style="color:var(--muted)">—</span>'}</td>
       <td style="font-size:.78rem;color:var(--muted)">${typeL[o.order_type]||o.order_type||'—'}${o.table_number?' · T'+o.table_number:''}</td>
@@ -560,7 +820,7 @@ function openOrder(id) {
       <div class="meta-item">
         <div class="ml">Discount (KD)</div>
         <input type="number" min="0" step="0.001" placeholder="0.000" id="modal-discount" value="${order.discount_amt||0}" 
-          style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:.9rem;padding:7px 11px;border-radius:6px;outline:none;width:100%"
+          style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow Condensed,sans-serif,sans-serif;font-size:.9rem;padding:7px 11px;border-radius:6px;outline:none;width:100%"
           onchange="applyDiscount(this.value)">
       </div>
         <select class="status-sel" onchange="updateStatus(this.value)">
@@ -575,11 +835,27 @@ function openOrder(id) {
       ${(order.discount_amt>0)?`<div class="tot-row"><span class="l">Discount</span><span class="v" style="color:var(--red)">– ${fmt(order.discount_amt)}</span></div>`:''}
       <div class="tot-row"><span class="l">Tax</span><span class="v">—</span></div>
       <div class="tot-row grand"><span class="l">TOTAL</span><span class="v">${fmt(order.total)}</span></div>
+      ${order.payment_method === 'cash' ? `
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+        <div style="font-family:Barlow Condensed,sans-serif;font-size:.68rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">CASH CHANGE CALCULATOR</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="flex:1">
+            <div style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:2px;color:var(--muted);margin-bottom:4px">CUSTOMER PAID (KD)</div>
+            <input type="number" id="cash-paid" min="0" step="0.001" placeholder="0.000"
+              oninput="calcChange(${order.total})"
+              style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(31,149,120,.3);color:var(--text);font-family:Barlow Condensed,sans-serif;font-size:1rem;padding:8px 10px;border-radius:6px;outline:none">
+          </div>
+          <div style="flex:1;text-align:center">
+            <div style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:2px;color:var(--muted);margin-bottom:4px">CHANGE TO GIVE</div>
+            <div id="cash-change" style="font-family:Bebas Neue,sans-serif;font-size:1.5rem;color:var(--teal)">—</div>
+          </div>
+        </div>
+      </div>` : ''}
     </div>`;
   document.getElementById('m-foot').innerHTML = `
-    <button class="btn-pri" onclick="window.print()">🖨 PRINT</button>
+    <button class="btn-pri" onclick="printReceipt(${order.id})">🖨 PRINT</button>
     <button class="btn-ghost" onclick="closeModal()">CLOSE</button>
-    <button class="btn-dng" onclick="deleteOrder('${order.id}')">🗑 DELETE</button>`;
+    ${ADMIN_SESSION && ADMIN_SESSION.role === 'owner' ? `<button class="btn-dng" onclick="deleteOrder('${order.id}')">🗑 DELETE</button>` : ''}`;
   document.getElementById('order-modal').classList.add('open');
 }
 
@@ -603,6 +879,153 @@ async function deleteOrder(id) {
 }
 
 function closeModal() { document.getElementById('order-modal').classList.remove('open'); currentOrderId = null; }
+
+function printReceipt(id) {
+  const o = allOrders.find(x => String(x.id) === String(id));
+  if (!o) return;
+
+  const items = (o.items || []);
+  const now   = o.created_at ? new Date(o.created_at) : new Date();
+  const dateStr = now.toLocaleDateString('en-GB', {day:'2-digit',month:'2-digit',year:'2-digit'});
+  const timeStr = now.toLocaleTimeString('en-KW',{hour:'2-digit',minute:'2-digit'});
+  const typeL = {dinein:'Dine In', takeaway:'Takeaway', delivery:'Delivery'};
+  const payL  = {cash:'Cash', knet:'KNET', card:'Card'};
+
+  // Build items rows HTML
+  const itemRows = items.map(i => {
+    const lineTotal = ((i.price||0)*(i.qty||1)).toFixed(3);
+    const name = i.name + (i.size ? ' ('+i.size+')' : '');
+    return `<tr>
+      <td class="qty">${i.qty}</td>
+      <td class="desc">${name}</td>
+      <td class="price">${parseFloat(i.price||0).toFixed(3)}</td>
+      <td class="total">${lineTotal}</td>
+    </tr>`;
+  }).join('');
+
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Receipt ${o.order_id || o.id}</title>
+<style>
+  /* 57mm thermal = 215px at 96dpi, but printers use 72dpi so ~160px */
+  @page {
+    size: 57mm auto;
+    margin: 2mm 2mm 4mm 2mm;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 8pt;
+    width: 53mm;
+    color: #000;
+    background: #fff;
+  }
+  .center  { text-align: center; }
+  .right   { text-align: right; }
+  .left    { text-align: left; }
+  .bold    { font-weight: bold; }
+  .lg      { font-size: 11pt; font-weight: bold; }
+  .xl      { font-size: 14pt; font-weight: bold; letter-spacing: 2px; }
+  .sm      { font-size: 7pt; }
+  .divider { border: none; border-top: 1px dashed #000; margin: 3mm 0; }
+  .divider-solid { border: none; border-top: 1px solid #000; margin: 3mm 0; }
+  .spacer  { height: 2mm; }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead th { font-weight: bold; font-size: 7pt; padding: 1mm 0; }
+  td { vertical-align: top; padding: 0.8mm 0; font-size: 8pt; }
+  .qty   { width: 8mm; text-align: left; }
+  .desc  { text-align: left; }
+  .price { width: 15mm; text-align: right; }
+  .total { width: 16mm; text-align: right; }
+
+  .totals-row { display: flex; justify-content: space-between; padding: 0.5mm 0; font-size: 8pt; }
+  .totals-row.grand { font-size: 11pt; font-weight: bold; padding: 1mm 0; }
+  .totals-row.discount { color: #333; }
+
+  .info-row { display: flex; justify-content: space-between; font-size: 7.5pt; padding: 0.4mm 0; }
+  .badge { display: inline-block; border: 1px solid #000; padding: 0.5mm 2mm; font-size: 7pt; font-weight: bold; margin: 1mm 0; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="center">
+  <div class="xl">FAYRUZA</div>
+  <div class="sm" style="letter-spacing:1px">RESTAURANT</div>
+  <div class="spacer"></div>
+  <div class="sm">Jabriya · Block 12 · Jamia Branch</div>
+  <div class="sm">Tel: Coming Soon</div>
+</div>
+
+<hr class="divider-solid">
+
+<!-- ORDER INFO -->
+<div class="info-row"><span class="bold">#${o.order_id || o.id}</span><span>${dateStr}  ${timeStr}</span></div>
+<div class="info-row"><span>${typeL[o.order_type] || o.order_type || '—'}${o.table_number ? ' · Table '+o.table_number : ''}</span><span>${payL[o.payment_method] || o.payment_method || '—'}</span></div>
+${o.customer_name ? `<div class="info-row"><span>Customer: ${o.customer_name}</span></div>` : ''}
+
+<hr class="divider">
+
+<!-- ITEMS TABLE -->
+<table>
+  <thead>
+    <tr>
+      <th class="left">QTY</th>
+      <th class="left">ITEM</th>
+      <th class="right">PRICE</th>
+      <th class="right">TOTAL</th>
+    </tr>
+  </thead>
+  <tbody>${itemRows}</tbody>
+</table>
+
+<hr class="divider">
+
+<!-- TOTALS -->
+<div class="totals-row"><span>Subtotal</span><span>KD ${parseFloat(o.subtotal||0).toFixed(3)}</span></div>
+${(o.discount_amt > 0) ? `<div class="totals-row discount"><span>Discount</span><span>- KD ${parseFloat(o.discount_amt).toFixed(3)}</span></div>` : ''}
+<div class="totals-row"><span>VAT/Tax</span><span>—</span></div>
+
+<hr class="divider-solid">
+
+<div class="totals-row grand"><span>TOTAL</span><span>KD ${parseFloat(o.total||0).toFixed(3)}</span></div>
+
+${o.notes ? `<hr class="divider"><div class="sm"><b>Notes:</b> ${o.notes}</div>` : ''}
+
+<hr class="divider">
+
+<!-- FOOTER -->
+<div class="center">
+  <div class="sm">Thank you for dining with us!</div>
+  <div class="sm" style="margin-top:1mm">شكراً لزيارتكم</div>
+  <div class="spacer"></div>
+  <div class="sm bold">fayruza-website.vercel.app</div>
+</div>
+
+<div style="height:8mm"></div>
+
+<script>window.onload = function() { window.print(); window.onafterprint = function() { window.close(); }; }<\/script>
+</body>
+</html>`;
+
+  const w = window.open('', '_blank', 'width=300,height=600');
+  if (!w) { showToast('⚠ Allow popups to print'); return; }
+  w.document.write(html);
+  w.document.close();
+}
+
+function calcChange(total) {
+  var paid = parseFloat(document.getElementById('cash-paid').value) || 0;
+  var change = paid - total;
+  var el = document.getElementById('cash-change');
+  if (!el) return;
+  if (paid <= 0) { el.textContent = '—'; el.style.color = 'var(--teal)'; return; }
+  if (change < 0) { el.textContent = 'SHORT ' + fmt(Math.abs(change)); el.style.color = 'var(--red)'; }
+  else { el.textContent = fmt(change); el.style.color = 'var(--teal)'; }
+}
 
 /* ── Apply discount from modal ── */
 async function applyDiscount(val) {
@@ -930,8 +1353,8 @@ function renderProductList() {
     return `
       <div class="panel" style="margin-bottom:16px">
         <div class="ph">
-          <div class="ph-title">${meta.emoji||''} ${meta.name||catId} <span style="font-family:'Barlow Condensed';font-size:.8rem;color:var(--muted);letter-spacing:1px;margin-left:8px">${items.length} items</span></div>
-          <button onclick="openProductModal(null,'${catId}')" style="background:rgba(31,149,120,.12);border:1px solid rgba(31,149,120,.3);color:var(--teal);font-family:'Bebas Neue',sans-serif;font-size:.8rem;letter-spacing:2px;padding:6px 14px;border-radius:6px;cursor:pointer">＋ ADD</button>
+          <div class="ph-title">${meta.emoji||''} ${meta.name||catId} <span style="font-family:Barlow Condensed,sans-serif;font-size:.8rem;color:var(--muted);letter-spacing:1px;margin-left:8px">${items.length} items</span></div>
+          <button onclick="openProductModal(null,'${catId}')" style="background:rgba(31,149,120,.12);border:1px solid rgba(31,149,120,.3);color:var(--teal);font-family:Bebas Neue,sans-serif,sans-serif;font-size:.8rem;letter-spacing:2px;padding:6px 14px;border-radius:6px;cursor:pointer">＋ ADD</button>
         </div>
         <div class="tbl-wrap">
           <table>
@@ -959,12 +1382,12 @@ function prodRow(p) {
   return `<tr style="opacity:${hidden?'.45':'1'}">
     <td>
       <span style="font-size:1.2rem;margin-right:8px">${p.emoji||''}</span>
-      <span style="font-family:'Barlow Condensed';font-weight:700;font-size:.88rem;text-transform:uppercase">${p.name}</span>
+      <span style="font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:.88rem;text-transform:uppercase">${p.name}</span>
       <div style="font-size:.75rem;color:var(--muted)">${p.name_ar||''}</div>
     </td>
-    <td style="font-family:'Bebas Neue';font-size:1rem;color:var(--teal)">${priceStr}</td>
+    <td style="font-family:Bebas Neue,sans-serif;font-size:1rem;color:var(--teal)">${priceStr}</td>
     <td style="font-size:.8rem;color:var(--muted)">${mealStr}</td>
-    <td>${p.badge ? `<span style="background:rgba(31,149,120,.15);color:var(--teal);font-family:'Bebas Neue';font-size:.7rem;letter-spacing:1px;padding:2px 8px;border-radius:3px">${p.badge}</span>` : '—'}</td>
+    <td>${p.badge ? `<span style="background:rgba(31,149,120,.15);color:var(--teal);font-family:Bebas Neue,sans-serif;font-size:.7rem;letter-spacing:1px;padding:2px 8px;border-radius:3px">${p.badge}</span>` : '—'}</td>
     <td>
       ${hidden
         ? '<span style="font-family:\'Bebas Neue\';font-size:.7rem;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,.05);padding:3px 8px;border-radius:3px">HIDDEN</span>'
@@ -972,8 +1395,8 @@ function prodRow(p) {
     </td>
     <td>
       <div style="display:flex;gap:6px">
-        <button onclick="openProductModal(${p.id})" style="background:rgba(31,149,120,.1);border:1px solid rgba(31,149,120,.25);color:var(--teal);font-family:'Bebas Neue',sans-serif;font-size:.75rem;letter-spacing:1px;padding:4px 10px;border-radius:5px;cursor:pointer">✏ EDIT</button>
-        <button onclick="toggleHide(${p.id},${!hidden})" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--muted);font-family:'Bebas Neue',sans-serif;font-size:.75rem;letter-spacing:1px;padding:4px 10px;border-radius:5px;cursor:pointer">${hidden ? '👁 SHOW' : '🙈 HIDE'}</button>
+        <button onclick="openProductModal(${p.id})" style="background:rgba(31,149,120,.1);border:1px solid rgba(31,149,120,.25);color:var(--teal);font-family:Bebas Neue,sans-serif,sans-serif;font-size:.75rem;letter-spacing:1px;padding:4px 10px;border-radius:5px;cursor:pointer">✏ EDIT</button>
+        <button onclick="toggleHide(${p.id},${!hidden})" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--muted);font-family:Bebas Neue,sans-serif,sans-serif;font-size:.75rem;letter-spacing:1px;padding:4px 10px;border-radius:5px;cursor:pointer">${hidden ? '👁 SHOW' : '🙈 HIDE'}</button>
       </div>
     </td>
   </tr>`;
@@ -1034,6 +1457,9 @@ function openProductModal(id, defaultCat) {
   const titleEl = document.getElementById('pm-title');
   const delBtn = document.getElementById('pm-del-btn');
 
+  // Rebuild category dropdown from live DB data
+  rebuildCatDropdown();
+
   // Reset form
   ['pm-cat','pm-emoji','pm-name','pm-name-ar','pm-badge'].forEach(i => {
     const el = document.getElementById(i); if (el) el.value = '';
@@ -1055,6 +1481,10 @@ function openProductModal(id, defaultCat) {
     document.getElementById('pm-name-ar').value = p.name_ar || '';
     document.getElementById('pm-badge').value = p.badge || '';
     if (hiddenEl) hiddenEl.checked = !!p.is_hidden;
+    // Image URL
+    const imgEl = document.getElementById('pm-image');
+    if (imgEl) imgEl.value = p.image_url || '';
+    pm_previewImage(p.image_url);
 
     // Detect price type
     if (p.fils) {
@@ -1080,6 +1510,8 @@ function openProductModal(id, defaultCat) {
     // New product
     titleEl.textContent = 'ADD PRODUCT';
     if (delBtn) delBtn.style.display = 'none';
+    const imgElN = document.getElementById('pm-image'); if (imgElN) imgElN.value = '';
+    pm_previewImage('');
     if (defaultCat) {
       document.getElementById('pm-cat').value = defaultCat;
       pm_catChange();
@@ -1113,6 +1545,7 @@ async function saveProd() {
     name_ar: (document.getElementById('pm-name-ar')||{}).value?.trim() || '',
     badge: (document.getElementById('pm-badge')||{}).value?.trim() || null,
     is_hidden: !!(document.getElementById('pm-hidden')||{}).checked,
+    image_url: (document.getElementById('pm-image')||{}).value?.trim() || null,
     price: null, meal_price: null, fils: null, sml_s: null, sml_m: null, sml_l: null,
   };
 
@@ -1159,6 +1592,209 @@ async function deleteProd() {
 /* ══════════════════════════════════════════
    AUTH + ROLE-BASED ACCESS
 ══════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   PUSH NOTIFICATIONS
+══════════════════════════════════════════ */
+function initNotifications() {
+  if (!('Notification' in window)) return;
+  const el = document.getElementById('notif-status');
+  if (Notification.permission === 'granted') { if(el) el.textContent = '✓ ON'; if(el) el.style.color = 'var(--teal)'; }
+  else if (Notification.permission === 'denied') { if(el) el.textContent = 'BLOCKED'; }
+}
+
+function requestNotifPermission() {
+  if (!('Notification' in window)) { showToast('⚠ Notifications not supported in this browser'); return; }
+  if (Notification.permission === 'granted') { showToast('✓ Notifications already enabled'); return; }
+  Notification.requestPermission().then(function(perm) {
+    const el = document.getElementById('notif-status');
+    if (perm === 'granted') {
+      if(el) { el.textContent = '✓ ON'; el.style.color = 'var(--teal)'; }
+      showToast('✓ Notifications enabled! You will be alerted on new orders.');
+      new Notification('Fayruza Admin', { body: '🔔 Notifications are now active!', icon: '/icon-192.png' });
+    } else {
+      if(el) el.textContent = 'BLOCKED';
+      showToast('⚠ Notifications blocked — enable in browser settings');
+    }
+  });
+}
+
+function notifyNewOrder(order) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  const typeL = { dinein: 'Dine In', takeaway: 'Takeaway' };
+  new Notification('🔔 New Order — ' + (order.order_id || '#'+order.id), {
+    body: (typeL[order.order_type] || order.order_type || '') +
+          (order.table_number ? ' · Table ' + order.table_number : '') +
+          ' · KD ' + parseFloat(order.total||0).toFixed(3),
+    icon: '/icon-192.png',
+    tag: 'order-' + order.id,
+    requireInteraction: true
+  });
+}
+
+// Hook into realtime to fire notifications
+const _origSubRT = subscribeRealtime;
+subscribeRealtime = function() {
+  _origSubRT();
+  // Also watch for new orders specifically for notification
+  sb.channel('notif-orders')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, function(payload) {
+      if (payload.new && payload.new.status === 'new') notifyNewOrder(payload.new);
+    })
+    .subscribe();
+};
+
+/* ══════════════════════════════════════════
+   IMAGE PREVIEW HELPER (product modal)
+══════════════════════════════════════════ */
+function pm_previewImage(url) {
+  const preview = document.getElementById('pm-img-preview');
+  const thumb   = document.getElementById('pm-img-thumb');
+  if (!preview || !thumb) return;
+  if (url && url.trim()) {
+    thumb.src = url.trim();
+    preview.style.display = 'block';
+    thumb.onerror = function() { preview.style.display = 'none'; };
+  } else {
+    preview.style.display = 'none';
+    thumb.src = '';
+  }
+}
+// Live preview as user types
+document.addEventListener('input', function(e) {
+  if (e.target && e.target.id === 'pm-image') pm_previewImage(e.target.value);
+});
+
+/* ══════════════════════════════════════════
+   DAILY CLOSING REPORT (PDF/Print)
+══════════════════════════════════════════ */
+function printDailyReport() {
+  const todayOrders = allOrders.filter(o => isToday(o.created_at));
+  if (!todayOrders.length) { showToast('⚠ No orders today'); return; }
+
+  const done      = todayOrders.filter(o => o.status === 'done');
+  const all       = todayOrders;
+  const revenue   = all.reduce((s,o) => s + (o.total||0), 0);
+  const subtotal  = all.reduce((s,o) => s + (o.subtotal||0), 0);
+  const discounts = all.reduce((s,o) => s + (o.discount_amt||0), 0);
+
+  // Payment breakdown
+  const byPay = {};
+  all.forEach(function(o) {
+    const m = o.payment_method || 'cash';
+    byPay[m] = (byPay[m]||0) + (o.total||0);
+  });
+
+  // Top items
+  const itemCounts = {};
+  all.forEach(function(o) {
+    (o.items||[]).forEach(function(i) {
+      const k = i.name;
+      if (!itemCounts[k]) itemCounts[k] = { qty:0, rev:0 };
+      itemCounts[k].qty += i.qty||1;
+      itemCounts[k].rev += (i.price||0)*(i.qty||1);
+    });
+  });
+  const topItems = Object.entries(itemCounts)
+    .sort((a,b) => b[1].qty - a[1].qty).slice(0, 10);
+
+  // Order type breakdown
+  const byType = {};
+  all.forEach(function(o) { const t=o.order_type||'dinein'; byType[t]=(byType[t]||0)+1; });
+
+  const dateStr = new Date().toLocaleDateString('en-GB', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const fmt3 = v => 'KD ' + parseFloat(v||0).toFixed(3);
+  const payLabels = { cash:'Cash', knet:'KNET', card:'Credit Card' };
+  const typeLabels = { dinein:'Dine In', takeaway:'Takeaway', delivery:'Delivery' };
+
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Daily Report — ${dateStr}</title>
+<style>
+  @page { size: A4; margin: 15mm; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: 'Courier New', monospace; font-size: 10pt; color: #111; background: #fff; }
+  h1 { font-size: 18pt; text-align: center; letter-spacing: 4px; margin-bottom: 2mm; }
+  h2 { font-size: 12pt; letter-spacing: 2px; margin: 6mm 0 3mm; border-bottom: 1px solid #ccc; padding-bottom: 1.5mm; }
+  .center { text-align: center; }
+  .date { text-align: center; font-size: 9pt; color: #555; margin-bottom: 4mm; }
+  .divider { border: none; border-top: 1px dashed #aaa; margin: 4mm 0; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 4mm; }
+  th { text-align: left; font-size: 8pt; letter-spacing: 1px; border-bottom: 1px solid #ccc; padding: 2mm 1mm; }
+  td { padding: 1.5mm 1mm; font-size: 9.5pt; border-bottom: 1px solid #eee; }
+  .right { text-align: right; }
+  .bold { font-weight: bold; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 4mm; margin: 4mm 0; }
+  .kpi { border: 1px solid #ddd; border-radius: 3mm; padding: 3mm; text-align: center; }
+  .kpi-val { font-size: 16pt; font-weight: bold; }
+  .kpi-lbl { font-size: 7.5pt; color: #777; letter-spacing: 1px; text-transform: uppercase; margin-top: 1mm; }
+  .grand { font-weight: bold; font-size: 11pt; }
+  .footer { margin-top: 10mm; text-align: center; font-size: 8pt; color: #888; border-top: 1px solid #ccc; padding-top: 3mm; }
+</style>
+</head>
+<body>
+<h1>FAYRUZA RESTAURANT</h1>
+<div class="date">${dateStr} · Daily Closing Report</div>
+<hr class="divider">
+
+<div class="kpi-grid">
+  <div class="kpi"><div class="kpi-val">${all.length}</div><div class="kpi-lbl">Total Orders</div></div>
+  <div class="kpi"><div class="kpi-val">${fmt3(revenue)}</div><div class="kpi-lbl">Total Revenue</div></div>
+  <div class="kpi"><div class="kpi-val">${fmt3(revenue / (all.length||1))}</div><div class="kpi-lbl">Avg Order Value</div></div>
+</div>
+
+<h2>REVENUE SUMMARY</h2>
+<table>
+  <tr><td>Gross Subtotal</td><td class="right">${fmt3(subtotal)}</td></tr>
+  <tr><td>Discounts Given</td><td class="right" style="color:#cc0000">- ${fmt3(discounts)}</td></tr>
+  <tr class="grand"><td>NET REVENUE</td><td class="right">${fmt3(revenue)}</td></tr>
+</table>
+
+<h2>PAYMENT BREAKDOWN</h2>
+<table>
+  <thead><tr><th>METHOD</th><th class="right">AMOUNT</th><th class="right">ORDERS</th></tr></thead>
+  <tbody>
+  ${Object.entries(byPay).map(([m,v]) =>
+    `<tr><td>${payLabels[m]||m}</td><td class="right">${fmt3(v)}</td>
+    <td class="right">${all.filter(o=>(o.payment_method||'cash')===m).length}</td></tr>`
+  ).join('')}
+  </tbody>
+</table>
+
+<h2>ORDER TYPE BREAKDOWN</h2>
+<table>
+  <thead><tr><th>TYPE</th><th class="right">COUNT</th></tr></thead>
+  <tbody>
+  ${Object.entries(byType).map(([t,c]) =>
+    `<tr><td>${typeLabels[t]||t}</td><td class="right">${c}</td></tr>`).join('')}
+  </tbody>
+</table>
+
+<h2>TOP 10 ITEMS</h2>
+<table>
+  <thead><tr><th>#</th><th>ITEM</th><th class="right">QTY SOLD</th><th class="right">REVENUE</th></tr></thead>
+  <tbody>
+  ${topItems.map(([name,d],i) =>
+    `<tr><td>${i+1}</td><td>${name}</td><td class="right">${d.qty}</td><td class="right">${fmt3(d.rev)}</td></tr>`
+  ).join('')}
+  </tbody>
+</table>
+
+<div class="footer">
+  Generated: ${new Date().toLocaleString()} · Fayruza Restaurant Admin · fayruza-website.vercel.app
+</div>
+
+<script>window.onload = function() { window.print(); window.onafterprint = function() { window.close(); }; }<\/script>
+</body>
+</html>`;
+
+  const w = window.open('','_blank','width=800,height=900');
+  if (!w) { showToast('⚠ Allow popups to print'); return; }
+  w.document.write(html);
+  w.document.close();
+}
+
 var ADMIN_SESSION = null;
 
 function initAuth() {
@@ -1184,6 +1820,7 @@ function initAuth() {
     orders:    document.querySelector('[onclick*="orders"]'),
     reports:   document.querySelector('[onclick*="reports"]'),
     products:  document.querySelector('[onclick*="products"]'),
+    shifts:    document.querySelector('[onclick*="shifts"]'),
     users:     document.querySelector('[onclick*="users"]'),
   };
   // Also hide section headers if all items under them are hidden
@@ -1212,7 +1849,7 @@ function initAuth() {
   var pg = document.getElementById('page-' + firstPage);
   if (pg) pg.classList.add('active');
 
-  var titles = {dashboard:'DASHBOARD', orders:'ORDERS', reports:'REPORTS', products:'PRODUCTS', users:'USERS'};
+  var titles = {dashboard:'DASHBOARD', orders:'ORDERS', reports:'REPORTS', categories:'CATEGORIES', products:'PRODUCTS', combos:'COMBOS', customers:'CUSTOMERS', shifts:'SHIFTS', users:'USERS'};
   document.getElementById('page-title').textContent = titles[firstPage] || firstPage.toUpperCase();
 
   if (firstPage === 'reports') renderReport();
@@ -1235,7 +1872,520 @@ showPage = function(name, btn) {
   }
   _origShowPage(name, btn);
   if (name === 'users') loadUsers();
+  if (name === 'shifts') { loadShifts(); populateShiftUserSelect(); }
+  if (name === 'categories') loadCategories();
+  if (name === 'combos') loadCombos();
+  if (name === 'customers') loadCustomers();
 };
+
+/* ══════════════════════════════════════════
+   REVENUE TREND CHARTS
+══════════════════════════════════════════ */
+function renderRevenueTrends() {
+  var now = new Date();
+
+  // 7-day
+  var week = {};
+  for (var i = 6; i >= 0; i--) {
+    var d = new Date(now); d.setDate(d.getDate() - i);
+    week[d.toDateString()] = 0;
+  }
+  allOrders.forEach(function(o) {
+    var d = new Date(o.created_at).toDateString();
+    if (week[d] !== undefined) week[d] += (o.total||0);
+  });
+  var weekVals = Object.values(week);
+  var weekMax  = Math.max.apply(null, weekVals) || 1;
+  var weekTotal = weekVals.reduce(function(a,b){return a+b;},0);
+  var weekEl = document.getElementById('week-chart');
+  var weekTot = document.getElementById('week-total');
+  if (weekTot) weekTot.textContent = fmt(weekTotal) + ' total';
+  if (weekEl) weekEl.innerHTML = Object.keys(week).map(function(dk, i) {
+    var h = Math.round(week[dk]/weekMax*100);
+    var d = new Date(dk);
+    var lbl = d.toLocaleDateString('en-GB',{weekday:'short'});
+    var isToday2 = d.toDateString() === now.toDateString();
+    return '<div class="bar-col">'+
+      '<div class="bar" style="height:'+h+'%;'+(isToday2?'background:linear-gradient(to top,var(--teal),#7effd4)':'')+'"></div>'+
+      '<div class="bar-lbl">'+lbl+'<br><strong style="color:var(--teal)">'+(week[dk]>0?fmt(week[dk]).split(' ')[0]:'')+'</strong></div>'+
+    '</div>';
+  }).join('');
+
+  // 30-day (by week buckets for readability)
+  var months = {};
+  for (var j = 29; j >= 0; j--) {
+    var dd = new Date(now); dd.setDate(dd.getDate() - j);
+    var key = dd.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
+    months[key] = 0;
+  }
+  allOrders.forEach(function(o) {
+    var key = new Date(o.created_at).toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
+    if (months[key] !== undefined) months[key] += (o.total||0);
+  });
+  var mKeys = Object.keys(months);
+  var mVals = Object.values(months);
+  var mMax  = Math.max.apply(null, mVals) || 1;
+  var mTotal = mVals.reduce(function(a,b){return a+b;},0);
+  var mEl  = document.getElementById('month-chart');
+  var mTot = document.getElementById('month-total');
+  if (mTot) mTot.textContent = fmt(mTotal) + ' total';
+  if (mEl) mEl.innerHTML = mKeys.map(function(k, i) {
+    var h = Math.round(months[k]/mMax*100);
+    // Only show label every 5 days
+    var lbl = (i % 5 === 0) ? k.split(' ')[0] : '';
+    return '<div class="bar-col">'+
+      '<div class="bar" style="height:'+h+'%"></div>'+
+      '<div class="bar-lbl">'+lbl+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+/* ══════════════════════════════════════════
+   COMBOS
+══════════════════════════════════════════ */
+var allCombos = [];
+var editingComboId = null;
+var comboItemRows = [];
+
+async function loadCombos() {
+  try {
+    var { data, error } = await sb.from('combos').select('*').order('sort_order');
+    if (error) throw error;
+    allCombos = data || [];
+    renderCombosTable();
+  } catch(e) { showToast('⚠ Could not load combos: ' + e.message); }
+}
+
+function renderCombosTable() {
+  var tbody = document.getElementById('combos-tbody');
+  if (!tbody) return;
+  if (!allCombos.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:28px">No combos yet — create your first bundle deal!</td></tr>';
+    return;
+  }
+  tbody.innerHTML = allCombos.map(function(c) {
+    var items = (c.items||[]).map(function(i){ return (i.emoji||'')+'×'+i.qty+' '+i.name; }).join(', ');
+    return '<tr style="opacity:'+(c.is_hidden?.45:1)+'">'+
+      '<td><span style="font-size:1.2rem;margin-right:6px">'+(c.emoji||'🎁')+'</span>'+
+      '<span style="font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:.9rem;text-transform:uppercase">'+c.name+'</span>'+
+      (c.description?'<div style="font-size:.76rem;color:var(--muted)">'+c.description+'</div>':'')+
+      '</td>'+
+      '<td style="font-size:.78rem;color:var(--muted);max-width:200px">'+items+'</td>'+
+      '<td style="font-family:Bebas Neue,sans-serif;font-size:1.1rem;color:var(--teal)">'+parseFloat(c.price||0).toFixed(3)+' KD</td>'+
+      '<td>'+(c.badge?'<span style="background:rgba(31,149,120,.15);color:var(--teal);font-family:Bebas Neue,sans-serif;font-size:.7rem;letter-spacing:1px;padding:2px 8px;border-radius:3px">'+c.badge+'</span>':'—')+'</td>'+
+      '<td>'+(c.is_hidden?'<span style="color:var(--muted);font-family:Bebas Neue,sans-serif;font-size:.7rem;letter-spacing:1px;background:rgba(255,255,255,.05);padding:3px 8px;border-radius:3px">HIDDEN</span>':'<span style="color:var(--teal);font-family:Bebas Neue,sans-serif;font-size:.7rem;letter-spacing:1px;background:rgba(31,149,120,.1);padding:3px 8px;border-radius:3px">ACTIVE</span>')+'</td>'+
+      '<td><div style="display:flex;gap:6px">'+
+        '<button onclick="openComboModal('+c.id+')" style="background:rgba(31,149,120,.1);border:1px solid rgba(31,149,120,.25);color:var(--teal);font-family:Bebas Neue,sans-serif,sans-serif;font-size:.75rem;letter-spacing:1px;padding:4px 10px;border-radius:5px;cursor:pointer">✏ EDIT</button>'+
+        '<button onclick="toggleComboHide('+c.id+','+!c.is_hidden+')" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--muted);font-family:Bebas Neue,sans-serif,sans-serif;font-size:.75rem;letter-spacing:1px;padding:4px 10px;border-radius:5px;cursor:pointer">'+(c.is_hidden?'👁 SHOW':'🙈 HIDE')+'</button>'+
+      '</div></td>'+
+    '</tr>';
+  }).join('');
+}
+
+function openComboModal(id) {
+  editingComboId = id;
+  comboItemRows = [];
+  var delBtn = document.getElementById('cb-del-btn');
+  ['cb-emoji','cb-name','cb-name-ar','cb-price','cb-badge','cb-desc'].forEach(function(i) {
+    var el = document.getElementById(i); if (el) el.value = '';
+  });
+  document.getElementById('cb-items-list').innerHTML = '';
+
+  if (id) {
+    var c = allCombos.find(function(x){ return x.id === id; });
+    if (!c) return;
+    document.getElementById('combo-title').textContent = 'EDIT COMBO';
+    if (delBtn) delBtn.style.display = 'block';
+    document.getElementById('cb-emoji').value   = c.emoji || '🎁';
+    document.getElementById('cb-name').value    = c.name || '';
+    document.getElementById('cb-name-ar').value = c.name_ar || '';
+    document.getElementById('cb-price').value   = c.price || '';
+    document.getElementById('cb-badge').value   = c.badge || '';
+    document.getElementById('cb-desc').value    = c.description || '';
+    (c.items||[]).forEach(function(item) { addComboItemRow(item); });
+  } else {
+    document.getElementById('combo-title').textContent = 'ADD COMBO';
+    if (delBtn) delBtn.style.display = 'none';
+    addComboItemRow();
+  }
+  document.getElementById('combo-modal').classList.add('open');
+}
+
+function closeComboModal() {
+  document.getElementById('combo-modal').classList.remove('open');
+  editingComboId = null; comboItemRows = [];
+}
+
+var _comboRowId = 0;
+function addComboItemRow(existing) {
+  var rid = ++_comboRowId;
+  comboItemRows.push(rid);
+  var list = document.getElementById('cb-items-list');
+  var row = document.createElement('div');
+  row.id = 'cb-row-'+rid;
+  row.style.cssText = 'display:grid;grid-template-columns:50px 1fr 70px auto;gap:8px;margin-bottom:8px;align-items:center';
+  var inpStyle = 'background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow,sans-serif;font-size:.88rem;padding:7px 10px;border-radius:6px;outline:none;width:100%';
+  row.innerHTML =
+    '<input type="text" id="cb-r-emoji-'+rid+'" placeholder="🍔" value="'+(existing?existing.emoji||'':'')+'" style="'+inpStyle+';text-align:center;font-size:1.1rem">'+
+    '<input type="text" id="cb-r-name-'+rid+'"  placeholder="Item name" value="'+(existing?existing.name||'':'')+'" style="'+inpStyle+'">'+
+    '<input type="number" id="cb-r-qty-'+rid+'" placeholder="1" value="'+(existing?existing.qty||1:1)+'" min="1" style="'+inpStyle+'">'+
+    '<button onclick="removeComboRow('+rid+')" style="background:rgba(255,71,87,.1);border:1px solid rgba(255,71,87,.2);color:var(--red);font-family:Bebas Neue,sans-serif;font-size:.8rem;padding:7px 10px;border-radius:6px;cursor:pointer">✕</button>';
+  list.appendChild(row);
+}
+
+function removeComboRow(rid) {
+  var el = document.getElementById('cb-row-'+rid);
+  if (el) el.remove();
+  comboItemRows = comboItemRows.filter(function(r){ return r !== rid; });
+}
+
+async function saveCombo() {
+  var emoji = (document.getElementById('cb-emoji')||{}).value || '🎁';
+  var name  = ((document.getElementById('cb-name')||{}).value||'').trim();
+  var price = parseFloat((document.getElementById('cb-price')||{}).value)||0;
+  if (!name || !price) { showToast('⚠ Name and price are required'); return; }
+
+  var items = [];
+  document.querySelectorAll('[id^="cb-row-"]').forEach(function(row) {
+    var rid = row.id.replace('cb-row-','');
+    var n = (document.getElementById('cb-r-name-'+rid)||{}).value||'';
+    var e = (document.getElementById('cb-r-emoji-'+rid)||{}).value||'';
+    var q = parseInt((document.getElementById('cb-r-qty-'+rid)||{}).value)||1;
+    if (n) items.push({emoji:e,name:n,qty:q});
+  });
+
+  var record = {
+    emoji: emoji, name: name,
+    name_ar: ((document.getElementById('cb-name-ar')||{}).value||'').trim(),
+    description: ((document.getElementById('cb-desc')||{}).value||'').trim(),
+    badge: ((document.getElementById('cb-badge')||{}).value||'').trim()||null,
+    price: price, items: items,
+    sort_order: editingComboId ? undefined : allCombos.length
+  };
+  if (!editingComboId) record.sort_order = allCombos.length;
+
+  try {
+    var error;
+    if (editingComboId) {
+      ({ error } = await sb.from('combos').update(record).eq('id', editingComboId));
+    } else {
+      ({ error } = await sb.from('combos').insert([record]));
+    }
+    if (error) throw error;
+    showToast(editingComboId ? '✓ Combo updated' : '✓ Combo created');
+    closeComboModal(); await loadCombos();
+  } catch(e) { showToast('⚠ ' + e.message); }
+}
+
+async function deleteCombo() {
+  if (!editingComboId || !confirm('Delete this combo?')) return;
+  try {
+    var { error } = await sb.from('combos').delete().eq('id', editingComboId);
+    if (error) throw error;
+    showToast('🗑 Combo deleted'); closeComboModal(); await loadCombos();
+  } catch(e) { showToast('⚠ ' + e.message); }
+}
+
+async function toggleComboHide(id, hide) {
+  try {
+    var { error } = await sb.from('combos').update({is_hidden:hide}).eq('id',id);
+    if (error) throw error;
+    showToast(hide?'🙈 Combo hidden':'👁 Combo visible'); await loadCombos();
+  } catch(e) { showToast('⚠ ' + e.message); }
+}
+
+/* ══════════════════════════════════════════
+   CUSTOMERS
+══════════════════════════════════════════ */
+var allCustomers = [];
+
+async function loadCustomers() {
+  try {
+    var { data, error } = await sb.from('customers').select('*').order('total_orders',{ascending:false}).limit(200);
+    if (error) throw error;
+    allCustomers = data || [];
+    renderCustomersTable();
+  } catch(e) { showToast('⚠ Could not load customers: ' + e.message); }
+}
+
+function renderCustomersTable() {
+  var tbody = document.getElementById('customers-tbody');
+  if (!tbody) return;
+  var search = ((document.getElementById('cust-search')||{}).value||'').toLowerCase();
+  var list = allCustomers;
+  if (search) list = list.filter(function(c) {
+    return (c.name||'').toLowerCase().includes(search) || (c.phone||'').includes(search);
+  });
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:28px">No customers yet. Phone numbers entered at checkout will appear here.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(function(c) {
+    var lastItems = (c.last_order||[]).slice(0,3).map(function(i){ return (i.emoji||'')+'×'+(i.qty||1)+' '+i.name; }).join(' · ');
+    var lastDate = c.last_order_at ? fmtDate(c.last_order_at) : '—';
+    return '<tr>'+
+      '<td style="font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:.9rem">'+(c.name||'<span style="color:var(--muted)">—</span>')+'</td>'+
+      '<td style="font-family:Barlow Condensed,sans-serif;color:var(--teal)">'+c.phone+'</td>'+
+      '<td style="font-family:Bebas Neue,sans-serif;font-size:1.1rem;color:var(--teal)">'+c.total_orders+'</td>'+
+      '<td class="amt">'+fmt(c.total_spent)+'</td>'+
+      '<td style="font-size:.78rem;color:var(--muted)">'+lastDate+'</td>'+
+      '<td style="font-size:.78rem;color:var(--muted);max-width:200px">'+lastItems+'</td>'+
+    '</tr>';
+  }).join('');
+}
+
+/* ══════════════════════════════════════════
+   PRINTABLE MENU
+══════════════════════════════════════════ */
+async function printMenu() {
+  showToast('⏳ Generating printable menu…');
+
+  // Fetch all visible products grouped by category
+  var { data: products } = await sb.from('products')
+    .select('*')
+    .eq('is_hidden', false)
+    .order('category_sort')
+    .order('sort_order');
+
+  var { data: combos } = await sb.from('combos')
+    .select('*')
+    .eq('is_hidden', false)
+    .order('sort_order');
+
+  var byCat = {};
+  (products||[]).forEach(function(p) {
+    if (!byCat[p.category_id]) byCat[p.category_id] = { name: p.category_name||p.category_id, emoji: p.category_emoji||'', items: [] };
+    byCat[p.category_id].items.push(p);
+  });
+
+  function priceStr(p) {
+    if (p.fils) return p.fils + ' Fils';
+    if (p.sml_s) return 'S: '+p.sml_s+' / M: '+p.sml_m+' / L: '+p.sml_l+' KD';
+    if (p.meal_price) return p.price.toFixed(3)+' KD  |  Meal: '+p.meal_price.toFixed(3)+' KD';
+    return parseFloat(p.price||0).toFixed(3)+' KD';
+  }
+
+  var categoriesHTML = Object.values(byCat).map(function(cat) {
+    return '<div class="cat-section">'+
+      '<div class="cat-header-print">'+cat.emoji+' '+cat.name+'</div>'+
+      '<table class="items-table">'+
+      cat.items.map(function(p) {
+        return '<tr>'+
+          '<td class="item-emoji">'+(p.emoji||'')+'</td>'+
+          '<td class="item-name">'+p.name+(p.name_ar?'<span class="item-ar"> / '+p.name_ar+'</span>':'')+(p.badge?'<span class="item-badge">'+p.badge+'</span>':'')+'</td>'+
+          '<td class="item-price">'+priceStr(p)+'</td>'+
+        '</tr>';
+      }).join('')+
+      '</table></div>';
+  }).join('');
+
+  var combosHTML = (combos&&combos.length) ? (
+    '<div class="cat-section">'+
+    '<div class="cat-header-print">🎁 COMBO DEALS</div>'+
+    '<table class="items-table">'+
+    combos.map(function(c) {
+      var includes = (c.items||[]).map(function(i){return i.emoji+'×'+i.qty+' '+i.name;}).join(', ');
+      return '<tr>'+
+        '<td class="item-emoji">'+(c.emoji||'🎁')+'</td>'+
+        '<td class="item-name">'+c.name+(c.description?'<div style="font-size:8pt;color:#666">'+c.description+'</div>':'')+
+        '<div style="font-size:8pt;color:#444;margin-top:2px">Includes: '+includes+'</div></td>'+
+        '<td class="item-price">'+parseFloat(c.price||0).toFixed(3)+' KD</td>'+
+      '</tr>';
+    }).join('')+
+    '</table></div>'
+  ) : '';
+
+  var printDate = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+
+  var html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Fayruza Restaurant — Menu</title>
+<style>
+  @page { size: A4; margin: 12mm 15mm; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: Arial, sans-serif; font-size: 10pt; color: #111; }
+  .header { text-align:center; margin-bottom: 8mm; border-bottom: 2px solid #1F9578; padding-bottom: 5mm; }
+  .restaurant-name { font-size: 28pt; font-weight: 900; letter-spacing: 4px; color: #1F9578; }
+  .restaurant-sub { font-size: 9pt; color: #666; letter-spacing: 3px; text-transform: uppercase; margin-top: 2mm; }
+  .print-date { font-size: 8pt; color: #999; margin-top: 2mm; }
+  .menu-grid { columns: 2; column-gap: 8mm; }
+  .cat-section { break-inside: avoid; margin-bottom: 6mm; }
+  .cat-header-print { font-size: 11pt; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #1F9578; border-bottom: 1px solid #4DC4A3; padding-bottom: 1.5mm; margin-bottom: 2mm; }
+  .items-table { width: 100%; border-collapse: collapse; }
+  .items-table tr { border-bottom: 1px solid #f0f0f0; }
+  .item-emoji { width: 16px; padding: 1.5mm 2mm 1.5mm 0; font-size: 10pt; }
+  .item-name { padding: 1.5mm 2mm; font-size: 8.5pt; }
+  .item-ar { color: #888; }
+  .item-badge { display:inline-block; background: #fff3e0; color: #e65100; font-size: 6.5pt; padding: 1px 4px; border-radius: 2px; margin-left: 4px; vertical-align: middle; }
+  .item-price { text-align: right; white-space: nowrap; font-weight: 600; font-size: 8.5pt; color: #1F9578; padding: 1.5mm 0 1.5mm 4mm; }
+  .footer { text-align: center; margin-top: 8mm; padding-top: 3mm; border-top: 1px solid #ccc; font-size: 7.5pt; color: #999; }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="restaurant-name">FAYRUZA RESTAURANT</div>
+  <div class="restaurant-sub">Jabriya · Block 12 · Jamia Branch</div>
+  <div class="print-date">Menu as of ${printDate}</div>
+</div>
+<div class="menu-grid">
+  ${categoriesHTML}
+  ${combosHTML}
+</div>
+<div class="footer">Prices in Kuwaiti Dinars (KD) · فيروزا مطعم · fayruza-website.vercel.app</div>
+<script>window.onload=function(){window.print();window.onafterprint=function(){window.close();};};<\/script>
+</body>
+</html>`;
+
+  var w = window.open('','_blank','width=900,height=1000');
+  if (!w) { showToast('⚠ Allow popups to print'); return; }
+  w.document.write(html);
+  w.document.close();
+}
+
+/* ══════════════════════════════════════════
+   SHIFTS
+══════════════════════════════════════════ */
+let allShifts = [];
+let shiftFilter = 'all';
+
+async function loadShifts() {
+  try {
+    const res = await fetch(SB_URL + '/rest/v1/shifts?select=*&order=started_at.desc&limit=100', {
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+    });
+    if (!res.ok) throw new Error(res.status);
+    allShifts = await res.json();
+    renderShiftsTable();
+    populateActiveShifts();
+  } catch(e) { showToast('⚠ Could not load shifts: ' + e.message); }
+}
+
+function populateShiftUserSelect() {
+  const sel = document.getElementById('shift-start-user');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Select staff...</option>' +
+    allUsers.map(u => `<option value="${u.id}" data-name="${u.full_name}">${u.full_name} (@${u.username})</option>`).join('');
+}
+
+function populateActiveShifts() {
+  const sel = document.getElementById('shift-end-select');
+  if (!sel) return;
+  const active = allShifts.filter(s => s.status === 'active');
+  sel.innerHTML = active.length
+    ? '<option value="">Select active shift...</option>' + active.map(s =>
+        `<option value="${s.id}">${s.staff_name} — started ${fmtTime(s.started_at)}</option>`).join('')
+    : '<option value="">No active shifts</option>';
+}
+
+function filterShifts(f, btn) {
+  shiftFilter = f;
+  document.querySelectorAll('#page-shifts .btn-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderShiftsTable();
+}
+
+function renderShiftsTable() {
+  const tbody = document.getElementById('shifts-tbody');
+  if (!tbody) return;
+  let shifts = allShifts;
+  if (shiftFilter === 'active') shifts = shifts.filter(s => s.status === 'active');
+  if (shiftFilter === 'closed') shifts = shifts.filter(s => s.status === 'closed');
+  if (!shifts.length) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:28px">No shifts yet</td></tr>';
+    return;
+  }
+  tbody.innerHTML = shifts.map(s => {
+    const variance = s.closing_cash != null
+      ? s.closing_cash - (s.opening_cash + (s.cash_orders_total || 0))
+      : null;
+    const varColor = variance === null ? 'var(--muted)' : variance >= 0 ? 'var(--teal)' : 'var(--red)';
+    return `<tr>
+      <td style="font-family:Barlow Condensed,sans-serif;font-weight:700">${s.staff_name}</td>
+      <td style="font-size:.78rem;color:var(--muted)">${fmtDate(s.started_at)}<br>${fmtTime(s.started_at)}</td>
+      <td style="font-size:.78rem;color:var(--muted)">${s.ended_at ? fmtDate(s.ended_at)+'<br>'+fmtTime(s.ended_at) : '—'}</td>
+      <td class="amt">${fmt(s.opening_cash)}</td>
+      <td class="amt">${fmt(s.cash_orders_total || 0)}</td>
+      <td class="amt">${fmt((s.opening_cash || 0) + (s.cash_orders_total || 0))}</td>
+      <td class="amt">${s.closing_cash != null ? fmt(s.closing_cash) : '—'}</td>
+      <td style="font-family:Bebas Neue,sans-serif;font-size:1rem;color:${varColor}">${
+        variance === null ? '—' : (variance >= 0 ? '+' : '') + fmt(variance)}</td>
+      <td>${s.status === 'active'
+        ? '<span style="font-family:\'Bebas Neue\';font-size:.7rem;letter-spacing:1px;color:var(--teal);background:rgba(31,149,120,.1);padding:3px 8px;border-radius:3px">ACTIVE</span>'
+        : '<span style="font-family:\'Bebas Neue\';font-size:.7rem;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,.05);padding:3px 8px;border-radius:3px">CLOSED</span>'}</td>
+    </tr>`;
+  }).join('');
+}
+
+async function startShift() {
+  const userSel = document.getElementById('shift-start-user');
+  const userId = userSel?.value;
+  const staffName = userSel?.options[userSel.selectedIndex]?.getAttribute('data-name');
+  const openingCash = parseFloat(document.getElementById('shift-open-cash')?.value) || 0;
+  if (!userId) { showToast('⚠ Please select a staff member'); return; }
+
+  // Check no active shift for this user
+  const existing = allShifts.find(s => s.user_id == userId && s.status === 'active');
+  if (existing) { showToast('⚠ This staff already has an active shift'); return; }
+
+  try {
+    const res = await fetch(SB_URL + '/rest/v1/shifts', {
+      method: 'POST',
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({
+        user_id: parseInt(userId),
+        staff_name: staffName,
+        opening_cash: openingCash,
+        started_at: new Date().toISOString(),
+        status: 'active'
+      })
+    });
+    if (!res.ok) throw new Error(await res.text());
+    showToast('✓ Shift started for ' + staffName);
+    document.getElementById('shift-open-cash').value = '';
+    userSel.value = '';
+    await loadShifts();
+  } catch(e) { showToast('⚠ ' + e.message); }
+}
+
+async function endShift() {
+  const shiftId = document.getElementById('shift-end-select')?.value;
+  const closingCash = parseFloat(document.getElementById('shift-close-cash')?.value);
+  if (!shiftId) { showToast('⚠ Please select an active shift'); return; }
+  if (isNaN(closingCash)) { showToast('⚠ Please enter closing cash amount'); return; }
+
+  // Calculate cash orders during this shift
+  const shift = allShifts.find(s => String(s.id) === String(shiftId));
+  if (!shift) return;
+  const cashOrders = allOrders.filter(o =>
+    o.payment_method === 'cash' &&
+    new Date(o.created_at) >= new Date(shift.started_at)
+  );
+  const cashTotal = cashOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+
+  try {
+    const res = await fetch(SB_URL + '/rest/v1/shifts?id=eq.' + shiftId, {
+      method: 'PATCH',
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({
+        closing_cash: closingCash,
+        cash_orders_total: cashTotal,
+        ended_at: new Date().toISOString(),
+        status: 'closed'
+      })
+    });
+    if (!res.ok) throw new Error(await res.text());
+    const expected = (shift.opening_cash || 0) + cashTotal;
+    const variance = closingCash - expected;
+    const msg = variance >= 0
+      ? `✓ Shift closed. Surplus: ${fmt(variance)}`
+      : `⚠ Shift closed. Short by: ${fmt(Math.abs(variance))}`;
+    showToast(msg);
+    document.getElementById('shift-close-cash').value = '';
+    await loadShifts();
+  } catch(e) { showToast('⚠ ' + e.message); }
+}
 
 /* ══════════════════════════════════════════
    USERS PAGE
@@ -1251,6 +2401,7 @@ async function loadUsers() {
     if (!res.ok) throw new Error(res.status);
     allUsers = await res.json();
     renderUsersTable();
+    populateShiftUserSelect();
   } catch(e) { showToast('⚠ Could not load users: ' + e.message); }
 }
 
@@ -1262,14 +2413,14 @@ function renderUsersTable() {
   if (!tbody) return;
   tbody.innerHTML = allUsers.map(u => `
     <tr>
-      <td><span style="font-family:'Barlow Condensed';font-weight:700;font-size:.9rem">${u.full_name}</span></td>
-      <td style="font-family:'Barlow Condensed';color:var(--muted)">@${u.username}</td>
-      <td><span style="font-family:'Bebas Neue';font-size:.78rem;letter-spacing:1px;padding:3px 10px;border-radius:20px;background:rgba(31,149,120,.1);color:${roleColors[u.role]||'var(--muted)'}">${roleLabels[u.role]||u.role}</span></td>
+      <td><span style="font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:.9rem">${u.full_name}</span></td>
+      <td style="font-family:Barlow Condensed,sans-serif;color:var(--muted)">@${u.username}</td>
+      <td><span style="font-family:Bebas Neue,sans-serif;font-size:.78rem;letter-spacing:1px;padding:3px 10px;border-radius:20px;background:rgba(31,149,120,.1);color:${roleColors[u.role]||'var(--muted)'}">${roleLabels[u.role]||u.role}</span></td>
       <td style="font-size:.78rem;color:var(--muted)">${u.last_login ? fmtDate(u.last_login)+' '+fmtTime(u.last_login) : 'Never'}</td>
       <td>${u.is_active
         ? '<span style="font-family:\'Bebas Neue\';font-size:.7rem;letter-spacing:1px;color:var(--teal);background:rgba(31,149,120,.1);padding:3px 8px;border-radius:3px">ACTIVE</span>'
         : '<span style="font-family:\'Bebas Neue\';font-size:.7rem;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,.05);padding:3px 8px;border-radius:3px">INACTIVE</span>'}</td>
-      <td><button onclick="openUserModal(${u.id})" style="background:rgba(31,149,120,.1);border:1px solid rgba(31,149,120,.25);color:var(--teal);font-family:'Bebas Neue';font-size:.75rem;letter-spacing:1px;padding:4px 10px;border-radius:5px;cursor:pointer">✏ EDIT</button></td>
+      <td><button onclick="openUserModal(${u.id})" style="background:rgba(31,149,120,.1);border:1px solid rgba(31,149,120,.25);color:var(--teal);font-family:Bebas Neue,sans-serif;font-size:.75rem;letter-spacing:1px;padding:4px 10px;border-radius:5px;cursor:pointer">✏ EDIT</button></td>
     </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:28px">No users yet</td></tr>';
 }
 
@@ -1355,15 +2506,185 @@ async function deleteUser() {
 }
 
 /* ══════════════════════════════════════════
+   CATEGORIES
+══════════════════════════════════════════ */
+var allCategories = [];
+var editingCatId = null;  // db row id (bigint)
+
+async function loadCategories() {
+  try {
+    const { data, error } = await sb.from('categories').select('*').order('sort_order');
+    if (error) throw error;
+    allCategories = data || [];
+    renderCatsTable();
+    // Rebuild product category dropdown from DB
+    rebuildCatDropdown();
+  } catch(e) {
+    showToast('⚠ Could not load categories: ' + e.message);
+    // Fall back to hardcoded CAT_META
+    allCategories = Object.entries(CAT_META).map(([id, m]) => ({
+      id: null, category_id: id, name: m.name, name_ar: m.ar||'',
+      emoji: m.emoji, anim_class: m.anim, sort_order: m.sort, is_active: true
+    }));
+    renderCatsTable();
+    rebuildCatDropdown();
+  }
+}
+
+function rebuildCatDropdown() {
+  const sel = document.getElementById('pm-cat');
+  if (!sel) return;
+  const active = allCategories.filter(c => c.is_active);
+  sel.innerHTML = '<option value="">Select category...</option>' +
+    active.map(c =>
+      `<option value="${c.category_id}">${c.emoji || ''} ${c.name}</option>`
+    ).join('');
+}
+
+function renderCatsTable() {
+  const tbody = document.getElementById('cat-tbody');
+  if (!tbody) return;
+  if (!allCategories.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:28px">No categories yet</td></tr>';
+    return;
+  }
+  tbody.innerHTML = allCategories.map(c => `
+    <tr style="opacity:${c.is_active ? 1 : .45}">
+      <td style="font-size:1.4rem">${c.emoji || '🍽️'}</td>
+      <td><span style="font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:.9rem;text-transform:uppercase">${c.name}</span></td>
+      <td style="color:var(--muted);font-size:.85rem">${c.name_ar || '—'}</td>
+      <td><span style="font-family:Bebas Neue,sans-serif;font-size:.78rem;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,.06);padding:2px 8px;border-radius:4px">${c.category_id}</span></td>
+      <td style="font-family:Bebas Neue,sans-serif;color:var(--muted)">${c.sort_order}</td>
+      <td>${c.is_active
+        ? '<span style="font-family:Bebas Neue,sans-serif;font-size:.7rem;letter-spacing:1px;color:var(--teal);background:rgba(31,149,120,.1);padding:3px 8px;border-radius:3px">ACTIVE</span>'
+        : '<span style="font-family:Bebas Neue,sans-serif;font-size:.7rem;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,.05);padding:3px 8px;border-radius:3px">HIDDEN</span>'}</td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button onclick="openCatModal(${c.id})" style="background:rgba(31,149,120,.1);border:1px solid rgba(31,149,120,.25);color:var(--teal);font-family:Bebas Neue,sans-serif,sans-serif;font-size:.75rem;letter-spacing:1px;padding:4px 10px;border-radius:5px;cursor:pointer">✏ EDIT</button>
+          <button onclick="toggleCatActive(${c.id},${!c.is_active})" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--muted);font-family:Bebas Neue,sans-serif;font-size:.75rem;letter-spacing:1px;padding:4px 10px;border-radius:5px;cursor:pointer">${c.is_active ? '🙈 HIDE' : '👁 SHOW'}</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function openCatModal(dbId) {
+  editingCatId = dbId;
+  const titleEl = document.getElementById('cm-title');
+  const delBtn  = document.getElementById('cm-del-btn');
+  ['cm-emoji','cm-id','cm-name','cm-name-ar','cm-sort'].forEach(i => {
+    const el = document.getElementById(i); if (el) el.value = '';
+  });
+  document.getElementById('cm-active').checked = true;
+
+  if (dbId) {
+    const c = allCategories.find(x => x.id === dbId);
+    if (!c) return;
+    titleEl.textContent = 'EDIT CATEGORY';
+    if (delBtn) delBtn.style.display = 'block';
+    document.getElementById('cm-emoji').value   = c.emoji || '';
+    document.getElementById('cm-id').value      = c.category_id || '';
+    document.getElementById('cm-id').disabled   = true; // can't change ID
+    document.getElementById('cm-name').value    = c.name || '';
+    document.getElementById('cm-name-ar').value = c.name_ar || '';
+    document.getElementById('cm-sort').value    = c.sort_order || 0;
+    document.getElementById('cm-active').checked = !!c.is_active;
+  } else {
+    titleEl.textContent = 'ADD CATEGORY';
+    if (delBtn) delBtn.style.display = 'none';
+    document.getElementById('cm-id').disabled = false;
+    document.getElementById('cm-sort').value = allCategories.length;
+  }
+  document.getElementById('cat-modal').classList.add('open');
+}
+
+function closeCatModal() {
+  document.getElementById('cat-modal').classList.remove('open');
+  editingCatId = null;
+  const idEl = document.getElementById('cm-id');
+  if (idEl) idEl.disabled = false;
+}
+
+async function saveCat() {
+  const emoji   = (document.getElementById('cm-emoji')||{}).value?.trim() || '🍽️';
+  const catId   = (document.getElementById('cm-id')||{}).value?.trim().toLowerCase().replace(/[^a-z0-9_]/g,'');
+  const name    = (document.getElementById('cm-name')||{}).value?.trim();
+  const nameAr  = (document.getElementById('cm-name-ar')||{}).value?.trim() || '';
+  const sort    = parseInt((document.getElementById('cm-sort')||{}).value) || 0;
+  const active  = !!(document.getElementById('cm-active')||{}).checked;
+
+  if (!catId || !name) { showToast('⚠ Category ID and name are required'); return; }
+
+  const record = {
+    category_id: catId, name, name_ar: nameAr,
+    emoji, anim_class: catId, sort_order: sort, is_active: active
+  };
+
+  try {
+    let error;
+    if (editingCatId) {
+      ({ error } = await sb.from('categories').update(record).eq('id', editingCatId));
+      // Also update all products in this category
+      await sb.from('products').update({
+        category_name: name, category_name_ar: nameAr,
+        category_emoji: emoji, category_sort: sort
+      }).eq('category_id', catId);
+    } else {
+      // Check category_id not already taken
+      const { data: existing } = await sb.from('categories').select('id').eq('category_id', catId).limit(1);
+      if (existing && existing.length) { showToast('⚠ Category ID already exists'); return; }
+      ({ error } = await sb.from('categories').insert([record]));
+    }
+    if (error) throw error;
+    showToast(editingCatId ? '✓ Category updated' : '✓ Category added');
+    closeCatModal();
+    await loadCategories();
+  } catch(e) { showToast('⚠ ' + e.message); }
+}
+
+async function deleteCat() {
+  if (!editingCatId) return;
+  const c = allCategories.find(x => x.id === editingCatId);
+  if (!c) return;
+  // Check if products exist in this category
+  const { data: prods } = await sb.from('products').select('id').eq('category_id', c.category_id).limit(1);
+  if (prods && prods.length) {
+    showToast('⚠ Move or delete all products in this category first');
+    return;
+  }
+  if (!confirm('Delete "' + c.name + '" category permanently?')) return;
+  try {
+    const { error } = await sb.from('categories').delete().eq('id', editingCatId);
+    if (error) throw error;
+    showToast('🗑 Category deleted');
+    closeCatModal();
+    await loadCategories();
+  } catch(e) { showToast('⚠ ' + e.message); }
+}
+
+async function toggleCatActive(dbId, active) {
+  try {
+    const { error } = await sb.from('categories').update({ is_active: active }).eq('id', dbId);
+    if (error) throw error;
+    showToast(active ? '👁 Category visible' : '🙈 Category hidden');
+    await loadCategories();
+  } catch(e) { showToast('⚠ ' + e.message); }
+}
+
+/* ══════════════════════════════════════════
    INIT
 ══════════════════════════════════════════ */
 loadAll();
 subscribeRealtime();
 loadProducts();
+loadUsers();
+loadCategories();
+loadCombos();
+loadCustomers();
 initAuth();
+initNotifications();
 updateClock();
 setInterval(updateClock, 1000);
-setInterval(loadAll, 30000);
+setInterval(loadAll, 3000);
 </script>
 </body>
 </html>
