@@ -161,6 +161,7 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
     <button class="nb" id="nav-users" onclick="showPage('users',this)"><span class="ic">👥</span> Users</button>
     <div class="sb-sec">SITE</div>
     <button class="nb" id="nav-settings" onclick="showPage('settings',this)"><span class="ic">⚙️</span> Settings</button>
+    <button class="nb" onclick="openPrinterSettings()"><span class="ic">🖨</span> Printer</button>
     <button class="nb" id="nav-qrcodes" onclick="showPage('qrcodes',this)"><span class="ic">📲</span> Table QR Codes</button>
     <a href="kds.html" target="_blank" class="nb"><span class="ic">🍳</span> Kitchen Display</a>
     <button class="nb" id="nav-notif" onclick="requestNotifPermission()"><span class="ic">🔔</span> Notifications <span id="notif-status" style="font-size:.65rem;margin-left:4px;color:var(--muted)">OFF</span></button>
@@ -953,6 +954,138 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
   </div>
 </div>
 
+<!-- PRINTER SETTINGS MODAL -->
+<div class="modal-bg" id="printer-modal">
+  <div class="modal" style="max-width:500px">
+    <div class="mh">
+      <div><div class="mh-title">🖨 PRINTER SETTINGS</div><div class="mh-sub">Configure your receipt printer</div></div>
+      <button class="mc" onclick="closePrinterSettings()">✕</button>
+    </div>
+    <div class="mbody">
+      <!-- Printer Name -->
+      <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Printer Name</label>
+      <input type="text" id="pt-name" placeholder="e.g. Kitchen Thermal" style="width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow,sans-serif;font-size:.92rem;padding:9px 12px;border-radius:7px;outline:none;margin-bottom:14px">
+
+      <!-- Printer Type -->
+      <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:8px">Printer Type</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+        <button class="pt-type-btn active" id="pt-type-network"   onclick="selectPrinterType('network')"   style="padding:14px 8px;border-radius:10px;border:2px solid var(--green);background:rgba(31,149,120,.12);color:var(--teal);font-family:Bebas Neue,sans-serif;font-size:.88rem;letter-spacing:2px;cursor:pointer;transition:all .2s">
+          🌐<br>NETWORK
+        </button>
+        <button class="pt-type-btn" id="pt-type-bluetooth" onclick="selectPrinterType('bluetooth')" style="padding:14px 8px;border-radius:10px;border:2px solid var(--border);background:rgba(255,255,255,.04);color:var(--muted);font-family:Bebas Neue,sans-serif;font-size:.88rem;letter-spacing:2px;cursor:pointer;transition:all .2s">
+          📶<br>BLUETOOTH
+        </button>
+        <button class="pt-type-btn" id="pt-type-usb"       onclick="selectPrinterType('usb')"       style="padding:14px 8px;border-radius:10px;border:2px solid var(--border);background:rgba(255,255,255,.04);color:var(--muted);font-family:Bebas Neue,sans-serif;font-size:.88rem;letter-spacing:2px;cursor:pointer;transition:all .2s">
+          🔌<br>USB
+        </button>
+      </div>
+
+      <!-- Network fields -->
+      <div id="pt-network-fields">
+        <div style="display:grid;grid-template-columns:1fr auto;gap:8px">
+          <div>
+            <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Printer IP Address</label>
+            <input type="text" id="pt-ip" placeholder="e.g. 192.168.1.100" style="width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow,sans-serif;font-size:.9rem;padding:8px 11px;border-radius:6px;outline:none">
+          </div>
+          <div>
+            <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Port</label>
+            <input type="number" id="pt-port" value="9100" placeholder="9100" style="width:80px;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow,sans-serif;font-size:.9rem;padding:8px 11px;border-radius:6px;outline:none">
+          </div>
+        </div>
+        <div style="font-family:Barlow Condensed,sans-serif;font-size:.72rem;color:var(--muted);margin-top:6px;letter-spacing:1px">
+          💡 Standard thermal printer port is 9100. Find the IP in your printer settings or router.
+        </div>
+      </div>
+
+      <!-- Bluetooth fields -->
+      <div id="pt-bluetooth-fields" style="display:none">
+        <div style="background:rgba(100,149,237,.08);border:1px solid rgba(100,149,237,.2);border-radius:8px;padding:12px 14px">
+          <div style="font-family:Barlow Condensed,sans-serif;font-size:.78rem;color:#6495ed;margin-bottom:8px;letter-spacing:1px">📶 BLUETOOTH PRINTER</div>
+          <div style="font-family:Barlow Condensed,sans-serif;font-size:.78rem;color:var(--muted);line-height:1.6;margin-bottom:10px">
+            Make sure your Bluetooth thermal printer is powered on and in pairing mode.
+            Requires Chrome or Edge browser.
+          </div>
+          <button onclick="connectBluetooth()" style="width:100%;padding:10px;background:rgba(100,149,237,.15);border:1px solid rgba(100,149,237,.3);color:#6495ed;font-family:Bebas Neue,sans-serif;font-size:.9rem;letter-spacing:2px;border-radius:8px;cursor:pointer" id="pt-bt-btn">
+            📶 SCAN & CONNECT
+          </button>
+          <div id="pt-bt-status" style="margin-top:8px;font-family:Barlow Condensed,sans-serif;font-size:.78rem;color:var(--muted);text-align:center"></div>
+        </div>
+      </div>
+
+      <!-- USB fields -->
+      <div id="pt-usb-fields" style="display:none">
+        <div style="background:rgba(255,165,0,.08);border:1px solid rgba(255,165,0,.2);border-radius:8px;padding:12px 14px">
+          <div style="font-family:Barlow Condensed,sans-serif;font-size:.78rem;color:orange;margin-bottom:8px;letter-spacing:1px">🔌 USB PRINTER</div>
+          <div style="font-family:Barlow Condensed,sans-serif;font-size:.78rem;color:var(--muted);line-height:1.6;margin-bottom:10px">
+            Connect your USB thermal printer and click below to authorize access.
+            Requires Chrome or Edge browser (WebUSB API).
+          </div>
+          <button onclick="connectUSB()" style="width:100%;padding:10px;background:rgba(255,165,0,.12);border:1px solid rgba(255,165,0,.3);color:orange;font-family:Bebas Neue,sans-serif;font-size:.9rem;letter-spacing:2px;border-radius:8px;cursor:pointer" id="pt-usb-btn">
+            🔌 SELECT USB DEVICE
+          </button>
+          <div id="pt-usb-status" style="margin-top:8px;font-family:Barlow Condensed,sans-serif;font-size:.78rem;color:var(--muted);text-align:center"></div>
+        </div>
+      </div>
+
+      <!-- Number of copies -->
+      <div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between">
+        <label style="font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:.85rem;color:var(--text)">Number of Copies</label>
+        <div style="display:flex;align-items:center;gap:10px">
+          <button onclick="var e=document.getElementById('pt-copies');e.value=Math.max(1,+e.value-1)" style="background:rgba(255,255,255,.07);border:1px solid var(--border);color:var(--text);width:30px;height:30px;border-radius:6px;cursor:pointer;font-size:1.1rem">−</button>
+          <input type="number" id="pt-copies" value="1" min="1" max="5" style="width:50px;text-align:center;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow Condensed,sans-serif;font-size:1rem;padding:5px;border-radius:6px;outline:none">
+          <button onclick="var e=document.getElementById('pt-copies');e.value=Math.min(5,+e.value+1)" style="background:rgba(255,255,255,.07);border:1px solid var(--border);color:var(--text);width:30px;height:30px;border-radius:6px;cursor:pointer;font-size:1.1rem">+</button>
+        </div>
+      </div>
+
+      <!-- Print triggers -->
+      <div style="margin-top:16px;padding:12px 14px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px">
+        <div style="font-family:Barlow Condensed,sans-serif;font-size:.68rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:10px">AUTO-PRINT TRIGGERS</div>
+        <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:4px 0">
+          <span style="font-family:Barlow Condensed,sans-serif;font-size:.88rem;color:var(--text)">Print on new order</span>
+          <input type="checkbox" id="pt-auto-order" style="width:18px;height:18px;accent-color:var(--green);cursor:pointer">
+        </label>
+        <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:4px 0">
+          <span style="font-family:Barlow Condensed,sans-serif;font-size:.88rem;color:var(--text)">Print on close shift</span>
+          <input type="checkbox" id="pt-auto-shift" style="width:18px;height:18px;accent-color:var(--green);cursor:pointer">
+        </label>
+      </div>
+
+      <!-- Status bar -->
+      <div id="pt-modal-status" style="margin-top:12px;font-family:Barlow Condensed,sans-serif;font-size:.78rem;color:var(--muted);text-align:center;min-height:20px"></div>
+    </div>
+    <div class="mfoot" style="gap:8px">
+      <button onclick="testPrint()" class="btn-ghost">🧪 TEST PRINT</button>
+      <button onclick="savePrinterSettings()" class="btn-pri">💾 SAVE</button>
+    </div>
+  </div>
+</div>
+
+<!-- PRINT OPTIONS MODAL -->
+<div class="modal-bg" id="print-options-modal">
+  <div class="modal" style="max-width:380px">
+    <div class="mh">
+      <div><div class="mh-title">🖨 PRINT RECEIPT</div><div class="mh-sub" id="po-order-label">Order receipt</div></div>
+      <button class="mc" onclick="document.getElementById('print-options-modal').classList.remove('open')">✕</button>
+    </div>
+    <div class="mbody">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <!-- PDF Download -->
+        <button onclick="doPrint('pdf')" style="padding:20px 12px;background:rgba(31,149,120,.08);border:2px solid rgba(31,149,120,.25);color:var(--teal);border-radius:12px;cursor:pointer;text-align:center;transition:all .2s" onmouseover="this.style.background='rgba(31,149,120,.15)'" onmouseout="this.style.background='rgba(31,149,120,.08)'">
+          <div style="font-size:2rem;margin-bottom:8px">📥</div>
+          <div style="font-family:Bebas Neue,sans-serif;font-size:1rem;letter-spacing:2px">SAVE PDF</div>
+          <div style="font-family:Barlow Condensed,sans-serif;font-size:.72rem;color:var(--muted);margin-top:3px">Download receipt</div>
+        </button>
+        <!-- Linked Printer -->
+        <button id="po-printer-btn" onclick="doPrint('printer')" style="padding:20px 12px;background:rgba(255,255,255,.05);border:2px solid var(--border);color:var(--text);border-radius:12px;cursor:pointer;text-align:center;transition:all .2s" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="font-size:2rem;margin-bottom:8px">🖨</div>
+          <div style="font-family:Bebas Neue,sans-serif;font-size:1rem;letter-spacing:2px" id="po-printer-name">BROWSER PRINT</div>
+          <div style="font-family:Barlow Condensed,sans-serif;font-size:.72rem;color:var(--muted);margin-top:3px" id="po-printer-type">Opens print dialog</div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1183,7 +1316,7 @@ function openOrder(id) {
       </div>` : ''}
     </div>`;
   document.getElementById('m-foot').innerHTML = `
-    <button class="btn-pri" onclick="printReceipt(${order.id})">🖨 PRINT</button>
+    <button class="btn-pri" onclick="showPrintOptions(${order.id})">🖨 PRINT / PDF</button>
     <button class="btn-ghost" onclick="closeModal()">CLOSE</button>
     ${ADMIN_SESSION && ADMIN_SESSION.role === 'owner' ? `<button class="btn-dng" onclick="deleteOrder('${order.id}')">🗑 DELETE</button>` : ''}`;
   document.getElementById('order-modal').classList.add('open');
@@ -3450,6 +3583,370 @@ async function adjustCustomerPoints(customerId, delta, reason) {
     showToast('✓ Points adjusted: ' + (delta > 0 ? '+' : '') + delta);
   } catch(e) { showToast('⚠ ' + e.message); }
 }
+
+/* ══════════════════════════════════════════
+   PRINTER SETTINGS + RECEIPT PRINTING
+   Supports: Network (ESC/POS), Bluetooth, USB
+══════════════════════════════════════════ */
+var _printerConfig = {};
+var _btDevice = null;   // Web Bluetooth device
+var _usbDevice = null;  // WebUSB device
+var _currentPrintOrderId = null;
+
+// Load saved config on init
+(function() {
+  try { _printerConfig = JSON.parse(localStorage.getItem('fayruza_printer') || '{}'); } catch(e) {}
+})();
+
+function openPrinterSettings() {
+  // Fill fields from saved config
+  var nc = _printerConfig;
+  var nameEl = document.getElementById('pt-name');
+  if (nameEl) nameEl.value = nc.name || '';
+  var ipEl = document.getElementById('pt-ip');
+  if (ipEl) ipEl.value = nc.ip || '';
+  var portEl = document.getElementById('pt-port');
+  if (portEl) portEl.value = nc.port || 9100;
+  var copiesEl = document.getElementById('pt-copies');
+  if (copiesEl) copiesEl.value = nc.copies || 1;
+  var aoEl = document.getElementById('pt-auto-order');
+  if (aoEl) aoEl.checked = !!nc.autoOrder;
+  var asEl = document.getElementById('pt-auto-shift');
+  if (asEl) asEl.checked = !!nc.autoShift;
+  selectPrinterType(nc.type || 'network');
+  if (_btDevice) document.getElementById('pt-bt-status').textContent = '✓ Connected: ' + _btDevice.name;
+  if (_usbDevice) document.getElementById('pt-usb-status').textContent = '✓ Connected: ' + (_usbDevice.productName || 'USB Printer');
+  document.getElementById('pt-modal-status').textContent = '';
+  document.getElementById('printer-modal').classList.add('open');
+}
+
+function closePrinterSettings() {
+  document.getElementById('printer-modal').classList.remove('open');
+}
+
+function selectPrinterType(type) {
+  _printerConfig.type = type;
+  ['network','bluetooth','usb'].forEach(function(t) {
+    var btn = document.getElementById('pt-type-' + t);
+    var fields = document.getElementById('pt-' + t + '-fields');
+    if (btn) {
+      btn.style.border = (t === type) ? '2px solid var(--green)' : '2px solid var(--border)';
+      btn.style.background = (t === type) ? 'rgba(31,149,120,.12)' : 'rgba(255,255,255,.04)';
+      btn.style.color = (t === type) ? 'var(--teal)' : 'var(--muted)';
+    }
+    if (fields) fields.style.display = (t === type) ? 'block' : 'none';
+  });
+}
+
+function savePrinterSettings() {
+  var name = (document.getElementById('pt-name') || {}).value || '';
+  var ip   = (document.getElementById('pt-ip') || {}).value || '';
+  var port = parseInt((document.getElementById('pt-port') || {}).value) || 9100;
+  var copies = parseInt((document.getElementById('pt-copies') || {}).value) || 1;
+  var autoOrder = !!(document.getElementById('pt-auto-order') || {}).checked;
+  var autoShift = !!(document.getElementById('pt-auto-shift') || {}).checked;
+  _printerConfig = Object.assign(_printerConfig, { name, ip, port, copies, autoOrder, autoShift });
+  localStorage.setItem('fayruza_printer', JSON.stringify(_printerConfig));
+  document.getElementById('pt-modal-status').textContent = '✓ Settings saved!';
+  showToast('✓ Printer settings saved');
+  setTimeout(function() { closePrinterSettings(); }, 700);
+}
+
+/* ── Bluetooth ─────────────────────────── */
+async function connectBluetooth() {
+  var btn = document.getElementById('pt-bt-btn');
+  var status = document.getElementById('pt-bt-status');
+  if (!navigator.bluetooth) {
+    if (status) status.textContent = '⚠ Web Bluetooth not supported — use Chrome/Edge';
+    return;
+  }
+  try {
+    if (btn) btn.textContent = '🔍 Scanning…';
+    _btDevice = await navigator.bluetooth.requestDevice({
+      filters: [{ services: ['000018f0-0000-1000-8000-00805f9b34fb'] }],
+      optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
+    }).catch(function() {
+      // Try generic fallback
+      return navigator.bluetooth.requestDevice({ acceptAllDevices: true });
+    });
+    if (status) status.textContent = '✓ Connected: ' + _btDevice.name;
+    if (btn) btn.textContent = '✓ CONNECTED: ' + _btDevice.name;
+    btn.style.background = 'rgba(31,149,120,.15)';
+    btn.style.color = 'var(--teal)';
+    btn.style.borderColor = 'var(--teal)';
+    _printerConfig.btDeviceName = _btDevice.name;
+  } catch(e) {
+    if (status) status.textContent = '⚠ ' + e.message;
+    if (btn) btn.textContent = '📶 SCAN & CONNECT';
+  }
+}
+
+/* ── USB ────────────────────────────────── */
+async function connectUSB() {
+  var btn = document.getElementById('pt-usb-btn');
+  var status = document.getElementById('pt-usb-status');
+  if (!navigator.usb) {
+    if (status) status.textContent = '⚠ WebUSB not supported — use Chrome/Edge on desktop';
+    return;
+  }
+  try {
+    _usbDevice = await navigator.usb.requestDevice({ filters: [] });
+    if (status) status.textContent = '✓ Connected: ' + (_usbDevice.productName || 'USB Printer');
+    if (btn) btn.textContent = '✓ CONNECTED: ' + (_usbDevice.productName || 'USB Device');
+    btn.style.background = 'rgba(31,149,120,.12)';
+    btn.style.color = 'var(--teal)';
+    btn.style.borderColor = 'var(--teal)';
+    _printerConfig.usbProductName = _usbDevice.productName;
+  } catch(e) {
+    if (status) status.textContent = '⚠ ' + e.message;
+    if (btn) btn.textContent = '🔌 SELECT USB DEVICE';
+  }
+}
+
+/* ── ESC/POS receipt builder ─────────────
+   Generates binary-compatible string for
+   58mm / 80mm thermal printers
+─────────────────────────────────────────── */
+function buildEscPosReceipt(o) {
+  // ESC/POS commands
+  var ESC = '\x1B', GS = '\x1D';
+  var INIT        = ESC + '@';
+  var CENTER      = ESC + 'a\x01';
+  var LEFT        = ESC + 'a\x00';
+  var BOLD_ON     = ESC + 'E\x01';
+  var BOLD_OFF    = ESC + 'E\x00';
+  var DOUBLE_H    = GS + '!\x11';   // double height+width
+  var NORMAL      = GS + '!\x00';
+  var CUT         = GS + 'V\x41\x03'; // partial cut with feed
+  var NL          = '\n';
+
+  function pad(str, len, right) {
+    str = String(str);
+    while (str.length < len) str = right ? str + ' ' : ' ' + str;
+    return str.slice(0, len);
+  }
+  function line58(left, right) {
+    // 32-char line for 58mm printer
+    var gap = 32 - left.length - right.length;
+    return left + ' '.repeat(Math.max(1, gap)) + right + NL;
+  }
+
+  var items = o.items || [];
+  var now = o.created_at ? new Date(o.created_at) : new Date();
+  var dateStr = now.toLocaleDateString('en-GB', {day:'2-digit', month:'2-digit', year:'2-digit'});
+  var timeStr = now.toLocaleTimeString('en-KW', {hour:'2-digit', minute:'2-digit'});
+  var typeL = {dinein:'Dine In', takeaway:'Takeaway', delivery:'Delivery'};
+  var payL  = {cash:'Cash', knet:'KNET', card:'Card'};
+
+  var r = '';
+  r += INIT;
+  r += CENTER + DOUBLE_H + BOLD_ON + 'FAYRUZA\n' + BOLD_OFF + NORMAL;
+  r += CENTER + 'RESTAURANT\n';
+  r += CENTER + 'Jabriya, Kuwait\n';
+  r += CENTER + '================================\n';
+  r += LEFT;
+  r += BOLD_ON + 'Order: ' + BOLD_OFF + (o.order_id || o.id) + NL;
+  r += dateStr + '  ' + timeStr + NL;
+  r += (typeL[o.order_type] || o.order_type || '') + (o.table_number ? '  Table ' + o.table_number : '') + NL;
+  if (o.customer_name) r += 'Customer: ' + o.customer_name + NL;
+  r += '--------------------------------\n';
+  r += BOLD_ON + pad('ITEM', 20) + pad('QTY', 4) + pad('KD', 8, true) + NL + BOLD_OFF;
+  r += '--------------------------------\n';
+  items.forEach(function(i) {
+    var name = (i.name + (i.size ? ' (' + i.size + ')' : '')).slice(0, 20);
+    var price = ((i.price || 0) * (i.qty || 1)).toFixed(3);
+    r += pad(name, 20) + pad(String(i.qty || 1), 4) + pad(price, 8, true) + NL;
+  });
+  r += '--------------------------------\n';
+  r += line58('Subtotal', parseFloat(o.subtotal || 0).toFixed(3) + ' KD');
+  if (o.discount_amt > 0) r += line58('Discount', '- ' + parseFloat(o.discount_amt).toFixed(3) + ' KD');
+  r += '================================\n';
+  r += BOLD_ON + DOUBLE_H + line58('TOTAL', parseFloat(o.total || 0).toFixed(3) + ' KD') + NORMAL + BOLD_OFF;
+  r += '================================\n';
+  r += CENTER + 'Thank you! / شكرا لزيارتكم\n';
+  r += CENTER + 'fayruza-website.vercel.app\n';
+  r += NL + NL + NL;
+  r += CUT;
+  return r;
+}
+
+/* ── Print options modal ────────────────── */
+function showPrintOptions(orderId) {
+  _currentPrintOrderId = orderId;
+  var o = allOrders.find(function(x){ return String(x.id) === String(orderId); });
+  var label = document.getElementById('po-order-label');
+  if (label && o) label.textContent = (o.order_id || o.id) + ' · KD ' + parseFloat(o.total || 0).toFixed(3);
+
+  // Update printer button label
+  var pBtn = document.getElementById('po-printer-name');
+  var pType = document.getElementById('po-printer-type');
+  var cfg = _printerConfig;
+  if (pBtn) pBtn.textContent = cfg.name ? cfg.name.toUpperCase() : 'BROWSER PRINT';
+  if (pType) {
+    if (!cfg.type || cfg.type === 'network')    pType.textContent = cfg.ip ? 'Network · ' + cfg.ip : 'Opens print dialog';
+    else if (cfg.type === 'bluetooth') pType.textContent = cfg.btDeviceName ? '📶 ' + cfg.btDeviceName : 'Bluetooth printer';
+    else if (cfg.type === 'usb')       pType.textContent = cfg.usbProductName ? '🔌 ' + cfg.usbProductName : 'USB printer';
+  }
+  // Close order modal, open print options
+  document.getElementById('order-modal').classList.remove('open');
+  document.getElementById('print-options-modal').classList.add('open');
+}
+
+async function doPrint(mode) {
+  var orderId = _currentPrintOrderId;
+  if (!orderId) return;
+  document.getElementById('print-options-modal').classList.remove('open');
+
+  if (mode === 'pdf') {
+    // Use existing printReceipt which opens a print-ready HTML window
+    printReceipt(orderId);
+    return;
+  }
+
+  // mode === 'printer'
+  var cfg = _printerConfig;
+  var o = allOrders.find(function(x){ return String(x.id) === String(orderId); });
+  if (!o) return;
+
+  var copies = cfg.copies || 1;
+
+  if (cfg.type === 'bluetooth') {
+    await _printViaBluetooth(o, copies);
+  } else if (cfg.type === 'usb') {
+    await _printViaUSB(o, copies);
+  } else {
+    // Network (default) or fallback
+    if (cfg.ip) {
+      await _printViaNetwork(o, copies);
+    } else {
+      // No IP configured — fallback to browser print dialog
+      printReceipt(orderId);
+    }
+  }
+}
+
+async function _printViaBluetooth(o, copies) {
+  if (!_btDevice) {
+    showToast('⚠ No Bluetooth printer connected — configure in Printer Settings');
+    printReceipt(o.id); return;
+  }
+  try {
+    showToast('📶 Sending to Bluetooth printer…');
+    var server  = await _btDevice.gatt.connect();
+    var service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
+    var char    = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
+    var data    = buildEscPosReceipt(o);
+    var encoder = new TextEncoder();
+    for (var c = 0; c < copies; c++) {
+      var bytes = encoder.encode(data);
+      // Send in 512-byte chunks (BLE MTU limit)
+      for (var i = 0; i < bytes.length; i += 512) {
+        await char.writeValue(bytes.slice(i, i + 512));
+      }
+    }
+    showToast('✓ Printed via Bluetooth!');
+  } catch(e) {
+    showToast('⚠ BT error: ' + e.message + ' — falling back to PDF');
+    printReceipt(o.id);
+  }
+}
+
+async function _printViaUSB(o, copies) {
+  if (!_usbDevice) {
+    showToast('⚠ No USB printer connected — configure in Printer Settings');
+    printReceipt(o.id); return;
+  }
+  try {
+    showToast('🔌 Sending to USB printer…');
+    await _usbDevice.open();
+    if (_usbDevice.configuration === null) await _usbDevice.selectConfiguration(1);
+    await _usbDevice.claimInterface(0);
+    var data    = buildEscPosReceipt(o);
+    var encoder = new TextEncoder();
+    for (var c = 0; c < copies; c++) {
+      await _usbDevice.transferOut(1, encoder.encode(data));
+    }
+    showToast('✓ Printed via USB!');
+    await _usbDevice.releaseInterface(0);
+    await _usbDevice.close();
+  } catch(e) {
+    showToast('⚠ USB error: ' + e.message + ' — falling back to PDF');
+    printReceipt(o.id);
+  }
+}
+
+async function _printViaNetwork(o, copies) {
+  var cfg = _printerConfig;
+  var url = 'http://' + cfg.ip + ':' + (cfg.port || 9100);
+  showToast('🌐 Sending to ' + cfg.ip + '…');
+  try {
+    var data = buildEscPosReceipt(o);
+    var encoder = new TextEncoder();
+    var body = encoder.encode(data.repeat(copies));
+    var res = await fetch(url, {
+      method: 'POST',
+      body: body,
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/octet-stream' }
+    });
+    showToast('✓ Sent to network printer!');
+  } catch(e) {
+    // no-cors fetch always "succeeds" from JS perspective
+    // if it reaches here it's a real error
+    showToast('⚠ Network printer may be unreachable — opening PDF');
+    printReceipt(o.id);
+  }
+}
+
+function testPrint() {
+  savePrinterSettings();
+  var mockOrder = {
+    id: 'TEST', order_id: 'TEST-001',
+    created_at: new Date().toISOString(),
+    order_type: 'dinein', table_number: '5',
+    customer_name: 'Test Customer',
+    payment_method: 'cash',
+    items: [
+      { name: 'Zinger Burger', emoji: '🍔', qty: 2, price: 1.500 },
+      { name: 'Mango Juice', emoji: '🥭', qty: 1, price: 0.650 }
+    ],
+    subtotal: 3.650, discount_amt: 0, total: 3.650
+  };
+  document.getElementById('pt-modal-status').textContent = '⏳ Sending test print…';
+  var cfg = _printerConfig;
+
+  if (cfg.type === 'bluetooth' && _btDevice) {
+    _printViaBluetooth(mockOrder, 1).then(function() {
+      document.getElementById('pt-modal-status').textContent = '✓ Test sent via Bluetooth!';
+    });
+  } else if (cfg.type === 'usb' && _usbDevice) {
+    _printViaUSB(mockOrder, 1).then(function() {
+      document.getElementById('pt-modal-status').textContent = '✓ Test sent via USB!';
+    });
+  } else if (cfg.type === 'network' && cfg.ip) {
+    _printViaNetwork(mockOrder, 1).then(function() {
+      document.getElementById('pt-modal-status').textContent = '✓ Test sent to ' + cfg.ip;
+    });
+  } else {
+    // Fallback: show PDF
+    document.getElementById('pt-modal-status').textContent = '📄 Opening test receipt as PDF…';
+    setTimeout(function() { printReceipt('TEST'); }, 300);
+  }
+}
+
+// Auto-print on new order if configured
+var _origNotifyNewOrder = notifyNewOrder;
+notifyNewOrder = function(order) {
+  _origNotifyNewOrder(order);
+  if (_printerConfig.autoOrder && order && order.id) {
+    setTimeout(function() {
+      var cfg = _printerConfig;
+      if (cfg.type === 'bluetooth' && _btDevice)      _printViaBluetooth(order, cfg.copies || 1);
+      else if (cfg.type === 'usb' && _usbDevice)      _printViaUSB(order, cfg.copies || 1);
+      else if (cfg.type === 'network' && cfg.ip)      _printViaNetwork(order, cfg.copies || 1);
+    }, 500);
+  }
+};
 
 /* ══════════════════════════════════════════
    SHIFTS
