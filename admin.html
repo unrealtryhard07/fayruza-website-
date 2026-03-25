@@ -254,8 +254,14 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
             <button class="btn-filter" onclick="setFilter('ready',this)">READY</button>
             <button class="btn-filter" onclick="setFilter('done',this)">DONE</button>
             <button class="btn-refresh" onclick="loadAll()">↻</button>
-            <button onclick="exportOrdersCSV()" style="background:rgba(31,149,120,.1);border:1px solid rgba(31,149,120,.3);color:var(--teal);font-family:Bebas Neue,sans-serif;font-size:.78rem;letter-spacing:2px;padding:6px 13px;border-radius:6px;cursor:pointer">⬇ EXPORT CSV</button>
           </div>
+        </div>
+        <!-- Export bar — always visible below filters -->
+        <div style="padding:10px 18px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <div style="font-family:Barlow Condensed,sans-serif;font-size:.72rem;color:var(--muted);letter-spacing:1px" id="orders-count-label">Loading orders…</div>
+          <button onclick="exportOrdersCSV()" style="background:rgba(31,149,120,.12);border:1px solid rgba(31,149,120,.4);color:var(--teal);font-family:Bebas Neue,sans-serif;font-size:.88rem;letter-spacing:2px;padding:8px 20px;border-radius:7px;cursor:pointer;display:flex;align-items:center;gap:7px">
+            <span>⬇</span> EXPORT CSV
+          </button>
         </div>
         <div class="tbl-wrap">
           <table><thead><tr><th>ORDER ID</th><th>TIME</th><th>CUSTOMER</th><th>TYPE</th><th>ITEMS</th><th>TOTAL</th><th>PAYMENT</th><th>STATUS</th><th>CANCEL REASON</th></tr></thead>
@@ -1097,8 +1103,10 @@ function renderOrdersTable() {
   const tbody = document.getElementById('orders-tbody');
   const empty = document.getElementById('orders-empty');
   if (!tbody) return;
-  if (!orders.length) { tbody.innerHTML = ''; if (empty) empty.style.display = 'block'; return; }
+  var countLabel = document.getElementById('orders-count-label');
+  if (!orders.length) { tbody.innerHTML = ''; if (empty) empty.style.display = 'block'; if(countLabel) countLabel.textContent = 'No orders found'; return; }
   if (empty) empty.style.display = 'none';
+  if (countLabel) countLabel.textContent = orders.length + ' order' + (orders.length !== 1 ? 's' : '') + (currentFilter !== 'all' ? ' · filtered by: ' + currentFilter.toUpperCase() : '');
   const payL = {cash:'💵 Cash',knet:'💳 KNET',card:'💳 Card'};
   const typeL = {dinein:'🍽 Dine-In',takeaway:'🥡 Takeaway',delivery:'🚴 Delivery'};
   tbody.innerHTML = orders.map(o => `
