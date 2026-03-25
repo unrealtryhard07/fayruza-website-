@@ -439,6 +439,7 @@ body {
 }
 
 .item-card {
+  position:relative;
   background: var(--card);
   border: 1px solid rgba(255,255,255,0.04);
   border-radius: 8px; padding: 14px 12px;
@@ -701,6 +702,17 @@ body.ar .back-btn{flex-direction:row-reverse;}
 body.ar .subcat-label{direction:rtl;}
 body.ar .items-grid{direction:rtl;}
 body.ar .hero h1{font-size:clamp(50px,12vw,130px);}
+
+/* ── Menu Search ── */
+.menu-search-wrap{padding:0 12px 16px;max-width:900px;margin:0 auto;}
+.menu-search-inp{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--text);font-family:'Barlow',sans-serif;font-size:1rem;padding:13px 48px 13px 18px;border-radius:12px;outline:none;transition:border-color .2s;-webkit-appearance:none;}
+.menu-search-inp:focus{border-color:var(--green);}
+.menu-search-inp::placeholder{color:var(--muted);}
+.menu-search-wrap-inner{position:relative;}
+.menu-search-icon{position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:1.1rem;pointer-events:none;opacity:.5;}
+.search-results-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:10px;padding:0 12px 20px;max-width:900px;margin:0 auto;}
+#search-results-section{display:none;}
+.search-no-results{text-align:center;padding:40px 20px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:.95rem;letter-spacing:1px;}
 </style>
 </head>
 <body>
@@ -742,6 +754,20 @@ body.ar .hero h1{font-size:clamp(50px,12vw,130px);}
       <span>🍜 NOODLES & RICE <span class="ticker-dot">✦</span></span>
       <span>🥣 SOUPS <span class="ticker-dot">✦</span></span>
     </div>
+  </div>
+
+  <!-- MENU SEARCH -->
+  <div class="menu-search-wrap">
+    <div class="menu-search-wrap-inner">
+      <input class="menu-search-inp" id="menu-search-inp" type="search"
+        placeholder="Search menu… e.g. biryani, zinger, juice"
+        autocomplete="off" oninput="menuSearch(this.value)">
+      <span class="menu-search-icon">🔍</span>
+    </div>
+  </div>
+  <!-- SEARCH RESULTS (shown instead of categories when searching) -->
+  <div id="search-results-section">
+    <div id="search-results-grid" class="search-results-grid"></div>
   </div>
 
   <!-- CATEGORIES -->
@@ -994,7 +1020,8 @@ function openCategory(id) {
         n: p.name,
         ar: p.name_ar || '',
         badge: p.badge || null,
-        img: p.image_url || null
+        img: p.image_url || null,
+        soldOut: p.is_sold_out || false
       };
       if (p.fils) {
         item.fils = p.fils;
@@ -1103,6 +1130,17 @@ window.addEventListener('popstate', function() {
           <input class="co-inp" id="co-phone" type="tel" placeholder="e.g. 9XXXXXXX" oninput="coLookupPhone()">
         </div>
       </div>
+      <!-- Loyalty points (shown for returning customers with points) -->
+      <div id="co-loyalty-box" style="display:none;background:rgba(255,212,59,.07);border:1px solid rgba(255,212,59,.2);border-radius:8px;padding:12px 14px;margin-bottom:10px">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:.68rem;letter-spacing:3px;text-transform:uppercase;color:var(--yellow);margin-bottom:8px">⭐ YOUR LOYALTY POINTS</div>
+        <div id="co-loyalty-balance" style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--yellow)">0 pts</div>
+        <div id="co-loyalty-redeem-row" style="display:none;margin-top:8px">
+          <label style="font-family:'Barlow Condensed',sans-serif;font-size:.78rem;color:var(--muted);display:flex;align-items:center;gap:8px;cursor:pointer">
+            <input type="checkbox" id="co-use-points" onchange="togglePointsRedeem()" style="width:18px;height:18px;cursor:pointer;accent-color:var(--yellow)">
+            <span id="co-redeem-label">Redeem points for discount</span>
+          </label>
+        </div>
+      </div>
       <!-- Reorder suggestion (shown if returning customer) -->
       <div id="co-reorder-box" style="display:none;background:rgba(31,149,120,.08);border:1px solid rgba(31,149,120,.2);border-radius:8px;padding:12px 14px;margin-bottom:10px">
         <div style="font-family:'Barlow Condensed';font-size:.68rem;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:8px">👋 WELCOME BACK! LAST ORDER:</div>
@@ -1112,14 +1150,24 @@ window.addEventListener('popstate', function() {
       <div class="co-row2">
         <div>
           <label class="co-lbl">Order Type</label>
-          <select class="co-sel" id="co-type" onchange="coTableToggle()">
-            <option value="dinein">Dine In</option>
-            <option value="takeaway">Takeaway</option>
+          <select class="co-sel" id="co-type" onchange="coTypeChange()">
+            <option value="dinein">🍽 Dine In</option>
+            <option value="takeaway">🥡 Takeaway</option>
+            <option value="delivery">🚴 Delivery</option>
           </select>
         </div>
         <div id="co-table-wrap">
           <label class="co-lbl">Table No.</label>
           <input class="co-inp" id="co-table" type="text" placeholder="e.g. 5" style="margin-bottom:0">
+        </div>
+      </div>
+      <!-- Delivery address (shown when delivery selected) -->
+      <div id="co-delivery-wrap" style="display:none;margin-top:10px">
+        <label class="co-lbl">Delivery Address</label>
+        <input class="co-inp" id="co-address" type="text" placeholder="Block, Street, House/Building No." style="margin-bottom:6px">
+        <input class="co-inp" id="co-area" type="text" placeholder="Area (e.g. Jabriya, Salmiya)" style="margin-bottom:6px">
+        <div style="background:rgba(31,149,120,.08);border:1px solid rgba(31,149,120,.15);border-radius:8px;padding:9px 12px;font-family:'Barlow Condensed',sans-serif;font-size:.82rem;color:var(--teal);letter-spacing:1px" id="co-delivery-fee-note">
+          🚴 Delivery fee will be confirmed by the restaurant
         </div>
       </div>
       <label class="co-lbl" style="margin-top:10px">Payment Method</label>
@@ -1215,14 +1263,18 @@ function renderItem(item, delay) {
   var imgHtml = item.img
     ? '<div class="ic-img-wrap"><img class="ic-img" src="'+item.img+'" alt="'+item.n+'" loading="lazy" onerror="this.parentNode.style.display=\'none\'"></div>'
     : '<span class="ic-emoji">'+item.e+'</span>';
-  return '<div class="item-card" style="'+style+'" data-idx="'+idx+'" data-meal="0" data-qty="0">'+
+  var soldOutOverlay = item.soldOut
+    ? '<div style="position:absolute;inset:0;background:rgba(0,0,0,.55);border-radius:8px;display:flex;align-items:center;justify-content:center;z-index:3"><span style="font-family:Bebas Neue,sans-serif;font-size:.95rem;letter-spacing:3px;color:#fff;background:var(--red);padding:5px 14px;border-radius:4px">SOLD OUT</span></div>'
+    : '';
+  return '<div class="item-card" style="'+style+(item.soldOut?';opacity:.65':'')+'" data-idx="'+idx+'" data-meal="0" data-qty="0">'+
+    soldOutOverlay+
     (item.badge?'<div class="ic-badge">'+item.badge+'</div>':'')+
     imgHtml+
     '<div class="ic-name">'+item.n+'</div>'+
     '<div class="ic-name-ar">'+item.ar+'</div>'+
     ph+
     '<div class="ic-atc-zone">'+
-      '<button class="atc-btn" onclick="g_atc(this,'+idx+')">+ ADD TO CART</button>'+
+      '<button class="atc-btn" '+(item.soldOut?'disabled style="opacity:.4;cursor:not-allowed"':'')+' onclick="'+(item.soldOut?'':' g_atc(this,'+idx+')')+'">'+  (item.soldOut?'SOLD OUT':'+ ADD TO CART')+'</button>'+
       '<div class="ic-qty-row" style="display:none">'+
         '<button class="iq-btn" onclick="g_iqDec(this,'+idx+')">&#8722;</button>'+
         '<span class="iq-num">1</span>'+
@@ -1458,20 +1510,83 @@ function openCheckout() {
 function closeCheckout() {
   document.getElementById('checkout-view').classList.remove('open');
 }
-function coTableToggle() {
-  var w = document.getElementById('co-table-wrap');
+function coTableToggle() { coTypeChange(); }
+function coTypeChange() {
   var t = (document.getElementById('co-type')||{}).value;
-  if (w) w.style.display = t==='dinein'?'block':'none';
+  var tw = document.getElementById('co-table-wrap');
+  var dw = document.getElementById('co-delivery-wrap');
+  if (tw) tw.style.display = (t==='dinein') ? 'block' : 'none';
+  if (dw) dw.style.display = (t==='delivery') ? 'block' : 'none';
 }
 function coRecalc() {
   var sub = cartSum();
-  var el  = document.getElementById('co-totals');
+  var taxRate = parseFloat(window._settings && window._settings['tax_rate'] || 0) / 100;
+  var tax = Math.round(sub * taxRate * 1000) / 1000;
+  // Delivery fee
+  var isDelivery = (document.getElementById('co-type')||{}).value === 'delivery';
+  var deliveryFee = isDelivery ? parseFloat(window._settings && window._settings['delivery_fee'] || 0) : 0;
+  // Loyalty discount
+  var loyaltyDisc = window._loyaltyDiscount || 0;
+  var total = Math.max(0, sub + tax + deliveryFee - loyaltyDisc);
+  var el = document.getElementById('co-totals');
   if (!el) return;
   el.innerHTML =
     '<div class="co-tot-line"><span class="tl">SUBTOTAL</span><span class="tv">'+money(sub)+'</span></div>'+
-    '<div class="co-tot-line"><span class="tl">TAX</span><span class="tv">&mdash;</span></div>'+
-    '<div class="co-tot-line grand"><span class="tl">TOTAL</span><span class="tv">'+money(sub)+'</span></div>';
+    (tax > 0 ? '<div class="co-tot-line"><span class="tl">TAX ('+Math.round(taxRate*100)+'%)</span><span class="tv">'+money(tax)+'</span></div>' : '')+
+    (deliveryFee > 0 ? '<div class="co-tot-line"><span class="tl">DELIVERY FEE</span><span class="tv">'+money(deliveryFee)+'</span></div>' : '')+
+    (loyaltyDisc > 0 ? '<div class="co-tot-line" style="color:var(--yellow)"><span class="tl">⭐ POINTS DISCOUNT</span><span class="tv">- '+money(loyaltyDisc)+'</span></div>' : '')+
+    '<div class="co-tot-line grand"><span class="tl">TOTAL</span><span class="tv">'+money(total)+'</span></div>';
+  window._checkoutTotal = total;
+  window._checkoutSub = sub;
+  window._checkoutTax = tax;
 }
+
+/* ── Loyalty Points ──────────────────────────────────── */
+var _loyaltyDiscount = 0;
+var _loyaltyPointsToRedeem = 0;
+var _loyaltyRedeemRate = 100;  // points per 1 KD, loaded from settings
+var _loyaltyEarnRate   = 10;   // points per 1 KD spent
+
+function _initLoyaltySettings() {
+  if (window._settings) {
+    _loyaltyEarnRate   = parseInt(window._settings['loyalty_rate']        || 10);
+    _loyaltyRedeemRate = parseInt(window._settings['loyalty_redeem_rate'] || 100);
+  }
+}
+
+function _showLoyaltyForCustomer(customer) {
+  _initLoyaltySettings();
+  var box = document.getElementById('co-loyalty-box');
+  var balEl = document.getElementById('co-loyalty-balance');
+  var redeemRow = document.getElementById('co-loyalty-redeem-row');
+  var redeemLabel = document.getElementById('co-redeem-label');
+  if (!box || !customer) return;
+  var pts = customer.points_balance || 0;
+  if (pts <= 0) return;
+  box.style.display = 'block';
+  if (balEl) balEl.textContent = pts + ' pts';
+  // Max they can redeem
+  var maxKD = Math.floor(pts / _loyaltyRedeemRate) * 1;
+  if (maxKD > 0 && redeemRow) {
+    redeemRow.style.display = 'block';
+    if (redeemLabel) redeemLabel.textContent = 'Use ' + (maxKD * _loyaltyRedeemRate) + ' pts = ' + maxKD.toFixed(3) + ' KD discount';
+    window._loyaltyMaxKD = maxKD;
+    window._loyaltyMaxPts = maxKD * _loyaltyRedeemRate;
+  }
+}
+
+function togglePointsRedeem() {
+  var cb = document.getElementById('co-use-points');
+  if (cb && cb.checked) {
+    _loyaltyDiscount = window._loyaltyMaxKD || 0;
+    _loyaltyPointsToRedeem = window._loyaltyMaxPts || 0;
+  } else {
+    _loyaltyDiscount = 0;
+    _loyaltyPointsToRedeem = 0;
+  }
+  coRecalc();
+}
+
 
 /* ── Place order ── */
 
@@ -1506,6 +1621,8 @@ async function _doPhoneLookup(phone) {
       // Pre-fill name
       var nameEl = document.getElementById('co-name');
       if (nameEl && !nameEl.value && _customerData.name) nameEl.value = _customerData.name;
+      // Show loyalty points
+      _showLoyaltyForCustomer(_customerData);
       // Show reorder box
       if (_customerData.last_order && _customerData.last_order.length) {
         var box = document.getElementById('co-reorder-box');
@@ -1556,7 +1673,10 @@ async function _saveCustomer(phone, name, orderItems, total) {
           total_orders: (existing.total_orders||0) + 1,
           total_spent: (existing.total_spent||0) + total,
           last_order: orderItems,
-          last_order_at: new Date().toISOString()
+          last_order_at: new Date().toISOString(),
+          points_balance: Math.max(0, (existing.points_balance||0) + Math.floor(total * _loyaltyEarnRate) - (_loyaltyPointsToRedeem||0)),
+          points_earned: (existing.points_earned||0) + Math.floor(total * _loyaltyEarnRate),
+          points_redeemed: (existing.points_redeemed||0) + (_loyaltyPointsToRedeem||0)
         })
       });
     } else {
@@ -1578,17 +1698,23 @@ async function placeOrder() {
   if (cart.length===0) return;
   var btn = document.getElementById('co-place-btn');
   if (btn) { btn.textContent='PLACING...'; btn.disabled=true; }
-  var sub = cartSum(), total = sub;
+  var sub = cartSum();
+  var total = window._checkoutTotal !== undefined ? window._checkoutTotal : sub;
+  var taxAmt = window._checkoutTax || 0;
   var oid = 'ORD-'+Date.now().toString().slice(-6);
   var order = {
     order_id:oid, items:cart.map(function(c){var o=Object.assign({},c);if(!o.note)delete o.note;return o;}),
-    subtotal:sub, discount_amt:0, discount_type:'kd', tax:0, total:total,
+    subtotal:sub, discount_amt:0, discount_type:'kd', tax:taxAmt, total:total,
     payment_method:(document.getElementById('co-payment')||{}).value||'cash',
     order_type:(document.getElementById('co-type')||{}).value||'dinein',
+    delivery_address:(document.getElementById('co-address')||{}).value||'',
+    delivery_area:(document.getElementById('co-area')||{}).value||'',
     table_number:(document.getElementById('co-table')||{}).value||'',
     customer_name:(document.getElementById('co-name')||{}).value||'',
     notes:(document.getElementById('co-notes')||{}).value||'',
     customer_phone:(document.getElementById('co-phone')||{}).value||'',
+    points_redeemed: _loyaltyPointsToRedeem || 0,
+    points_discount: _loyaltyDiscount || 0,
     status:'new'
   };
   try {
@@ -1618,8 +1744,11 @@ function backToMenu() {
   document.getElementById('confirm-view').classList.remove('open');
   document.getElementById('checkout-view').classList.remove('open');
   document.body.style.overflow='';
-  ['co-name','co-table','co-notes','co-phone'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  ['co-name','co-table','co-notes','co-phone','co-address','co-area'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
   _customerData=null;
+  _loyaltyDiscount = 0; _loyaltyPointsToRedeem = 0;
+  var lb = document.getElementById('co-loyalty-box'); if (lb) lb.style.display='none';
+  var ucb = document.getElementById('co-use-points'); if (ucb) ucb.checked = false;
   document.getElementById('co-reorder-box').style.display='none';;
   var btn=document.getElementById('co-place-btn');
   if (btn) { btn.textContent='PLACE ORDER'; btn.disabled=false; }
@@ -1743,6 +1872,56 @@ function comboQtyDec(card) {
   }
 }
 
+/* ── Menu Search ─────────────────────────────────────────── */
+function menuSearch(query) {
+  var q = query.trim().toLowerCase();
+  var catGrid   = document.getElementById('cards-grid');
+  var catLabel  = document.querySelector('.cat-section-label');
+  var resultsEl = document.getElementById('search-results-section');
+  var resultsGrid = document.getElementById('search-results-grid');
+  var combosEl  = document.getElementById('combos-section');
+
+  if (!q) {
+    // Clear: show normal menu
+    if (catGrid)   catGrid.style.display   = '';
+    if (catLabel)  catLabel.style.display  = '';
+    if (resultsEl) resultsEl.style.display = 'none';
+    if (combosEl)  combosEl.style.display  = '';
+    return;
+  }
+
+  // Hide normal view
+  if (catGrid)   catGrid.style.display   = 'none';
+  if (catLabel)  catLabel.style.display  = 'none';
+  if (combosEl)  combosEl.style.display  = 'none';
+  if (resultsEl) resultsEl.style.display = 'block';
+
+  // Search across all loaded products in G_ITEMS
+  var matches = G_ITEMS.filter(function(item) {
+    if (!item) return false;
+    var name   = (item.n  || '').toLowerCase();
+    var nameAr = (item.ar || '').toLowerCase();
+    var badge  = (item.badge || '').toLowerCase();
+    return name.includes(q) || nameAr.includes(q) || badge.includes(q);
+  });
+
+  if (!matches.length) {
+    if (resultsGrid) resultsGrid.innerHTML = '<div class="search-no-results">🔍 No results for "' + query + '"</div>';
+    return;
+  }
+
+  var html2 = matches.map(function(item, i) {
+    return renderItem(item, i * 30);
+  }).join('');
+  if (resultsGrid) {
+    resultsGrid.innerHTML = html2;
+    // Re-wire qty buttons to work in search results
+    resultsGrid.querySelectorAll('.ic-atc-zone').forEach(function(zone) {
+      // qty buttons handled by global g_iqDec / g_iqInc via onclick attrs
+    });
+  }
+}
+
 // Pre-fill table from URL param ?table=X
 (function(){
   var params = new URLSearchParams(window.location.search);
@@ -1760,6 +1939,28 @@ function comboQtyDec(card) {
 
 // Load active special offers and apply to prices
 var _activeOffers = [];
+// Load restaurant settings for menu
+async function loadRestaurantSettings() {
+  try {
+    var res = await fetch(_SB_URL + '/rest/v1/restaurant_settings?select=key,value', {
+      headers: { 'apikey': _SB_KEY, 'Authorization': 'Bearer ' + _SB_KEY }
+    });
+    var data = await res.json();
+    window._settings = {};
+    (data || []).forEach(function(r) { window._settings[r.key] = r.value; });
+    // Check if restaurant is open
+    if (window._settings['restaurant_open'] === 'false') {
+      var msg = window._settings['closed_message'] || 'We are currently closed.';
+      var banner = document.createElement('div');
+      banner.style.cssText = 'position:fixed;inset:0;z-index:999;background:rgba(10,15,13,.96);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px';
+      banner.innerHTML = '<div style="font-family:Bebas Neue,sans-serif;font-size:2.5rem;letter-spacing:4px;color:var(--red);margin-bottom:12px">CLOSED</div>'+
+        '<div style="font-family:Barlow Condensed,sans-serif;font-size:1rem;color:var(--muted);letter-spacing:2px;text-align:center;max-width:340px">'+msg+'</div>'+
+        '<div style="font-family:Barlow Condensed,sans-serif;font-size:.75rem;color:#444;letter-spacing:2px;margin-top:20px">FAYRUZA RESTAURANT · JABRIYA</div>';
+      document.body.appendChild(banner);
+    }
+  } catch(e) {}
+}
+
 async function loadActiveOffers() {
   try {
     var res = await fetch(_SB_URL + '/rest/v1/special_offers?select=*&is_active=eq.true', {
@@ -1814,6 +2015,7 @@ function applyOfferToPrice(price, itemName, categoryId) {
 loadMenuFromSupabase();
 loadMenuCombos();
 loadActiveOffers();
+loadRestaurantSettings();
 </script>
 
 

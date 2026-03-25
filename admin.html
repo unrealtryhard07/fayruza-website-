@@ -160,9 +160,11 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
     <button class="nb" id="nav-customers" onclick="showPage('customers',this)"><span class="ic">👤</span> Customers</button>
     <button class="nb" id="nav-users" onclick="showPage('users',this)"><span class="ic">👥</span> Users</button>
     <div class="sb-sec">SITE</div>
+    <button class="nb" id="nav-settings" onclick="showPage('settings',this)"><span class="ic">⚙️</span> Settings</button>
     <button class="nb" id="nav-qrcodes" onclick="showPage('qrcodes',this)"><span class="ic">📲</span> Table QR Codes</button>
     <a href="kds.html" target="_blank" class="nb"><span class="ic">🍳</span> Kitchen Display</a>
     <button class="nb" id="nav-notif" onclick="requestNotifPermission()"><span class="ic">🔔</span> Notifications <span id="notif-status" style="font-size:.65rem;margin-left:4px;color:var(--muted)">OFF</span></button>
+    <button class="nb" onclick="openWASettings()"><span class="ic">💬</span> WhatsApp Alerts</button>
     <a href="index.html" class="nb"><span class="ic">🍔</span> View Menu</a>
   </div>
   <div class="sb-foot">
@@ -197,6 +199,7 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
         <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-lbl">Today's Revenue</div><div class="stat-val" id="s-revenue">–</div><div class="stat-sub">Completed only</div></div>
         <div class="stat-card"><div class="stat-icon">⏳</div><div class="stat-lbl">Pending</div><div class="stat-val" id="s-pending">–</div><div class="stat-sub">New + Preparing</div></div>
         <div class="stat-card"><div class="stat-icon">🧾</div><div class="stat-lbl">Avg Order</div><div class="stat-val" id="s-avg">–</div><div class="stat-sub">Per order value</div></div>
+        <div class="stat-card" id="s-stock-card" style="border-color:rgba(255,71,87,.0)"><div class="stat-icon">📦</div><div class="stat-lbl">Low Stock Items</div><div class="stat-val" id="s-stock">–</div><div class="stat-sub" id="s-stock-sub">Checking…</div></div>
       </div>
       <div class="dash-cols">
         <div class="panel">
@@ -229,6 +232,14 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
           <div style="padding:16px 18px 12px"><div class="chart-wrap" id="month-chart"></div></div>
         </div>
       </div>
+      <!-- Prep time analytics panel -->
+      <div class="panel" style="margin-top:0">
+        <div class="ph">
+          <div class="ph-title">⏱ KITCHEN PREP TIME</div>
+          <div style="font-family:Barlow Condensed,sans-serif;font-size:.72rem;color:var(--muted);letter-spacing:1px">Time from order placed → ready</div>
+        </div>
+        <div id="prep-stats-panel"></div>
+      </div>
     </div>
 
     <div class="page" id="page-orders">
@@ -243,10 +254,11 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
             <button class="btn-filter" onclick="setFilter('ready',this)">READY</button>
             <button class="btn-filter" onclick="setFilter('done',this)">DONE</button>
             <button class="btn-refresh" onclick="loadAll()">↻</button>
+            <button onclick="exportOrdersCSV()" style="background:rgba(31,149,120,.1);border:1px solid rgba(31,149,120,.3);color:var(--teal);font-family:Bebas Neue,sans-serif;font-size:.78rem;letter-spacing:2px;padding:6px 13px;border-radius:6px;cursor:pointer">⬇ EXPORT CSV</button>
           </div>
         </div>
         <div class="tbl-wrap">
-          <table><thead><tr><th>ORDER ID</th><th>TIME</th><th>CUSTOMER</th><th>TYPE</th><th>ITEMS</th><th>TOTAL</th><th>PAYMENT</th><th>STATUS</th></tr></thead>
+          <table><thead><tr><th>ORDER ID</th><th>TIME</th><th>CUSTOMER</th><th>TYPE</th><th>ITEMS</th><th>TOTAL</th><th>PAYMENT</th><th>STATUS</th><th>CANCEL REASON</th></tr></thead>
           <tbody id="orders-tbody"></tbody></table>
         </div>
         <div id="orders-empty" class="empty-state" style="display:none"><span class="empty-icon">📋</span>No orders yet. They'll appear here in real-time.</div>
@@ -260,6 +272,7 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
         <button class="btn-filter" onclick="showReport('items',this)">🍔 Top Items</button>
         <button class="btn-filter" onclick="showReport('stock',this)">📦 Stock On Hand</button>
         <button class="btn-filter" onclick="showReport('payments',this)">💳 Payments</button>
+        <button class="btn-filter" onclick="showReport('preptime',this)">⏱ Prep Time</button>
         <div style="flex:1"></div>
         <select id="rpt-period" onchange="renderReport()" style="background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text);font-family:Barlow Condensed,sans-serif,sans-serif;font-size:.85rem;padding:6px 12px;border-radius:6px;outline:none;cursor:pointer">
           <option value="today">Today</option>
@@ -338,6 +351,108 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
         <div class="tbl-wrap">
           <table><thead><tr><th>COMBO</th><th>INCLUDES</th><th>PRICE</th><th>BADGE</th><th>STATUS</th><th>ACTIONS</th></tr></thead>
           <tbody id="combos-tbody"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS PAGE -->
+    <div class="page" id="page-settings">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+        <!-- Restaurant Status -->
+        <div class="panel">
+          <div class="ph"><div class="ph-title">🏪 RESTAURANT STATUS</div></div>
+          <div style="padding:18px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+              <div>
+                <div style="font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:.9rem;text-transform:uppercase;color:var(--text)">Accept Orders</div>
+                <div style="font-family:Barlow Condensed,sans-serif;font-size:.78rem;color:var(--muted);margin-top:2px">Toggle to stop/resume orders on the menu</div>
+              </div>
+              <label style="position:relative;display:inline-block;width:52px;height:28px;cursor:pointer">
+                <input type="checkbox" id="setting-open" style="opacity:0;width:0;height:0" onchange="saveSetting('restaurant_open', this.checked ? 'true' : 'false')">
+                <span id="toggle-track" style="position:absolute;inset:0;background:#333;border-radius:14px;transition:background .3s"></span>
+                <span id="toggle-thumb" style="position:absolute;left:3px;top:3px;width:22px;height:22px;background:#fff;border-radius:50%;transition:transform .3s"></span>
+              </label>
+            </div>
+            <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Closed Message (shown on menu)</label>
+            <textarea id="setting-closed-msg" rows="2" style="width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow,sans-serif;font-size:.88rem;padding:8px 11px;border-radius:6px;outline:none;resize:vertical"></textarea>
+            <button onclick="saveSetting('closed_message', document.getElementById('setting-closed-msg').value)" style="margin-top:8px;background:var(--green);color:#fff;font-family:Bebas Neue,sans-serif;font-size:.88rem;letter-spacing:2px;padding:8px 18px;border:none;border-radius:6px;cursor:pointer">SAVE</button>
+          </div>
+        </div>
+
+        <!-- Pricing & Fees -->
+        <div class="panel">
+          <div class="ph"><div class="ph-title">💰 PRICING & FEES</div></div>
+          <div style="padding:18px;display:flex;flex-direction:column;gap:12px">
+            <div>
+              <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Tax Rate (%)</label>
+              <div style="display:flex;gap:8px">
+                <input type="number" id="setting-tax" min="0" max="30" step="0.1" placeholder="0" style="flex:1;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow Condensed,sans-serif;font-size:.95rem;padding:7px 11px;border-radius:6px;outline:none">
+                <button onclick="saveSetting('tax_rate', document.getElementById('setting-tax').value)" style="background:var(--green);color:#fff;font-family:Bebas Neue,sans-serif;font-size:.82rem;letter-spacing:2px;padding:7px 14px;border:none;border-radius:6px;cursor:pointer">SAVE</button>
+              </div>
+            </div>
+            <div>
+              <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Delivery Fee (KD)</label>
+              <div style="display:flex;gap:8px">
+                <input type="number" id="setting-delivery-fee" min="0" step="0.001" placeholder="0.500" style="flex:1;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow Condensed,sans-serif;font-size:.95rem;padding:7px 11px;border-radius:6px;outline:none">
+                <button onclick="saveSetting('delivery_fee', document.getElementById('setting-delivery-fee').value)" style="background:var(--green);color:#fff;font-family:Bebas Neue,sans-serif;font-size:.82rem;letter-spacing:2px;padding:7px 14px;border:none;border-radius:6px;cursor:pointer">SAVE</button>
+              </div>
+            </div>
+            <div>
+              <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Min. Order for Delivery (KD)</label>
+              <div style="display:flex;gap:8px">
+                <input type="number" id="setting-min-delivery" min="0" step="0.001" placeholder="1.500" style="flex:1;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow Condensed,sans-serif;font-size:.95rem;padding:7px 11px;border-radius:6px;outline:none">
+                <button onclick="saveSetting('min_order_delivery', document.getElementById('setting-min-delivery').value)" style="background:var(--green);color:#fff;font-family:Bebas Neue,sans-serif;font-size:.82rem;letter-spacing:2px;padding:7px 14px;border:none;border-radius:6px;cursor:pointer">SAVE</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loyalty Points -->
+        <div class="panel">
+          <div class="ph"><div class="ph-title">⭐ LOYALTY POINTS</div></div>
+          <div style="padding:18px">
+            <div style="background:rgba(31,149,120,.08);border:1px solid rgba(31,149,120,.15);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-family:Barlow Condensed,sans-serif;font-size:.8rem;color:var(--muted)">
+              Customers earn points on every order. They can redeem points for discounts at checkout.
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div>
+                <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Points per KD spent</label>
+                <input type="number" id="setting-loyalty-rate" min="1" max="100" placeholder="10" style="width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow Condensed,sans-serif;font-size:.95rem;padding:7px 11px;border-radius:6px;outline:none">
+              </div>
+              <div>
+                <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Points to redeem 1 KD</label>
+                <input type="number" id="setting-redeem-rate" min="1" placeholder="100" style="width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow Condensed,sans-serif;font-size:.95rem;padding:7px 11px;border-radius:6px;outline:none">
+              </div>
+            </div>
+            <button onclick="saveLoyaltySettings()" style="margin-top:12px;width:100%;background:var(--green);color:#fff;font-family:Bebas Neue,sans-serif;font-size:.9rem;letter-spacing:2px;padding:10px;border:none;border-radius:8px;cursor:pointer">SAVE LOYALTY SETTINGS</button>
+          </div>
+        </div>
+
+        <!-- Opening Hours -->
+        <div class="panel">
+          <div class="ph"><div class="ph-title">🕐 OPENING HOURS</div></div>
+          <div style="padding:14px 18px" id="opening-hours-editor">
+            <div style="font-family:Barlow Condensed,sans-serif;font-size:.78rem;color:var(--muted);letter-spacing:1px;margin-bottom:12px">Configure when the restaurant accepts orders</div>
+            <!-- Days rendered by JS -->
+          </div>
+          <div style="padding:0 18px 14px">
+            <button onclick="saveOpeningHours()" style="width:100%;background:var(--green);color:#fff;font-family:Bebas Neue,sans-serif;font-size:.9rem;letter-spacing:2px;padding:10px;border:none;border-radius:8px;cursor:pointer">SAVE HOURS</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Inventory Stock Levels -->
+      <div class="panel" style="margin-top:16px">
+        <div class="ph">
+          <div class="ph-title">📦 INVENTORY STOCK LEVELS</div>
+          <div style="font-family:Barlow Condensed,sans-serif;font-size:.72rem;color:var(--muted);letter-spacing:1px">Set counts to track stock — blank = unlimited</div>
+          <button class="btn-refresh" onclick="loadInventory()">↻</button>
+        </div>
+        <div class="tbl-wrap">
+          <table><thead><tr><th>ITEM</th><th>CATEGORY</th><th>STOCK COUNT</th><th>ALERT AT</th><th>STATUS</th></tr></thead>
+          <tbody id="inventory-tbody"></tbody></table>
         </div>
       </div>
     </div>
@@ -801,6 +916,37 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
   </div>
 </div>
 
+<!-- WHATSAPP SETTINGS MODAL -->
+<div class="modal-bg" id="wa-modal">
+  <div class="modal" style="max-width:480px">
+    <div class="mh">
+      <div><div class="mh-title">💬 WHATSAPP ALERTS</div><div class="mh-sub">Get notified on new orders via WhatsApp</div></div>
+      <button class="mc" onclick="closeWASettings()">✕</button>
+    </div>
+    <div class="mbody">
+      <div style="background:rgba(37,211,102,.08);border:1px solid rgba(37,211,102,.2);border-radius:10px;padding:14px;margin-bottom:16px">
+        <div style="font-family:Bebas Neue,sans-serif;font-size:1rem;letter-spacing:2px;color:#25d366;margin-bottom:6px">📲 HOW IT WORKS</div>
+        <div style="font-family:Barlow Condensed,sans-serif;font-size:.82rem;color:var(--muted);line-height:1.6">
+          Uses <b style="color:var(--text)">CallMeBot</b> — free WhatsApp API for Kuwait numbers.<br>
+          1. Add <b style="color:var(--text)">+34 644 59 26 49</b> to your WhatsApp contacts<br>
+          2. Send: <b style="color:var(--text)">I allow callmebot to send me messages</b><br>
+          3. You'll receive an API key via WhatsApp<br>
+          4. Enter your number and API key below
+        </div>
+      </div>
+      <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Your WhatsApp Number</label>
+      <input type="tel" id="wa-phone" placeholder="+96512345678" style="width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow,sans-serif;font-size:.92rem;padding:8px 11px;border-radius:6px;outline:none;margin-bottom:12px">
+      <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">CallMeBot API Key</label>
+      <input type="text" id="wa-apikey" placeholder="e.g. 1234567" style="width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow,sans-serif;font-size:.92rem;padding:8px 11px;border-radius:6px;outline:none;margin-bottom:12px">
+      <div style="display:flex;gap:8px">
+        <button onclick="testWAAlert()" style="flex:1;padding:10px;background:rgba(37,211,102,.12);border:1px solid rgba(37,211,102,.3);color:#25d366;font-family:Bebas Neue,sans-serif;font-size:.9rem;letter-spacing:2px;border-radius:8px;cursor:pointer">📤 SEND TEST</button>
+        <button onclick="saveWASettings()" class="btn-pri">💾 SAVE</button>
+      </div>
+      <div id="wa-status" style="margin-top:10px;font-family:Barlow Condensed,sans-serif;font-size:.82rem;color:var(--muted);text-align:center"></div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -836,7 +982,10 @@ async function loadAll() {
 }
 
 function renderAll() {
-  renderStats(); renderRecentOrders(); renderTopItems(); renderHourlyChart(); renderRevenueTrends();
+  renderStats(); renderRecentOrders(); renderTopItems(); renderHourlyChart(); renderRevenueTrends(); renderPrepTimeStats();
+  // Refresh stock KPI every 5th load to avoid hammering DB
+  if (typeof _stockRefreshCount === "undefined") window._stockRefreshCount = 0;
+  if (++window._stockRefreshCount % 5 === 1) loadInventory();
   const active = document.querySelector('.page.active')?.id;
   if (active === 'page-orders') renderOrdersTable();
   if (active === 'page-reports') renderReport();
@@ -895,6 +1044,7 @@ function renderRecentOrders() {
       <td>${(o.items||[]).length} item${(o.items||[]).length!==1?'s':''}</td>
       <td class="amt">${fmt(o.total)}</td>
       <td><span class="sbadge s-${o.status}">${(o.status||'').toUpperCase()}</span></td>
+      <td style="font-size:.75rem;color:var(--muted)">${o.cancel_reason?o.cancel_reason.replace(/_/g,' '):''}</td>
     </tr>`).join('');
 }
 
@@ -983,11 +1133,23 @@ function openOrder(id) {
           style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow Condensed,sans-serif,sans-serif;font-size:.9rem;padding:7px 11px;border-radius:6px;outline:none;width:100%"
           onchange="applyDiscount(this.value)">
       </div>
-        <select class="status-sel" onchange="updateStatus(this.value)">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <select class="status-sel" onchange="updateStatus(this.value)">
           ${['new','preparing','ready','done','cancelled'].map(s => `<option value="${s}" ${order.status===s?'selected':''}>${s.toUpperCase()}</option>`).join('')}
         </select>
+        <select class="status-sel" id="modal-cancel-reason" style="display:${order.status==='cancelled'?'block':'none'}" onchange="saveCancelReason(this.value)">
+          <option value="">Cancel reason…</option>
+          <option value="customer_request" ${order.cancel_reason==='customer_request'?'selected':''}>Customer request</option>
+          <option value="out_of_stock" ${order.cancel_reason==='out_of_stock'?'selected':''}>Out of stock</option>
+          <option value="wrong_order" ${order.cancel_reason==='wrong_order'?'selected':''}>Wrong order</option>
+          <option value="payment_issue" ${order.cancel_reason==='payment_issue'?'selected':''}>Payment issue</option>
+          <option value="other" ${order.cancel_reason==='other'?'selected':''}>Other</option>
+        </select>
+      </div>
       </div>
       ${order.notes?`<div class="meta-item" style="grid-column:1/-1"><div class="ml">Notes</div><div class="mv" style="color:var(--teal)">${order.notes}</div></div>`:''}
+      ${order.delivery_address?`<div class="meta-item" style="grid-column:1/-1"><div class="ml">Delivery Address</div><div class="mv" style="color:var(--yellow)">📍 ${order.delivery_address}${order.delivery_area?', '+order.delivery_area:''}</div></div>`:''}
+      ${order.cancel_reason?`<div class="meta-item" style="grid-column:1/-1"><div class="ml">Cancel Reason</div><div class="mv" style="color:var(--red)">${order.cancel_reason.replace(/_/g,' ')}</div></div>`:''}
     </div>
     <div>${(order.items||[]).map(i => `<div class="inv-item"><span>${i.emoji||''} <span class="in">${i.name}${i.size?' ('+i.size+')':''}</span><span class="iq">×${i.qty}</span></span><span class="ip">${fmt((i.price||0)*(i.qty||1))}</span></div>`).join('')}</div>
     <div class="totals-box">
@@ -1125,6 +1287,7 @@ function printReceipt(id) {
 <!-- ORDER INFO -->
 <div class="info-row"><span class="bold">#${o.order_id || o.id}</span><span>${dateStr}  ${timeStr}</span></div>
 <div class="info-row"><span>${typeL[o.order_type] || o.order_type || '—'}${o.table_number ? ' · Table '+o.table_number : ''}</span><span>${payL[o.payment_method] || o.payment_method || '—'}</span></div>
+${o.delivery_address ? `<div class="info-row"><span>📍 ${o.delivery_address}${o.delivery_area?', '+o.delivery_area:''}</span></div>` : ''}
 ${o.customer_name ? `<div class="info-row"><span>Customer: ${o.customer_name}</span></div>` : ''}
 
 <hr class="divider">
@@ -1358,6 +1521,47 @@ function renderReport() {
         '</tbody></table></div></div>';
     }).join('');
 
+  } else if (currentReport === 'preptime') {
+    // Show full prep-time table for filtered orders
+    var ptOrders = orders.filter(function(o){ return o.preparing_at; });
+    if (!ptOrders.length) {
+      el.innerHTML = '<div class="empty-state"><span class="empty-icon">⏱</span>No prep time data yet. Prep time is recorded when you move orders to Preparing status.</div>';
+      return;
+    }
+    var rows2 = ptOrders.map(function(o) {
+      var placed = new Date(o.created_at).getTime();
+      var prep   = new Date(o.preparing_at).getTime();
+      var ready  = o.ready_at ? new Date(o.ready_at).getTime() : null;
+      var wait   = Math.round((prep - placed)/60000);
+      var kitchen = ready ? Math.round((ready - prep)/60000) : null;
+      var total   = ready ? Math.round((ready - placed)/60000) : null;
+      var color = total === null ? 'var(--muted)' : total <= 12 ? 'var(--teal)' : total <= 20 ? 'var(--yellow)' : 'var(--red)';
+      return '<tr onclick="openOrder(\''+o.id+'\')" style="cursor:pointer">'+
+        '<td style="font-family:Bebas Neue,sans-serif;letter-spacing:1px">'+(o.order_id||o.id)+'</td>'+
+        '<td style="font-size:.78rem;color:var(--muted)">'+fmtDate(o.created_at)+' '+fmtTime(o.created_at)+'</td>'+
+        '<td>'+(o.customer_name||'—')+'</td>'+
+        '<td style="font-size:.78rem;color:var(--muted)">'+(o.order_type||'—')+(o.table_number?' · T'+o.table_number:'')+'</td>'+
+        '<td style="font-family:Bebas Neue,sans-serif;color:var(--muted)">'+wait+'m</td>'+
+        '<td style="font-family:Bebas Neue,sans-serif;color:var(--teal)">'+(kitchen!==null?kitchen+'m':'—')+'</td>'+
+        '<td style="font-family:Bebas Neue,sans-serif;font-size:1.1rem;color:'+color+'">'+(total!==null?total+'m':'In progress')+'</td>'+
+        '<td><span class="sbadge s-'+o.status+'">'+o.status.toUpperCase()+'</span></td>'+
+      '</tr>';
+    }).join('');
+    // Summary stats
+    var ptDone = ptOrders.filter(function(o){ return o.ready_at; });
+    var totals = ptDone.map(function(o){ return Math.round((new Date(o.ready_at)-new Date(o.created_at))/60000); }).filter(function(t){return t>0&&t<120;});
+    var avg = totals.length ? Math.round(totals.reduce(function(a,b){return a+b;},0)/totals.length) : 0;
+    el.innerHTML =
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-bottom:18px">'+
+        rptStat('⏱','Avg Prep Time',avg+'m','Placed → Ready')+
+        rptStat('📋','Orders Tracked',ptDone.length,'With full timing')+
+        rptStat('🚀','Under 15 min',ptDone.filter(function(o){return o.ready_at&&Math.round((new Date(o.ready_at)-new Date(o.created_at))/60000)<=15;}).length,'Orders')+
+      '</div>'+
+      '<div class="panel"><div class="ph"><div class="ph-title">ORDER PREP TIMES</div></div>'+
+      '<div class="tbl-wrap"><table><thead><tr>'+
+        '<th>ORDER</th><th>PLACED</th><th>CUSTOMER</th><th>TYPE</th><th>WAIT TO KITCHEN</th><th>KITCHEN TIME</th><th>TOTAL TIME</th><th>STATUS</th>'+
+      '</tr></thead><tbody>'+rows2+'</tbody></table></div></div>';
+
   } else if (currentReport === 'payments') {
     var pCounts = {cash:0, knet:0, card:0};
     var pRevenue = {cash:0, knet:0, card:0};
@@ -1550,13 +1754,16 @@ function prodRow(p) {
     <td>${p.badge ? `<span style="background:rgba(31,149,120,.15);color:var(--teal);font-family:Bebas Neue,sans-serif;font-size:.7rem;letter-spacing:1px;padding:2px 8px;border-radius:3px">${p.badge}</span>` : '—'}</td>
     <td>
       ${hidden
-        ? '<span style="font-family:\'Bebas Neue\';font-size:.7rem;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,.05);padding:3px 8px;border-radius:3px">HIDDEN</span>'
-        : '<span style="font-family:\'Bebas Neue\';font-size:.7rem;letter-spacing:1px;color:var(--teal);background:rgba(31,149,120,.1);padding:3px 8px;border-radius:3px">VISIBLE</span>'}
+        ? '<span style="font-family:Bebas Neue,sans-serif;font-size:.7rem;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,.05);padding:3px 8px;border-radius:3px">HIDDEN</span>'
+        : p.is_sold_out
+          ? '<span style="font-family:Bebas Neue,sans-serif;font-size:.7rem;letter-spacing:1px;color:var(--red);background:rgba(255,71,87,.12);padding:3px 8px;border-radius:3px">SOLD OUT</span>'
+          : '<span style="font-family:Bebas Neue,sans-serif;font-size:.7rem;letter-spacing:1px;color:var(--teal);background:rgba(31,149,120,.1);padding:3px 8px;border-radius:3px">VISIBLE</span>'}
     </td>
     <td>
-      <div style="display:flex;gap:6px">
-        <button onclick="openProductModal(${p.id})" style="background:rgba(31,149,120,.1);border:1px solid rgba(31,149,120,.25);color:var(--teal);font-family:Bebas Neue,sans-serif,sans-serif;font-size:.75rem;letter-spacing:1px;padding:4px 10px;border-radius:5px;cursor:pointer">✏ EDIT</button>
-        <button onclick="toggleHide(${p.id},${!hidden})" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--muted);font-family:Bebas Neue,sans-serif,sans-serif;font-size:.75rem;letter-spacing:1px;padding:4px 10px;border-radius:5px;cursor:pointer">${hidden ? '👁 SHOW' : '🙈 HIDE'}</button>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button onclick="openProductModal(${p.id})" style="background:rgba(31,149,120,.1);border:1px solid rgba(31,149,120,.25);color:var(--teal);font-family:Bebas Neue,sans-serif;font-size:.75rem;letter-spacing:1px;padding:4px 10px;border-radius:5px;cursor:pointer">✏ EDIT</button>
+        <button onclick="toggleHide(${p.id},${!hidden})" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--muted);font-family:Bebas Neue,sans-serif;font-size:.75rem;letter-spacing:1px;padding:4px 10px;border-radius:5px;cursor:pointer">${hidden ? '👁 SHOW' : '🙈 HIDE'}</button>
+        <button onclick="toggleSoldOut(${p.id},${!p.is_sold_out})" style="background:${p.is_sold_out?'rgba(255,71,87,.15)':'rgba(255,255,255,.04)'};border:1px solid ${p.is_sold_out?'rgba(255,71,87,.4)':'rgba(255,255,255,.1)'};color:${p.is_sold_out?'var(--red)':'var(--muted)'};font-family:Bebas Neue,sans-serif;font-size:.75rem;letter-spacing:1px;padding:4px 10px;border-radius:5px;cursor:pointer">${p.is_sold_out ? '🟢 RESTOCK' : '❌ SOLD OUT'}</button>
       </div>
     </td>
   </tr>`;
@@ -1798,7 +2005,10 @@ subscribeRealtime = function() {
   // Also watch for new orders specifically for notification
   sb.channel('notif-orders')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, function(payload) {
-      if (payload.new && payload.new.status === 'new') notifyNewOrder(payload.new);
+      if (payload.new && payload.new.status === 'new') {
+        notifyNewOrder(payload.new);
+        sendWAAlert(buildWAMessage(payload.new));
+      }
     })
     .subscribe();
 };
@@ -2009,7 +2219,7 @@ function initAuth() {
   var pg = document.getElementById('page-' + firstPage);
   if (pg) pg.classList.add('active');
 
-  var titles = {dashboard:'DASHBOARD', orders:'ORDERS', reports:'REPORTS', expenses:'EXPENSES', categories:'CATEGORIES', products:'PRODUCTS', combos:'COMBOS', offers:'SPECIAL OFFERS', customers:'CUSTOMERS', qrcodes:'TABLE QR CODES', shifts:'SHIFTS', users:'USERS'};
+  var titles = {dashboard:'DASHBOARD', orders:'ORDERS', reports:'REPORTS', expenses:'EXPENSES', categories:'CATEGORIES', products:'PRODUCTS', combos:'COMBOS', offers:'SPECIAL OFFERS', customers:'CUSTOMERS', settings:'SETTINGS', qrcodes:'TABLE QR CODES', shifts:'SHIFTS', users:'USERS'};
   document.getElementById('page-title').textContent = titles[firstPage] || firstPage.toUpperCase();
 
   if (firstPage === 'reports') renderReport();
@@ -2039,6 +2249,7 @@ showPage = function(name, btn) {
   if (name === 'expenses') { loadExpenses(); }
   if (name === 'offers') loadOffers();
   if (name === 'qrcodes') generateQRCodes();
+  if (name === 'settings') { loadSettings(); loadInventory(); }
 };
 
 /* ══════════════════════════════════════════
@@ -2734,6 +2945,505 @@ async function toggleOfferActive(id, active) {
 }
 
 /* ══════════════════════════════════════════
+   SOLD OUT TOGGLE
+══════════════════════════════════════════ */
+async function toggleSoldOut(id, soldOut) {
+  try {
+    var update = { is_sold_out: soldOut };
+    if (soldOut) update.sold_out_at = new Date().toISOString();
+    else         update.sold_out_at = null;
+    var { error } = await sb.from('products').update(update).eq('id', id);
+    if (error) throw error;
+    showToast(soldOut ? '❌ Marked as sold out' : '🟢 Item restocked');
+    await loadProducts();
+  } catch(e) { showToast('⚠ ' + e.message); }
+}
+
+// Auto-restock items sold out yesterday (client-side daily reset)
+async function autoRestockDaily() {
+  try {
+    var yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    yesterday.setHours(23, 59, 59, 0);
+    // Find items sold out before today
+    var { data } = await sb.from('products')
+      .select('id, sold_out_at')
+      .eq('is_sold_out', true);
+    if (!data || !data.length) return;
+    var toRestock = data.filter(function(p) {
+      if (!p.sold_out_at) return true;
+      return new Date(p.sold_out_at) < new Date(new Date().setHours(0,0,0,0));
+    });
+    if (!toRestock.length) return;
+    var ids = toRestock.map(function(p){return p.id;});
+    // Restock each
+    for (var i = 0; i < ids.length; i++) {
+      await sb.from('products').update({ is_sold_out: false, sold_out_at: null }).eq('id', ids[i]);
+    }
+    if (ids.length) showToast('🟢 ' + ids.length + ' item(s) auto-restocked for today');
+  } catch(e) {}
+}
+
+/* ══════════════════════════════════════════
+   KITCHEN PREP TIME ANALYTICS
+   Tracks: placed → preparing → ready
+══════════════════════════════════════════ */
+function renderPrepTimeStats() {
+  // Only use orders that have both placed time and ready_at OR we estimate from status changes
+  var done = allOrders.filter(function(o) {
+    return (o.status === 'done' || o.status === 'ready') && o.preparing_at;
+  });
+
+  var prepTimes = done.map(function(o) {
+    var placed = new Date(o.created_at).getTime();
+    var ready  = o.ready_at ? new Date(o.ready_at).getTime() : null;
+    var prep   = new Date(o.preparing_at).getTime();
+    // Time from placed → preparing_at = wait time
+    // Time from preparing_at → ready_at = actual kitchen time
+    return {
+      wait:    Math.round((prep - placed) / 60000),
+      kitchen: ready ? Math.round((ready - prep) / 60000) : null,
+      total:   ready ? Math.round((ready - placed) / 60000) : null,
+    };
+  }).filter(function(t) { return t.total !== null && t.total > 0 && t.total < 120; });
+
+  // Dashboard KPI patch — inject into stats grid if prep panel exists
+  var prepEl = document.getElementById('prep-stats-panel');
+  if (!prepEl) return;
+
+  if (!prepTimes.length) {
+    prepEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-family:Barlow Condensed,sans-serif;font-size:.88rem;letter-spacing:1px">No prep time data yet. Data collects as orders move through New → Preparing → Ready.</div>';
+    return;
+  }
+
+  var avgTotal   = Math.round(prepTimes.reduce(function(s,t){return s+t.total;},0) / prepTimes.length);
+  var avgWait    = Math.round(prepTimes.reduce(function(s,t){return s+t.wait;},0) / prepTimes.length);
+  var avgKitchen = Math.round(prepTimes.filter(function(t){return t.kitchen!==null;}).reduce(function(s,t){return s+(t.kitchen||0);},0) / (prepTimes.filter(function(t){return t.kitchen!==null;}).length||1));
+  var fastest = Math.min.apply(null, prepTimes.map(function(t){return t.total;}));
+  var slowest = Math.max.apply(null, prepTimes.map(function(t){return t.total;}));
+
+  // Buckets for chart: 0-5, 5-10, 10-15, 15-20, 20-30, 30+
+  var buckets = [0,0,0,0,0,0];
+  var labels  = ['<5m','5-10m','10-15m','15-20m','20-30m','30m+'];
+  prepTimes.forEach(function(t) {
+    if      (t.total < 5)  buckets[0]++;
+    else if (t.total < 10) buckets[1]++;
+    else if (t.total < 15) buckets[2]++;
+    else if (t.total < 20) buckets[3]++;
+    else if (t.total < 30) buckets[4]++;
+    else                   buckets[5]++;
+  });
+  var maxB = Math.max.apply(null, buckets) || 1;
+  var barColor = avgTotal <= 12 ? 'var(--teal)' : avgTotal <= 20 ? 'var(--yellow)' : 'var(--red)';
+
+  prepEl.innerHTML =
+    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:16px 18px;border-bottom:1px solid var(--border)">' +
+      '<div style="text-align:center"><div style="font-family:Bebas Neue,sans-serif;font-size:2rem;color:'+barColor+'">'+avgTotal+'m</div><div style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted)">Avg Total</div></div>' +
+      '<div style="text-align:center"><div style="font-family:Bebas Neue,sans-serif;font-size:2rem;color:var(--muted)">'+avgWait+'m</div><div style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted)">Avg Wait</div></div>' +
+      '<div style="text-align:center"><div style="font-family:Bebas Neue,sans-serif;font-size:2rem;color:var(--teal)">'+fastest+'m</div><div style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted)">Fastest</div></div>' +
+      '<div style="text-align:center"><div style="font-family:Bebas Neue,sans-serif;font-size:2rem;color:var(--red)">'+slowest+'m</div><div style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted)">Slowest</div></div>' +
+    '</div>' +
+    '<div style="padding:14px 18px 8px">' +
+      '<div style="font-family:Barlow Condensed,sans-serif;font-size:.68rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:12px">DISTRIBUTION — ' + prepTimes.length + ' orders</div>' +
+      '<div style="display:flex;align-items:flex-end;gap:8px;height:80px">' +
+        buckets.map(function(cnt, i) {
+          var h = Math.round(cnt/maxB*100);
+          var color = i <= 1 ? 'var(--teal)' : i <= 3 ? 'var(--yellow)' : 'var(--red)';
+          return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">' +
+            '<div style="font-family:Barlow Condensed,sans-serif;font-size:.62rem;color:var(--muted)">' + (cnt||'') + '</div>' +
+            '<div style="width:100%;height:'+h+'%;min-height:3px;background:'+color+';border-radius:3px 3px 0 0"></div>' +
+            '<div style="font-family:Barlow Condensed,sans-serif;font-size:.6rem;color:var(--muted);letter-spacing:1px">' + labels[i] + '</div>' +
+          '</div>';
+        }).join('') +
+      '</div>' +
+    '</div>';
+}
+
+// Intercept updateStatus to record timestamps
+var _origUpdateStatus = typeof updateStatus === 'function' ? updateStatus : null;
+async function updateStatus(newStatus) {
+  if (!currentOrderId) return;
+  try {
+    var update = { status: newStatus };
+    if (newStatus === 'preparing') update.preparing_at = new Date().toISOString();
+    if (newStatus === 'ready')     update.ready_at     = new Date().toISOString();
+    var { error } = await sb.from('orders').update(update).eq('id', currentOrderId);
+    if (error) throw error;
+    showToast('✓ Status → ' + newStatus.toUpperCase());
+    await loadAll();
+  } catch(e) { showToast('⚠ ' + e.message); }
+}
+
+/* ══════════════════════════════════════════
+   ORDERS EXPORT TO CSV
+══════════════════════════════════════════ */
+function exportOrdersCSV() {
+  // Get the currently filtered orders
+  var search = (document.getElementById('order-search') || {}).value || '';
+  var filter = currentFilter || 'all';
+  var orders = allOrders.slice();
+  if (filter !== 'all') orders = orders.filter(function(o){ return o.status === filter; });
+  if (search) {
+    var q = search.toLowerCase();
+    orders = orders.filter(function(o){
+      return (o.order_id||'').toLowerCase().includes(q) ||
+             (o.customer_name||'').toLowerCase().includes(q) ||
+             (o.table_number||'').toLowerCase().includes(q) ||
+             (o.customer_phone||'').includes(q);
+    });
+  }
+
+  if (!orders.length) { showToast('⚠ No orders to export'); return; }
+
+  var headers = ['Order ID','Date','Time','Customer Name','Phone','Type','Table','Payment','Items','Subtotal KD','Discount KD','Total KD','Status','Notes'];
+
+  var rows = orders.map(function(o) {
+    var items = (o.items||[]).map(function(i){
+      return i.qty + 'x ' + i.name + (i.note ? ' ['+i.note+']' : '');
+    }).join(' | ');
+    var d = new Date(o.created_at);
+    return [
+      o.order_id || o.id,
+      d.toLocaleDateString('en-GB'),
+      d.toLocaleTimeString('en-KW',{hour:'2-digit',minute:'2-digit'}),
+      o.customer_name || '',
+      o.customer_phone || '',
+      o.order_type || '',
+      o.table_number || '',
+      o.payment_method || '',
+      '"' + items.replace(/"/g,"'") + '"',
+      parseFloat(o.subtotal||0).toFixed(3),
+      parseFloat(o.discount_amt||0).toFixed(3),
+      parseFloat(o.total||0).toFixed(3),
+      o.status || '',
+      '"' + (o.notes||'').replace(/"/g,"'") + '"'
+    ];
+  });
+
+  var csv = [headers.join(',')].concat(rows.map(function(r){ return r.join(','); })).join('\n');
+  // BOM for Excel Arabic support
+  var bom = '\uFEFF';
+  var blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  var date = new Date().toISOString().slice(0,10);
+  a.href     = url;
+  a.download = 'fayruza-orders-' + date + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('✓ Exported ' + orders.length + ' orders to CSV');
+}
+
+/* ══════════════════════════════════════════
+   WHATSAPP ORDER ALERTS (CallMeBot)
+══════════════════════════════════════════ */
+var _waPhone  = localStorage.getItem('fayruza_wa_phone')  || '';
+var _waApiKey = localStorage.getItem('fayruza_wa_apikey') || '';
+
+function openWASettings() {
+  document.getElementById('wa-phone').value  = _waPhone;
+  document.getElementById('wa-apikey').value = _waApiKey;
+  document.getElementById('wa-status').textContent = _waPhone ? '✓ Configured: ' + _waPhone : '';
+  document.getElementById('wa-modal').classList.add('open');
+}
+function closeWASettings() { document.getElementById('wa-modal').classList.remove('open'); }
+
+function saveWASettings() {
+  _waPhone  = (document.getElementById('wa-phone').value  || '').trim();
+  _waApiKey = (document.getElementById('wa-apikey').value || '').trim();
+  localStorage.setItem('fayruza_wa_phone',  _waPhone);
+  localStorage.setItem('fayruza_wa_apikey', _waApiKey);
+  document.getElementById('wa-status').textContent = '✓ Saved!';
+  setTimeout(function(){ closeWASettings(); }, 800);
+  showToast('✓ WhatsApp settings saved');
+}
+
+async function sendWAAlert(message) {
+  if (!_waPhone || !_waApiKey) return;
+  try {
+    var url = 'https://api.callmebot.com/whatsapp.php?phone=' +
+      encodeURIComponent(_waPhone) + '&text=' +
+      encodeURIComponent(message)  + '&apikey=' + encodeURIComponent(_waApiKey);
+    // Use no-cors since CallMeBot doesn't support CORS — fire and forget
+    await fetch(url, { method: 'GET', mode: 'no-cors' });
+  } catch(e) { /* silent — no-cors always throws */ }
+}
+
+async function testWAAlert() {
+  _waPhone  = (document.getElementById('wa-phone').value  || '').trim();
+  _waApiKey = (document.getElementById('wa-apikey').value || '').trim();
+  if (!_waPhone || !_waApiKey) {
+    document.getElementById('wa-status').textContent = '⚠ Enter phone and API key first';
+    return;
+  }
+  document.getElementById('wa-status').textContent = '📤 Sending test...';
+  await sendWAAlert('🔔 Fayruza Admin — WhatsApp alerts are working! Test sent at ' + new Date().toLocaleTimeString('en-KW'));
+  document.getElementById('wa-status').textContent = '✓ Test sent! Check your WhatsApp';
+}
+
+function buildWAMessage(order) {
+  var typeL = { dinein: 'Dine In', takeaway: 'Takeaway', delivery: 'Delivery' };
+  var items = (order.items || []).slice(0, 5).map(function(i) {
+    return i.qty + 'x ' + i.name;
+  }).join(', ');
+  var msg = '🔔 NEW ORDER at Fayruza!\n';
+  msg += '#' + (order.order_id || order.id) + '\n';
+  msg += '💰 KD ' + parseFloat(order.total || 0).toFixed(3) + '\n';
+  msg += '📋 ' + (typeL[order.order_type] || order.order_type || '') +
+         (order.table_number ? ' · Table ' + order.table_number : '') + '\n';
+  if (order.customer_name) msg += '👤 ' + order.customer_name + '\n';
+  if (order.customer_phone) msg += '📱 ' + order.customer_phone + '\n';
+  msg += '🍽 ' + items;
+  if (order.items && order.items.length > 5) msg += ' +' + (order.items.length - 5) + ' more';
+  if (order.delivery_address) msg += '\n📍 ' + order.delivery_address + ', ' + (order.delivery_area || '');
+  return msg;
+}
+
+// Restore saved settings on load
+(function() {
+  _waPhone  = localStorage.getItem('fayruza_wa_phone')  || '';
+  _waApiKey = localStorage.getItem('fayruza_wa_apikey') || '';
+})();
+
+/* ══════════════════════════════════════════
+   CANCEL REASON
+══════════════════════════════════════════ */
+async function saveCancelReason(reason) {
+  if (!currentOrderId || !reason) return;
+  try {
+    var { error } = await sb.from('orders').update({ cancel_reason: reason }).eq('id', currentOrderId);
+    if (error) throw error;
+    showToast('✓ Cancel reason saved: ' + reason.replace(/_/g,' '));
+  } catch(e) { showToast('⚠ ' + e.message); }
+}
+
+// Show/hide cancel reason dropdown when status changes
+var _origUpdateStatus2 = updateStatus;
+updateStatus = async function(newStatus) {
+  var cancelSel = document.getElementById('modal-cancel-reason');
+  if (cancelSel) cancelSel.style.display = (newStatus === 'cancelled') ? 'block' : 'none';
+  await _origUpdateStatus2(newStatus);
+};
+
+/* ══════════════════════════════════════════
+   RESTAURANT SETTINGS
+══════════════════════════════════════════ */
+var _settings = {};
+
+async function loadSettings() {
+  try {
+    var { data, error } = await sb.from('restaurant_settings').select('*');
+    if (error) throw error;
+    _settings = {};
+    (data || []).forEach(function(r) { _settings[r.key] = r.value; });
+    applySettingsToUI();
+  } catch(e) {
+    console.warn('Settings load failed:', e.message);
+  }
+}
+
+function applySettingsToUI() {
+  // Toggle
+  var openEl = document.getElementById('setting-open');
+  var track  = document.getElementById('toggle-track');
+  var thumb  = document.getElementById('toggle-thumb');
+  var isOpen = _settings['restaurant_open'] !== 'false';
+  if (openEl) openEl.checked = isOpen;
+  if (track)  track.style.background = isOpen ? 'var(--green)' : '#444';
+  if (thumb)  thumb.style.transform  = isOpen ? 'translateX(24px)' : 'translateX(0)';
+
+  var msgEl = document.getElementById('setting-closed-msg');
+  if (msgEl) msgEl.value = _settings['closed_message'] || '';
+
+  var taxEl = document.getElementById('setting-tax');
+  if (taxEl) taxEl.value = _settings['tax_rate'] || '0';
+
+  var feeEl = document.getElementById('setting-delivery-fee');
+  if (feeEl) feeEl.value = _settings['delivery_fee'] || '0.500';
+
+  var minEl = document.getElementById('setting-min-delivery');
+  if (minEl) minEl.value = _settings['min_order_delivery'] || '1.500';
+
+  var lrEl = document.getElementById('setting-loyalty-rate');
+  if (lrEl) lrEl.value = _settings['loyalty_rate'] || '10';
+
+  var rrEl = document.getElementById('setting-redeem-rate');
+  if (rrEl) rrEl.value = _settings['loyalty_redeem_rate'] || '100';
+
+  renderOpeningHoursEditor();
+
+  // Update toggle visual when checkbox changes
+  var openEl2 = document.getElementById('setting-open');
+  if (openEl2) openEl2.addEventListener('change', function() {
+    var t = document.getElementById('toggle-track');
+    var th = document.getElementById('toggle-thumb');
+    if (t)  t.style.background = this.checked ? 'var(--green)' : '#444';
+    if (th) th.style.transform  = this.checked ? 'translateX(24px)' : 'translateX(0)';
+  });
+}
+
+async function saveSetting(key, value) {
+  try {
+    var { error } = await sb.from('restaurant_settings')
+      .upsert({ key: key, value: String(value), updated_at: new Date().toISOString() }, { onConflict: 'key' });
+    if (error) throw error;
+    _settings[key] = String(value);
+    showToast('✓ Saved: ' + key.replace(/_/g,' '));
+  } catch(e) { showToast('⚠ ' + e.message); }
+}
+
+async function saveLoyaltySettings() {
+  var rate   = document.getElementById('setting-loyalty-rate').value || '10';
+  var redeem = document.getElementById('setting-redeem-rate').value  || '100';
+  await saveSetting('loyalty_rate', rate);
+  await saveSetting('loyalty_redeem_rate', redeem);
+  showToast('✓ Loyalty settings saved');
+}
+
+/* ── Opening Hours Editor ── */
+var DAY_LABELS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+function renderOpeningHoursEditor() {
+  var el = document.getElementById('opening-hours-editor');
+  if (!el) return;
+  var hours = {};
+  try { hours = JSON.parse(_settings['opening_hours'] || '{}'); } catch(e) {}
+  var dayKeys = ['sun','mon','tue','wed','thu','fri','sat'];
+  var inpStyle = 'background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow Condensed,sans-serif;font-size:.88rem;padding:5px 8px;border-radius:6px;outline:none;width:80px';
+  el.innerHTML = '<div style="font-family:Barlow Condensed,sans-serif;font-size:.78rem;color:var(--muted);letter-spacing:1px;margin-bottom:12px">Configure when the restaurant accepts orders</div>' +
+    dayKeys.map(function(d, i) {
+      var h = hours[d] || { open:'09:00', close:'23:00' };
+      return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">' +
+        '<span style="font-family:Bebas Neue,sans-serif;font-size:.88rem;letter-spacing:1px;width:32px;color:var(--text)">' + DAY_LABELS[i] + '</span>' +
+        '<input type="time" id="oh-open-'+d+'" value="'+h.open+'" style="'+inpStyle+'">' +
+        '<span style="font-family:Barlow Condensed,sans-serif;font-size:.75rem;color:var(--muted)">to</span>' +
+        '<input type="time" id="oh-close-'+d+'" value="'+h.close+'" style="'+inpStyle+'">' +
+      '</div>';
+    }).join('');
+}
+
+async function saveOpeningHours() {
+  var dayKeys = ['sun','mon','tue','wed','thu','fri','sat'];
+  var hours = {};
+  dayKeys.forEach(function(d) {
+    hours[d] = {
+      open:  (document.getElementById('oh-open-'+d)  || {}).value || '09:00',
+      close: (document.getElementById('oh-close-'+d) || {}).value || '23:00'
+    };
+  });
+  await saveSetting('opening_hours', JSON.stringify(hours));
+  showToast('✓ Opening hours saved');
+}
+
+/* ══════════════════════════════════════════
+   INVENTORY STOCK MANAGEMENT
+══════════════════════════════════════════ */
+async function loadInventory() {
+  try {
+    var { data, error } = await sb.from('products')
+      .select('id, name, emoji, category_name, stock_count, low_stock_alert, is_sold_out')
+      .eq('is_hidden', false)
+      .order('category_sort').order('sort_order');
+    if (error) throw error;
+    renderInventoryTable(data || []);
+    updateStockDashboard(data || []);
+  } catch(e) { showToast('⚠ Could not load inventory: ' + e.message); }
+}
+
+function renderInventoryTable(products) {
+  var tbody = document.getElementById('inventory-tbody');
+  if (!tbody) return;
+  if (!products.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:28px">No products found</td></tr>';
+    return;
+  }
+  var inpStyle = 'background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow Condensed,sans-serif;font-size:.88rem;padding:5px 9px;border-radius:6px;outline:none;width:70px';
+  tbody.innerHTML = products.map(function(p) {
+    var stock = p.stock_count;
+    var alert = p.low_stock_alert || 5;
+    var isLow  = stock !== null && stock !== undefined && stock <= alert;
+    var isOut  = stock !== null && stock !== undefined && stock <= 0;
+    var status = stock === null || stock === undefined
+      ? '<span style="color:var(--muted);font-family:Bebas Neue,sans-serif;font-size:.72rem;letter-spacing:1px">UNLIMITED</span>'
+      : isOut
+        ? '<span style="color:var(--red);font-family:Bebas Neue,sans-serif;font-size:.72rem;letter-spacing:1px;background:rgba(255,71,87,.12);padding:3px 8px;border-radius:3px">OUT OF STOCK</span>'
+        : isLow
+          ? '<span style="color:var(--yellow);font-family:Bebas Neue,sans-serif;font-size:.72rem;letter-spacing:1px;background:rgba(255,212,59,.1);padding:3px 8px;border-radius:3px">⚠ LOW: '+stock+' LEFT</span>'
+          : '<span style="color:var(--teal);font-family:Bebas Neue,sans-serif;font-size:.72rem;letter-spacing:1px">'+stock+' IN STOCK</span>';
+    return '<tr style="background:'+(isOut?'rgba(255,71,87,.04)':isLow?'rgba(255,212,59,.03)':'')+'">'+
+      '<td><span style="font-size:1.1rem;margin-right:6px">'+(p.emoji||'')+'</span>'+
+        '<span style="font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:.88rem;text-transform:uppercase">'+p.name+'</span></td>'+
+      '<td style="font-size:.8rem;color:var(--muted)">'+(p.category_name||'—')+'</td>'+
+      '<td><input type="number" min="0" placeholder="∞" value="'+(stock!==null&&stock!==undefined?stock:'')+'"'+
+        ' onchange="updateStockCount('+p.id+', this.value)"'+
+        ' style="'+inpStyle+'"></td>'+
+      '<td><input type="number" min="1" value="'+alert+'"'+
+        ' onchange="updateAlertLevel('+p.id+', this.value)"'+
+        ' style="'+inpStyle+'"></td>'+
+      '<td>'+status+'</td>'+
+    '</tr>';
+  }).join('');
+}
+
+function updateStockDashboard(products) {
+  var tracked = products.filter(function(p){ return p.stock_count !== null && p.stock_count !== undefined; });
+  var low = tracked.filter(function(p){ return p.stock_count <= (p.low_stock_alert || 5); });
+  var out = tracked.filter(function(p){ return p.stock_count <= 0; });
+
+  var el = document.getElementById('s-stock');
+  var sub = document.getElementById('s-stock-sub');
+  var card = document.getElementById('s-stock-card');
+  if (el) el.textContent = low.length || '—';
+  if (sub) sub.textContent = out.length ? out.length + ' out of stock' : tracked.length ? 'All OK' : 'No tracking set';
+  if (card) {
+    if (out.length) card.style.borderColor = 'rgba(255,71,87,.4)';
+    else if (low.length) card.style.borderColor = 'rgba(255,212,59,.3)';
+    else card.style.borderColor = 'rgba(255,71,87,.0)';
+  }
+}
+
+async function updateStockCount(id, val) {
+  var count = val === '' ? null : parseInt(val);
+  try {
+    var { error } = await sb.from('products').update({
+      stock_count: count,
+      is_sold_out: count !== null && count <= 0
+    }).eq('id', id);
+    if (error) throw error;
+    // Refresh dashboard stock KPI
+    await loadInventory();
+  } catch(e) { showToast('⚠ ' + e.message); }
+}
+
+async function updateAlertLevel(id, val) {
+  try {
+    var { error } = await sb.from('products').update({ low_stock_alert: parseInt(val) || 5 }).eq('id', id);
+    if (error) throw error;
+  } catch(e) { showToast('⚠ ' + e.message); }
+}
+
+/* ══════════════════════════════════════════
+   LOYALTY POINTS (admin view)
+   Customer-facing logic is in index.html
+══════════════════════════════════════════ */
+async function adjustCustomerPoints(customerId, delta, reason) {
+  try {
+    var { data: cust } = await sb.from('customers').select('points_balance,points_earned,points_redeemed').eq('id', customerId).limit(1);
+    if (!cust || !cust.length) return;
+    var c = cust[0];
+    var newBalance = Math.max(0, (c.points_balance || 0) + delta);
+    var update = { points_balance: newBalance };
+    if (delta > 0) update.points_earned = (c.points_earned || 0) + delta;
+    else update.points_redeemed = (c.points_redeemed || 0) + Math.abs(delta);
+    var { error } = await sb.from('customers').update(update).eq('id', customerId);
+    if (error) throw error;
+    showToast('✓ Points adjusted: ' + (delta > 0 ? '+' : '') + delta);
+  } catch(e) { showToast('⚠ ' + e.message); }
+}
+
+/* ══════════════════════════════════════════
    SHIFTS
 ══════════════════════════════════════════ */
 let allShifts = [];
@@ -3164,6 +3874,9 @@ async function toggleCatActive(dbId, active) {
 ══════════════════════════════════════════ */
 loadAll();
 subscribeRealtime();
+autoRestockDaily();
+loadSettings();
+loadInventory();
 // Set expense date to today
 (function(){var d=document.getElementById('exp-date');if(d)d.value=new Date().toISOString().split('T')[0];})();
 loadProducts();
