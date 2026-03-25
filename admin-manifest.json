@@ -1,0 +1,31 @@
+{
+  "name": "Fayruza Admin",
+  "short_name": "Fayruza",
+  "description": "Fayruza Restaurant Admin Panel",
+  "start_url": "/admin.html",
+  "display": "standalone",
+  "background_color": "#0d1a16",
+  "theme_color": "#0d1a16",
+  "orientation": "any",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "categories": ["business", "productivity"],
+  "shortcuts": [
+    {
+      "name": "Orders",
+      "short_name": "Orders",
+      "description": "View live orders",
+      "url": "/admin.html#orders",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Kitchen Display",
+      "short_name": "KDS",
+      "description": "Kitchen Display Screen",
+      "url": "/kds.html",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

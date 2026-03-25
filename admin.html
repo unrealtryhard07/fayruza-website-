@@ -134,8 +134,32 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
 .toast.show{transform:translateX(-50%) translateY(0);}
 @media(max-width:900px){:root{--sw:0px;}.sidebar{transform:translateX(-220px);width:220px;}.sidebar.open{transform:translateX(0);}.main{margin-left:0;}.sb-toggle{display:flex;}.stats-grid{grid-template-columns:repeat(2,1fr);}.dash-cols{grid-template-columns:1fr;}.content{padding:14px;}.topbar{padding:14px 14px 14px 58px;}}
 @media(max-width:480px){.stats-grid{grid-template-columns:1fr 1fr;}}
+/* ── Mobile bottom nav shortcut ── */
+.mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:#0d1a16;border-top:1px solid var(--border);z-index:200;padding:6px 0 env(safe-area-inset-bottom);justify-content:space-around;}
+@media(max-width:768px){
+  .mob-nav{display:flex;}
+  .main{padding-bottom:60px;}
+  /* Make tables scroll horizontally on mobile */
+  .tbl-wrap{-webkit-overflow-scrolling:touch;}
+  /* Bigger tap targets on mobile */
+  .nb{min-height:42px;}
+}
+.mob-btn{display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;color:var(--muted);cursor:pointer;padding:4px 8px;min-width:52px;font-family:Barlow Condensed,sans-serif;font-size:.58rem;letter-spacing:1.5px;text-transform:uppercase;transition:color .15s;}
+.mob-btn.active{color:var(--teal);}
+.mob-btn .mico{font-size:1.3rem;line-height:1;}
+
 @media print{.sidebar,.topbar,.mfoot,.mc{display:none!important;}.main{margin-left:0;}.modal-bg{position:static;opacity:1;pointer-events:all;background:none;}.modal{max-height:none;border:none;}}
 </style>
+
+<!-- Admin PWA -->
+<link rel="manifest" href="admin-manifest.json">
+<meta name="theme-color" content="#0d1a16">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Fayruza Admin">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 </head>
 <body>
 
@@ -566,7 +590,7 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
           </div>
         </div>
         <div class="tbl-wrap">
-          <table><thead><tr><th>NAME</th><th>PHONE</th><th>ORDERS</th><th>TOTAL SPENT</th><th>LAST ORDER</th><th>LAST ITEMS</th></tr></thead>
+          <table><thead><tr><th>NAME</th><th>PHONE</th><th>ORDERS</th><th>TOTAL SPENT</th><th>⭐ POINTS</th><th>LAST ORDER</th><th>LAST ITEMS</th></tr></thead>
           <tbody id="customers-tbody"></tbody></table>
         </div>
       </div>
@@ -602,18 +626,33 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
 
     <div class="page" id="page-products">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px">
-        <div style="display:flex;gap:8px;flex-wrap:wrap" id="prod-cat-filters">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center" id="prod-cat-filters">
+          <input class="search-inp" id="prod-search" placeholder="Search products…" oninput="renderProductList()" style="width:160px">
           <button class="btn-filter active" onclick="filterProdCat('all',this)">All</button>
         </div>
-        <button onclick="openProductModal(null)" style="background:var(--green);color:white;border:none;font-family:Bebas Neue,sans-serif,sans-serif;font-size:.95rem;letter-spacing:2px;padding:9px 20px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:6px">
-          ＋ ADD PRODUCT
-        </button>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button onclick="restockAll()" style="background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted);font-family:Bebas Neue,sans-serif;font-size:.82rem;letter-spacing:2px;padding:8px 14px;border-radius:7px;cursor:pointer">🟢 RESTOCK ALL</button>
+          <button id="bulk-hide-btn" onclick="bulkHideSelected(true)" style="display:none;background:rgba(255,71,87,.1);border:1px solid rgba(255,71,87,.3);color:var(--red);font-family:Bebas Neue,sans-serif;font-size:.82rem;letter-spacing:2px;padding:8px 14px;border-radius:7px;cursor:pointer">🙈 HIDE SELECTED</button>
+          <button id="bulk-show-btn" onclick="bulkHideSelected(false)" style="display:none;background:rgba(31,149,120,.1);border:1px solid rgba(31,149,120,.3);color:var(--teal);font-family:Bebas Neue,sans-serif;font-size:.82rem;letter-spacing:2px;padding:8px 14px;border-radius:7px;cursor:pointer">👁 SHOW SELECTED</button>
+          <button id="bulk-soldout-btn" onclick="bulkSoldOut()" style="display:none;background:rgba(255,165,0,.1);border:1px solid rgba(255,165,0,.3);color:orange;font-family:Bebas Neue,sans-serif;font-size:.82rem;letter-spacing:2px;padding:8px 14px;border-radius:7px;cursor:pointer">❌ MARK SOLD OUT</button>
+          <button onclick="openProductModal(null)" style="background:var(--green);color:white;border:none;font-family:Bebas Neue,sans-serif;font-size:.95rem;letter-spacing:2px;padding:9px 20px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:6px">
+            ＋ ADD PRODUCT
+          </button>
+        </div>
       </div>
       <div id="prod-list"></div>
     </div>
 
   </div>
 </div>
+
+<!-- Mobile bottom nav -->
+<nav class="mob-nav" id="mob-nav">
+  <button class="mob-btn" onclick="showPage('dashboard',this);closeMobNav(this)"><span class="mico">📊</span>Dash</button>
+  <button class="mob-btn active" onclick="showPage('orders',this);closeMobNav(this)"><span class="mico">📋</span>Orders</button>
+  <button class="mob-btn" onclick="showPage('products',this);closeMobNav(this)"><span class="mico">🍽️</span>Menu</button>
+  <button class="mob-btn" onclick="toggleSidebar()"><span class="mico">☰</span>More</button>
+</nav>
 
 <div class="modal-bg" id="order-modal">
   <div class="modal">
@@ -1161,14 +1200,29 @@ function subscribeRealtime() {
 }
 
 function renderStats() {
-  const today = allOrders.filter(o => isToday(o.created_at));
-  const done = today.filter(o => o.status === 'done');
-  const pending = today.filter(o => o.status === 'new' || o.status === 'preparing');
-  const revenue = done.reduce((s,o) => s + (o.total||0), 0);
-  const avg = today.length ? today.reduce((s,o) => s + (o.total||0), 0) / today.length : 0;
-  document.getElementById('s-orders').textContent = today.length;
+  var today = allOrders.filter(function(o){ return isToday(o.created_at); });
+  var done    = today.filter(function(o){ return o.status === 'done'; });
+  var pending = today.filter(function(o){ return o.status === 'new' || o.status === 'preparing'; });
+  var revenue = done.reduce(function(s,o){ return s+(o.total||0); }, 0);
+  var allRev  = today.reduce(function(s,o){ return s+(o.total||0); }, 0);
+  var avg     = today.length ? allRev / today.length : 0;
+  var dinein    = today.filter(function(o){ return o.order_type==='dinein'; }).length;
+  var takeaway  = today.filter(function(o){ return o.order_type==='takeaway'; }).length;
+  var delivery  = today.filter(function(o){ return o.order_type==='delivery'; }).length;
+  var cancelled = today.filter(function(o){ return o.status==='cancelled'; }).length;
+  var subEl = document.querySelector('#s-orders + .stat-sub') ||
+              document.querySelector('.stat-card .stat-sub');
+  // Update KPI values
+  var ordEl = document.getElementById('s-orders');
+  if (ordEl) {
+    ordEl.textContent = today.length;
+    var sub = ordEl.parentElement.querySelector('.stat-sub');
+    if (sub) sub.textContent = (dinein?'🍽'+dinein+' ':'')+(takeaway?'🥡'+takeaway+' ':'')+(delivery?'🚴'+delivery:'') || 'All types';
+  }
   document.getElementById('s-revenue').textContent = fmt(revenue);
   document.getElementById('s-pending').textContent = pending.length;
+  var pendSub = document.querySelector('#s-pending')?.parentElement?.querySelector('.stat-sub');
+  if (pendSub) pendSub.textContent = cancelled ? cancelled + ' cancelled today' : 'New + Preparing';
   document.getElementById('s-avg').textContent = fmt(avg);
 }
 
@@ -1246,7 +1300,7 @@ function renderOrdersTable() {
     <tr class="${o.status==='new'?'new-row':''}" onclick="openOrder('${o.id}')">
       <td><span style="font-family:Bebas Neue,sans-serif;letter-spacing:1px">${o.order_id||o.id}</span></td>
       <td style="font-size:.78rem;color:var(--muted)">${fmtDate(o.created_at)}<br>${fmtTime(o.created_at)}</td>
-      <td>${o.customer_name||'<span style="color:var(--muted)">—</span>'}</td>
+      <td>${o.customer_name||'<span style="color:var(--muted)">—</span>'}${o.customer_phone?'<div style="font-size:.68rem;color:var(--muted)">'+o.customer_phone+'</div>':''}</td>
       <td style="font-size:.78rem;color:var(--muted)">${typeL[o.order_type]||o.order_type||'—'}${o.table_number?' · T'+o.table_number:''}</td>
       <td>${(o.items||[]).length} items</td>
       <td class="amt">${fmt(o.total)}</td>
@@ -1344,143 +1398,127 @@ async function deleteOrder(id) {
 function closeModal() { document.getElementById('order-modal').classList.remove('open'); currentOrderId = null; }
 
 function printReceipt(id) {
-  const o = allOrders.find(x => String(x.id) === String(id));
+  var isTest = (id === 'TEST');
+  var o = isTest ? {
+    id:'TEST-001', order_id:'ORD-TEST', created_at: new Date().toISOString(),
+    order_type:'dinein', table_number:'5', customer_name:'Test Customer',
+    payment_method:'cash', delivery_address:'', delivery_area:'',
+    items:[{name:'Zinger Burger',emoji:'🍔',qty:2,price:1.500},{name:'Mango Juice',emoji:'🥭',qty:1,price:0.650}],
+    subtotal:3.650, discount_amt:0, total:3.650, notes:''
+  } : allOrders.find(function(x){ return String(x.id) === String(id); });
   if (!o) return;
 
-  const items = (o.items || []);
-  const now   = o.created_at ? new Date(o.created_at) : new Date();
-  const dateStr = now.toLocaleDateString('en-GB', {day:'2-digit',month:'2-digit',year:'2-digit'});
-  const timeStr = now.toLocaleTimeString('en-KW',{hour:'2-digit',minute:'2-digit'});
-  const typeL = {dinein:'Dine In', takeaway:'Takeaway', delivery:'Delivery'};
-  const payL  = {cash:'Cash', knet:'KNET', card:'Card'};
+  var items   = o.items || [];
+  var now     = o.created_at ? new Date(o.created_at) : new Date();
+  var dateStr = now.toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'2-digit'});
+  var timeStr = now.toLocaleTimeString('en-KW',{hour:'2-digit',minute:'2-digit'});
+  var typeL   = {dinein:'Dine In', takeaway:'Takeaway', delivery:'Delivery'};
+  var payL    = {cash:'Cash', knet:'KNET', card:'Card'};
 
-  // Build items rows HTML
-  const itemRows = items.map(i => {
-    const lineTotal = ((i.price||0)*(i.qty||1)).toFixed(3);
-    const name = i.name + (i.size ? ' ('+i.size+')' : '');
-    return `<tr>
-      <td class="qty">${i.qty}</td>
-      <td class="desc">${name}</td>
-      <td class="price">${parseFloat(i.price||0).toFixed(3)}</td>
-      <td class="total">${lineTotal}</td>
-    </tr>`;
+  var itemRows = items.map(function(i) {
+    var name = i.name + (i.size ? ' ('+i.size+')' : '');
+    var total = ((i.price||0)*(i.qty||1)).toFixed(3);
+    return '<tr><td class="rc-qty">'+i.qty+'</td><td class="rc-name">'+name+'</td>'+
+           '<td class="rc-price">'+parseFloat(i.price||0).toFixed(3)+'</td>'+
+           '<td class="rc-total">'+total+'</td></tr>';
   }).join('');
 
-  const html = `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Receipt ${o.order_id || o.id}</title>
-<style>
-  /* 57mm thermal = 215px at 96dpi, but printers use 72dpi so ~160px */
-  @page {
-    size: 57mm auto;
-    margin: 2mm 2mm 4mm 2mm;
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body {
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 8pt;
-    width: 53mm;
-    color: #000;
-    background: #fff;
-  }
-  .center  { text-align: center; }
-  .right   { text-align: right; }
-  .left    { text-align: left; }
-  .bold    { font-weight: bold; }
-  .lg      { font-size: 11pt; font-weight: bold; }
-  .xl      { font-size: 14pt; font-weight: bold; letter-spacing: 2px; }
-  .sm      { font-size: 7pt; }
-  .divider { border: none; border-top: 1px dashed #000; margin: 3mm 0; }
-  .divider-solid { border: none; border-top: 1px solid #000; margin: 3mm 0; }
-  .spacer  { height: 2mm; }
+  var discRow  = (o.discount_amt > 0)
+    ? '<div class="rc-row"><span>Discount</span><span style="color:#c00">- KD '+parseFloat(o.discount_amt).toFixed(3)+'</span></div>' : '';
+  var addrRow  = o.delivery_address
+    ? '<div class="rc-row sm">📍 '+o.delivery_address+(o.delivery_area?', '+o.delivery_area:'')+'</div>' : '';
+  var custRow  = o.customer_name
+    ? '<div class="rc-row sm"><span>Customer</span><span>'+o.customer_name+'</span></div>' : '';
+  var notesRow = o.notes
+    ? '<div class="rc-notes">Note: '+o.notes+'</div>' : '';
 
-  table { width: 100%; border-collapse: collapse; }
-  thead th { font-weight: bold; font-size: 7pt; padding: 1mm 0; }
-  td { vertical-align: top; padding: 0.8mm 0; font-size: 8pt; }
-  .qty   { width: 8mm; text-align: left; }
-  .desc  { text-align: left; }
-  .price { width: 15mm; text-align: right; }
-  .total { width: 16mm; text-align: right; }
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">'+
+    '<title>Receipt '+(o.order_id||o.id)+'</title>'+
+    '<style>'+
+    /* ─────── KEY FIX: @page forces single column, no margins ─────── */
+    '@page{size:auto;margin:0;}'+
+    '*{margin:0;padding:0;box-sizing:border-box;}'+
+    'html,body{background:#fff;color:#000;}'+
+    /* Outer wrapper: centers narrow receipt on any paper size */
+    '.rc-page{'+
+      'width:72mm;'+           /* 72mm = standard 80mm thermal content width */
+      'max-width:72mm;'+
+      'margin:4mm auto;'+      /* center on wider paper like A4 */
+      'padding:0;'+
+      'font-family:"Courier New",Courier,monospace;'+
+      'font-size:8.5pt;'+
+      'page-break-inside:avoid;'+   /* prevent splitting across pages */
+      'orphans:999;widows:999;'+    /* keep all lines together */
+    '}'+
+    /* Force the receipt wrapper to stay on ONE page by capping height */
+    '@media print{'+
+      'html,body{height:auto!important;overflow:visible;}'+
+      '.rc-page{'+
+        'width:72mm!important;'+
+        'margin:0 auto!important;'+
+        'page-break-after:avoid!important;'+
+        'page-break-before:avoid!important;'+
+        'page-break-inside:avoid!important;'+
+      '}'+
+    '}'+
+    '.rc-center{text-align:center;}'+
+    '.rc-bold{font-weight:bold;}'+
+    '.rc-xl{font-size:15pt;font-weight:900;letter-spacing:3px;}'+
+    '.rc-lg{font-size:10pt;font-weight:bold;}'+
+    '.rc-sm,.sm{font-size:7pt;color:#444;}'+
+    '.rc-dash{border:none;border-top:1px dashed #000;margin:2mm 0;}'+
+    '.rc-solid{border:none;border-top:1.5px solid #000;margin:2mm 0;}'+
+    'table{width:100%;border-collapse:collapse;}'+
+    'thead th{font-size:7pt;font-weight:bold;padding:1mm 0;border-bottom:1px solid #000;}'+
+    'td{font-size:8pt;padding:0.6mm 0;vertical-align:top;}'+
+    '.rc-qty{width:7mm;}'+
+    '.rc-name{padding:0 1mm;}'+
+    '.rc-price{width:14mm;text-align:right;}'+
+    '.rc-total{width:15mm;text-align:right;font-weight:bold;}'+
+    '.rc-row{display:flex;justify-content:space-between;padding:0.5mm 0;font-size:8pt;}'+
+    '.rc-row.grand{font-size:12pt;font-weight:bold;padding:1.5mm 0;border-top:1.5px solid #000;margin-top:1mm;}'+
+    '.rc-row.sm{font-size:7pt;color:#555;}'+
+    '.rc-notes{font-size:7.5pt;color:#333;margin:1.5mm 0;font-style:italic;}'+
+    '</style></head><body>'+
+    '<div class="rc-page">'+
+      '<div class="rc-center"><div class="rc-xl">FAYRUZA</div>'+
+      '<div style="font-size:8pt;letter-spacing:2px">RESTAURANT</div>'+
+      '<div class="rc-sm" style="margin-top:1mm">Jabriya · Block 12 · Jamia Branch</div></div>'+
+      '<hr class="rc-solid">'+
+      '<div class="rc-row rc-bold"><span>#'+(o.order_id||o.id)+'</span><span>'+dateStr+' '+timeStr+'</span></div>'+
+      '<div class="rc-row sm"><span>'+(typeL[o.order_type]||o.order_type||'—')+(o.table_number?' · Table '+o.table_number:'')+'</span>'+
+        '<span>'+(payL[o.payment_method]||o.payment_method||'—')+'</span></div>'+
+      custRow+addrRow+
+      '<hr class="rc-dash">'+
+      '<table><thead><tr>'+
+        '<th style="text-align:left">QTY</th><th style="text-align:left">ITEM</th>'+
+        '<th style="text-align:right">EACH</th><th style="text-align:right">KD</th>'+
+      '</tr></thead><tbody>'+itemRows+'</tbody></table>'+
+      '<hr class="rc-dash">'+
+      '<div class="rc-row"><span>Subtotal</span><span>KD '+parseFloat(o.subtotal||0).toFixed(3)+'</span></div>'+
+      discRow+
+      '<div class="rc-row grand"><span>TOTAL</span><span>KD '+parseFloat(o.total||0).toFixed(3)+'</span></div>'+
+      notesRow+
+      '<hr class="rc-dash">'+
+      '<div class="rc-center rc-sm" style="margin-top:2mm">Thank you! · شكراً لزيارتكم</div>'+
+      '<div class="rc-center rc-sm">fayruza-website.vercel.app</div>'+
+      '<div style="height:6mm"></div>'+
+    '</div>'+
+    '<script>'+
+    'window.onload=function(){'+
+      'setTimeout(function(){'+
+        'window.print();'+
+        'window.onafterprint=function(){window.close();};'+
+        'setTimeout(function(){window.close();},4000);'+  /* force close if onafterprint doesn't fire */
+      '},200);'+
+    '};'+
+    '<\/script></body></html>';
 
-  .totals-row { display: flex; justify-content: space-between; padding: 0.5mm 0; font-size: 8pt; }
-  .totals-row.grand { font-size: 11pt; font-weight: bold; padding: 1mm 0; }
-  .totals-row.discount { color: #333; }
-
-  .info-row { display: flex; justify-content: space-between; font-size: 7.5pt; padding: 0.4mm 0; }
-  .badge { display: inline-block; border: 1px solid #000; padding: 0.5mm 2mm; font-size: 7pt; font-weight: bold; margin: 1mm 0; }
-</style>
-</head>
-<body>
-
-<!-- HEADER -->
-<div class="center">
-  <div class="xl">FAYRUZA</div>
-  <div class="sm" style="letter-spacing:1px">RESTAURANT</div>
-  <div class="spacer"></div>
-  <div class="sm">Jabriya · Block 12 · Jamia Branch</div>
-  <div class="sm">Tel: Coming Soon</div>
-</div>
-
-<hr class="divider-solid">
-
-<!-- ORDER INFO -->
-<div class="info-row"><span class="bold">#${o.order_id || o.id}</span><span>${dateStr}  ${timeStr}</span></div>
-<div class="info-row"><span>${typeL[o.order_type] || o.order_type || '—'}${o.table_number ? ' · Table '+o.table_number : ''}</span><span>${payL[o.payment_method] || o.payment_method || '—'}</span></div>
-${o.delivery_address ? `<div class="info-row"><span>📍 ${o.delivery_address}${o.delivery_area?', '+o.delivery_area:''}</span></div>` : ''}
-${o.customer_name ? `<div class="info-row"><span>Customer: ${o.customer_name}</span></div>` : ''}
-
-<hr class="divider">
-
-<!-- ITEMS TABLE -->
-<table>
-  <thead>
-    <tr>
-      <th class="left">QTY</th>
-      <th class="left">ITEM</th>
-      <th class="right">PRICE</th>
-      <th class="right">TOTAL</th>
-    </tr>
-  </thead>
-  <tbody>${itemRows}</tbody>
-</table>
-
-<hr class="divider">
-
-<!-- TOTALS -->
-<div class="totals-row"><span>Subtotal</span><span>KD ${parseFloat(o.subtotal||0).toFixed(3)}</span></div>
-${(o.discount_amt > 0) ? `<div class="totals-row discount"><span>Discount</span><span>- KD ${parseFloat(o.discount_amt).toFixed(3)}</span></div>` : ''}
-<div class="totals-row"><span>VAT/Tax</span><span>—</span></div>
-
-<hr class="divider-solid">
-
-<div class="totals-row grand"><span>TOTAL</span><span>KD ${parseFloat(o.total||0).toFixed(3)}</span></div>
-
-${o.notes ? `<hr class="divider"><div class="sm"><b>Notes:</b> ${o.notes}</div>` : ''}
-
-<hr class="divider">
-
-<!-- FOOTER -->
-<div class="center">
-  <div class="sm">Thank you for dining with us!</div>
-  <div class="sm" style="margin-top:1mm">شكراً لزيارتكم</div>
-  <div class="spacer"></div>
-  <div class="sm bold">fayruza-website.vercel.app</div>
-</div>
-
-<div style="height:8mm"></div>
-
-<script>window.onload = function() { window.print(); window.onafterprint = function() { window.close(); }; }<\/script>
-</body>
-</html>`;
-
-  const w = window.open('', '_blank', 'width=300,height=600');
+  var w = window.open('','_blank','width=380,height=700,toolbar=0,menubar=0,scrollbars=0');
   if (!w) { showToast('⚠ Allow popups to print'); return; }
   w.document.write(html);
   w.document.close();
 }
-
 function calcChange(total) {
   var paid = parseFloat(document.getElementById('cash-paid').value) || 0;
   var change = paid - total;
@@ -1763,6 +1801,10 @@ function salesByDayHTML(orders) {
   '</div>';
 }
 
+function closeMobNav(activeBtn) {
+  document.querySelectorAll('.mob-btn').forEach(function(b){ b.classList.remove('active'); });
+  if (activeBtn && activeBtn.classList.contains('mob-btn')) activeBtn.classList.add('active');
+}
 function showPage(name, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nb').forEach(n => n.classList.remove('active'));
@@ -1840,7 +1882,13 @@ function renderProductList() {
   const el = document.getElementById('prod-list');
   if (!el) return;
 
+  var searchQ = ((document.getElementById('prod-search')||{}).value||'').toLowerCase().trim();
   let filtered = prodCatFilter === 'all' ? allProducts : allProducts.filter(p => p.category_id === prodCatFilter);
+  if (searchQ) filtered = filtered.filter(function(p){
+    return (p.name||'').toLowerCase().includes(searchQ) ||
+           (p.name_ar||'').toLowerCase().includes(searchQ) ||
+           (p.badge||'').toLowerCase().includes(searchQ);
+  });
   if (!filtered.length) {
     el.innerHTML = '<div class="empty-state"><span class="empty-icon">🍽️</span>No products yet. Click ADD PRODUCT to get started.</div>';
     return;
@@ -1863,7 +1911,7 @@ function renderProductList() {
         </div>
         <div class="tbl-wrap">
           <table>
-            <thead><tr><th>ITEM</th><th>PRICE</th><th>MEAL / SIZES</th><th>BADGE</th><th>STATUS</th><th>ACTIONS</th></tr></thead>
+            <thead><tr><th style="width:32px"><input type="checkbox" id="prod-select-all" onchange="toggleSelectAll(this)" style="width:16px;height:16px;cursor:pointer;accent-color:var(--green)"></th><th>ITEM</th><th>PRICE</th><th>MEAL / SIZES</th><th>BADGE</th><th>STATUS</th><th>ACTIONS</th></tr></thead>
             <tbody>
               ${items.map(p => prodRow(p)).join('')}
             </tbody>
@@ -1884,7 +1932,10 @@ function prodRow(p) {
   else if (p.sml_s) mealStr = 'S/M/L';
 
   const hidden = p.is_hidden;
-  return `<tr style="opacity:${hidden?'.45':'1'}">
+  return `<tr style="opacity:${hidden?'.45':'1'}" data-prod-id="${p.id}">
+    <td style="width:32px;padding-right:0">
+      <input type="checkbox" class="prod-cb" value="${p.id}" onchange="updateBulkButtons()" style="width:16px;height:16px;cursor:pointer;accent-color:var(--green)">
+    </td>
     <td>
       <span style="font-size:1.2rem;margin-right:8px">${p.emoji||''}</span>
       <span style="font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:.88rem;text-transform:uppercase">${p.name}</span>
@@ -2223,9 +2274,10 @@ function printDailyReport() {
 <meta charset="UTF-8">
 <title>Daily Report — ${dateStr}</title>
 <style>
-  @page { size: A4; margin: 15mm; }
+  @page { size: A4; margin: 12mm 15mm; }
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family: 'Courier New', monospace; font-size: 10pt; color: #111; background: #fff; }
+  html, body { width: 100%; height: auto !important; overflow: visible; }
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 10pt; color: #111; background: #fff; }
   h1 { font-size: 18pt; text-align: center; letter-spacing: 4px; margin-bottom: 2mm; }
   h2 { font-size: 12pt; letter-spacing: 2px; margin: 6mm 0 3mm; border-bottom: 1px solid #ccc; padding-bottom: 1.5mm; }
   .center { text-align: center; }
@@ -2298,462 +2350,9 @@ function printDailyReport() {
 
 <script>window.onload = function() { window.print(); window.onafterprint = function() { window.close(); }; }<\/script>
 </body>
-</html>`;
+</html>`
 
-  const w = window.open('','_blank','width=800,height=900');
-  if (!w) { showToast('⚠ Allow popups to print'); return; }
-  w.document.write(html);
-  w.document.close();
-}
-
-var ADMIN_SESSION = null;
-
-function initAuth() {
-  try {
-    ADMIN_SESSION = JSON.parse(localStorage.getItem('fayruza_admin') || 'null');
-  } catch(e) { ADMIN_SESSION = null; }
-
-  if (!ADMIN_SESSION) { window.location.replace('login.html'); return; }
-
-  // Show user info in sidebar
-  var userEl = document.getElementById('sb-user');
-  var roleEl = document.getElementById('sb-role');
-  if (userEl) userEl.textContent = ADMIN_SESSION.full_name || ADMIN_SESSION.username;
-  if (roleEl) roleEl.textContent = ADMIN_SESSION.role.toUpperCase();
-
-  // Build perms — users tab only for owner
-  var perms = ADMIN_SESSION.perms || {};
-  if (ADMIN_SESSION.role !== 'owner') perms.users = false;
-
-  // Hide nav items the user doesn't have access to
-  var navMap = {
-    dashboard: document.querySelector('[onclick*="dashboard"]'),
-    orders:    document.querySelector('[onclick*="orders"]'),
-    reports:   document.querySelector('[onclick*="reports"]'),
-    products:  document.querySelector('[onclick*="products"]'),
-    shifts:    document.querySelector('[onclick*="shifts"]'),
-    users:     document.querySelector('[onclick*="users"]'),
-  };
-  // Also hide section headers if all items under them are hidden
-  Object.keys(navMap).forEach(function(page) {
-    if (navMap[page] && perms[page] === false) {
-      navMap[page].style.display = 'none';
-    }
-  });
-  // Hide TEAM section header if users hidden
-  var teamSec = document.getElementById('nav-team-sec');
-  if (teamSec && perms.users === false) teamSec.style.display = 'none';
-  var menuSec = document.getElementById('nav-menu-sec');
-  if (menuSec && perms.products === false) menuSec.style.display = 'none';
-
-  // Start on first accessible page
-  var firstPage = ['dashboard','orders','reports','products','users'].find(function(p) {
-    return perms[p] !== false;
-  }) || 'orders';
-
-  // Activate the right nav button
-  document.querySelectorAll('.nb').forEach(function(b) { b.classList.remove('active'); });
-  var firstBtn = document.querySelector('[onclick*="' + firstPage + '"]');
-  if (firstBtn) firstBtn.classList.add('active');
-
-  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
-  var pg = document.getElementById('page-' + firstPage);
-  if (pg) pg.classList.add('active');
-
-  var titles = {dashboard:'DASHBOARD', orders:'ORDERS', reports:'REPORTS', expenses:'EXPENSES', categories:'CATEGORIES', products:'PRODUCTS', combos:'COMBOS', offers:'SPECIAL OFFERS', customers:'CUSTOMERS', settings:'SETTINGS', qrcodes:'TABLE QR CODES', shifts:'SHIFTS', users:'USERS'};
-  document.getElementById('page-title').textContent = titles[firstPage] || firstPage.toUpperCase();
-
-  if (firstPage === 'reports') renderReport();
-  if (firstPage === 'products') loadProducts();
-  if (firstPage === 'users') loadUsers();
-}
-
-function doLogout() {
-  localStorage.removeItem('fayruza_admin');
-  window.location.replace('login.html');
-}
-
-// Wrap showPage to enforce permissions
-var _origShowPage = showPage;
-showPage = function(name, btn) {
-  var perms = (ADMIN_SESSION && ADMIN_SESSION.perms) || {};
-  if (perms[name] === false) {
-    showToast('⚠ You don\'t have access to this section');
-    return;
-  }
-  _origShowPage(name, btn);
-  if (name === 'users') loadUsers();
-  if (name === 'shifts') { loadShifts(); populateShiftUserSelect(); }
-  if (name === 'categories') loadCategories();
-  if (name === 'combos') loadCombos();
-  if (name === 'customers') loadCustomers();
-  if (name === 'expenses') { loadExpenses(); }
-  if (name === 'offers') loadOffers();
-  if (name === 'qrcodes') generateQRCodes();
-  if (name === 'settings') { loadSettings(); loadInventory(); }
-};
-
-/* ══════════════════════════════════════════
-   REVENUE TREND CHARTS
-══════════════════════════════════════════ */
-function renderRevenueTrends() {
-  var now = new Date();
-
-  // 7-day
-  var week = {};
-  for (var i = 6; i >= 0; i--) {
-    var d = new Date(now); d.setDate(d.getDate() - i);
-    week[d.toDateString()] = 0;
-  }
-  allOrders.forEach(function(o) {
-    var d = new Date(o.created_at).toDateString();
-    if (week[d] !== undefined) week[d] += (o.total||0);
-  });
-  var weekVals = Object.values(week);
-  var weekMax  = Math.max.apply(null, weekVals) || 1;
-  var weekTotal = weekVals.reduce(function(a,b){return a+b;},0);
-  var weekEl = document.getElementById('week-chart');
-  var weekTot = document.getElementById('week-total');
-  if (weekTot) weekTot.textContent = fmt(weekTotal) + ' total';
-  if (weekEl) weekEl.innerHTML = Object.keys(week).map(function(dk, i) {
-    var h = Math.round(week[dk]/weekMax*100);
-    var d = new Date(dk);
-    var lbl = d.toLocaleDateString('en-GB',{weekday:'short'});
-    var isToday2 = d.toDateString() === now.toDateString();
-    return '<div class="bar-col">'+
-      '<div class="bar" style="height:'+h+'%;'+(isToday2?'background:linear-gradient(to top,var(--teal),#7effd4)':'')+'"></div>'+
-      '<div class="bar-lbl">'+lbl+'<br><strong style="color:var(--teal)">'+(week[dk]>0?fmt(week[dk]).split(' ')[0]:'')+'</strong></div>'+
-    '</div>';
-  }).join('');
-
-  // 30-day (by week buckets for readability)
-  var months = {};
-  for (var j = 29; j >= 0; j--) {
-    var dd = new Date(now); dd.setDate(dd.getDate() - j);
-    var key = dd.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
-    months[key] = 0;
-  }
-  allOrders.forEach(function(o) {
-    var key = new Date(o.created_at).toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
-    if (months[key] !== undefined) months[key] += (o.total||0);
-  });
-  var mKeys = Object.keys(months);
-  var mVals = Object.values(months);
-  var mMax  = Math.max.apply(null, mVals) || 1;
-  var mTotal = mVals.reduce(function(a,b){return a+b;},0);
-  var mEl  = document.getElementById('month-chart');
-  var mTot = document.getElementById('month-total');
-  if (mTot) mTot.textContent = fmt(mTotal) + ' total';
-  if (mEl) mEl.innerHTML = mKeys.map(function(k, i) {
-    var h = Math.round(months[k]/mMax*100);
-    // Only show label every 5 days
-    var lbl = (i % 5 === 0) ? k.split(' ')[0] : '';
-    return '<div class="bar-col">'+
-      '<div class="bar" style="height:'+h+'%"></div>'+
-      '<div class="bar-lbl">'+lbl+'</div>'+
-    '</div>';
-  }).join('');
-}
-
-/* ══════════════════════════════════════════
-   COMBOS
-══════════════════════════════════════════ */
-var allCombos = [];
-var editingComboId = null;
-var comboItemRows = [];
-
-async function loadCombos() {
-  try {
-    var { data, error } = await sb.from('combos').select('*').order('sort_order');
-    if (error) throw error;
-    allCombos = data || [];
-    renderCombosTable();
-  } catch(e) { showToast('⚠ Could not load combos: ' + e.message); }
-}
-
-function renderCombosTable() {
-  var tbody = document.getElementById('combos-tbody');
-  if (!tbody) return;
-  if (!allCombos.length) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:28px">No combos yet — create your first bundle deal!</td></tr>';
-    return;
-  }
-  tbody.innerHTML = allCombos.map(function(c) {
-    var items = (c.items||[]).map(function(i){ return (i.emoji||'')+'×'+i.qty+' '+i.name; }).join(', ');
-    return '<tr style="opacity:'+(c.is_hidden?.45:1)+'">'+
-      '<td><span style="font-size:1.2rem;margin-right:6px">'+(c.emoji||'🎁')+'</span>'+
-      '<span style="font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:.9rem;text-transform:uppercase">'+c.name+'</span>'+
-      (c.description?'<div style="font-size:.76rem;color:var(--muted)">'+c.description+'</div>':'')+
-      '</td>'+
-      '<td style="font-size:.78rem;color:var(--muted);max-width:200px">'+items+'</td>'+
-      '<td style="font-family:Bebas Neue,sans-serif;font-size:1.1rem;color:var(--teal)">'+parseFloat(c.price||0).toFixed(3)+' KD</td>'+
-      '<td>'+(c.badge?'<span style="background:rgba(31,149,120,.15);color:var(--teal);font-family:Bebas Neue,sans-serif;font-size:.7rem;letter-spacing:1px;padding:2px 8px;border-radius:3px">'+c.badge+'</span>':'—')+'</td>'+
-      '<td>'+(c.is_hidden?'<span style="color:var(--muted);font-family:Bebas Neue,sans-serif;font-size:.7rem;letter-spacing:1px;background:rgba(255,255,255,.05);padding:3px 8px;border-radius:3px">HIDDEN</span>':'<span style="color:var(--teal);font-family:Bebas Neue,sans-serif;font-size:.7rem;letter-spacing:1px;background:rgba(31,149,120,.1);padding:3px 8px;border-radius:3px">ACTIVE</span>')+'</td>'+
-      '<td><div style="display:flex;gap:6px">'+
-        '<button onclick="openComboModal('+c.id+')" style="background:rgba(31,149,120,.1);border:1px solid rgba(31,149,120,.25);color:var(--teal);font-family:Bebas Neue,sans-serif,sans-serif;font-size:.75rem;letter-spacing:1px;padding:4px 10px;border-radius:5px;cursor:pointer">✏ EDIT</button>'+
-        '<button onclick="toggleComboHide('+c.id+','+!c.is_hidden+')" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--muted);font-family:Bebas Neue,sans-serif,sans-serif;font-size:.75rem;letter-spacing:1px;padding:4px 10px;border-radius:5px;cursor:pointer">'+(c.is_hidden?'👁 SHOW':'🙈 HIDE')+'</button>'+
-      '</div></td>'+
-    '</tr>';
-  }).join('');
-}
-
-function openComboModal(id) {
-  editingComboId = id;
-  comboItemRows = [];
-  var delBtn = document.getElementById('cb-del-btn');
-  ['cb-emoji','cb-name','cb-name-ar','cb-price','cb-badge','cb-desc'].forEach(function(i) {
-    var el = document.getElementById(i); if (el) el.value = '';
-  });
-  document.getElementById('cb-items-list').innerHTML = '';
-
-  if (id) {
-    var c = allCombos.find(function(x){ return x.id === id; });
-    if (!c) return;
-    document.getElementById('combo-title').textContent = 'EDIT COMBO';
-    if (delBtn) delBtn.style.display = 'block';
-    document.getElementById('cb-emoji').value   = c.emoji || '🎁';
-    document.getElementById('cb-name').value    = c.name || '';
-    document.getElementById('cb-name-ar').value = c.name_ar || '';
-    document.getElementById('cb-price').value   = c.price || '';
-    document.getElementById('cb-badge').value   = c.badge || '';
-    document.getElementById('cb-desc').value    = c.description || '';
-    (c.items||[]).forEach(function(item) { addComboItemRow(item); });
-  } else {
-    document.getElementById('combo-title').textContent = 'ADD COMBO';
-    if (delBtn) delBtn.style.display = 'none';
-    addComboItemRow();
-  }
-  document.getElementById('combo-modal').classList.add('open');
-}
-
-function closeComboModal() {
-  document.getElementById('combo-modal').classList.remove('open');
-  editingComboId = null; comboItemRows = [];
-}
-
-var _comboRowId = 0;
-function addComboItemRow(existing) {
-  var rid = ++_comboRowId;
-  comboItemRows.push(rid);
-  var list = document.getElementById('cb-items-list');
-  var row = document.createElement('div');
-  row.id = 'cb-row-'+rid;
-  row.style.cssText = 'display:grid;grid-template-columns:50px 1fr 70px auto;gap:8px;margin-bottom:8px;align-items:center';
-  var inpStyle = 'background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow,sans-serif;font-size:.88rem;padding:7px 10px;border-radius:6px;outline:none;width:100%';
-  row.innerHTML =
-    '<input type="text" id="cb-r-emoji-'+rid+'" placeholder="🍔" value="'+(existing?existing.emoji||'':'')+'" style="'+inpStyle+';text-align:center;font-size:1.1rem">'+
-    '<input type="text" id="cb-r-name-'+rid+'"  placeholder="Item name" value="'+(existing?existing.name||'':'')+'" style="'+inpStyle+'">'+
-    '<input type="number" id="cb-r-qty-'+rid+'" placeholder="1" value="'+(existing?existing.qty||1:1)+'" min="1" style="'+inpStyle+'">'+
-    '<button onclick="removeComboRow('+rid+')" style="background:rgba(255,71,87,.1);border:1px solid rgba(255,71,87,.2);color:var(--red);font-family:Bebas Neue,sans-serif;font-size:.8rem;padding:7px 10px;border-radius:6px;cursor:pointer">✕</button>';
-  list.appendChild(row);
-}
-
-function removeComboRow(rid) {
-  var el = document.getElementById('cb-row-'+rid);
-  if (el) el.remove();
-  comboItemRows = comboItemRows.filter(function(r){ return r !== rid; });
-}
-
-async function saveCombo() {
-  var emoji = (document.getElementById('cb-emoji')||{}).value || '🎁';
-  var name  = ((document.getElementById('cb-name')||{}).value||'').trim();
-  var price = parseFloat((document.getElementById('cb-price')||{}).value)||0;
-  if (!name || !price) { showToast('⚠ Name and price are required'); return; }
-
-  var items = [];
-  document.querySelectorAll('[id^="cb-row-"]').forEach(function(row) {
-    var rid = row.id.replace('cb-row-','');
-    var n = (document.getElementById('cb-r-name-'+rid)||{}).value||'';
-    var e = (document.getElementById('cb-r-emoji-'+rid)||{}).value||'';
-    var q = parseInt((document.getElementById('cb-r-qty-'+rid)||{}).value)||1;
-    if (n) items.push({emoji:e,name:n,qty:q});
-  });
-
-  var record = {
-    emoji: emoji, name: name,
-    name_ar: ((document.getElementById('cb-name-ar')||{}).value||'').trim(),
-    description: ((document.getElementById('cb-desc')||{}).value||'').trim(),
-    badge: ((document.getElementById('cb-badge')||{}).value||'').trim()||null,
-    price: price, items: items,
-    sort_order: editingComboId ? undefined : allCombos.length
-  };
-  if (!editingComboId) record.sort_order = allCombos.length;
-
-  try {
-    var error;
-    if (editingComboId) {
-      ({ error } = await sb.from('combos').update(record).eq('id', editingComboId));
-    } else {
-      ({ error } = await sb.from('combos').insert([record]));
-    }
-    if (error) throw error;
-    showToast(editingComboId ? '✓ Combo updated' : '✓ Combo created');
-    closeComboModal(); await loadCombos();
-  } catch(e) { showToast('⚠ ' + e.message); }
-}
-
-async function deleteCombo() {
-  if (!editingComboId || !confirm('Delete this combo?')) return;
-  try {
-    var { error } = await sb.from('combos').delete().eq('id', editingComboId);
-    if (error) throw error;
-    showToast('🗑 Combo deleted'); closeComboModal(); await loadCombos();
-  } catch(e) { showToast('⚠ ' + e.message); }
-}
-
-async function toggleComboHide(id, hide) {
-  try {
-    var { error } = await sb.from('combos').update({is_hidden:hide}).eq('id',id);
-    if (error) throw error;
-    showToast(hide?'🙈 Combo hidden':'👁 Combo visible'); await loadCombos();
-  } catch(e) { showToast('⚠ ' + e.message); }
-}
-
-/* ══════════════════════════════════════════
-   CUSTOMERS
-══════════════════════════════════════════ */
-var allCustomers = [];
-
-async function loadCustomers() {
-  try {
-    var { data, error } = await sb.from('customers').select('*').order('total_orders',{ascending:false}).limit(200);
-    if (error) throw error;
-    allCustomers = data || [];
-    renderCustomersTable();
-  } catch(e) { showToast('⚠ Could not load customers: ' + e.message); }
-}
-
-function renderCustomersTable() {
-  var tbody = document.getElementById('customers-tbody');
-  if (!tbody) return;
-  var search = ((document.getElementById('cust-search')||{}).value||'').toLowerCase();
-  var list = allCustomers;
-  if (search) list = list.filter(function(c) {
-    return (c.name||'').toLowerCase().includes(search) || (c.phone||'').includes(search);
-  });
-  if (!list.length) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:28px">No customers yet. Phone numbers entered at checkout will appear here.</td></tr>';
-    return;
-  }
-  tbody.innerHTML = list.map(function(c) {
-    var lastItems = (c.last_order||[]).slice(0,3).map(function(i){ return (i.emoji||'')+'×'+(i.qty||1)+' '+i.name; }).join(' · ');
-    var lastDate = c.last_order_at ? fmtDate(c.last_order_at) : '—';
-    return '<tr>'+
-      '<td style="font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:.9rem">'+(c.name||'<span style="color:var(--muted)">—</span>')+'</td>'+
-      '<td style="font-family:Barlow Condensed,sans-serif;color:var(--teal)">'+c.phone+'</td>'+
-      '<td style="font-family:Bebas Neue,sans-serif;font-size:1.1rem;color:var(--teal)">'+c.total_orders+'</td>'+
-      '<td class="amt">'+fmt(c.total_spent)+'</td>'+
-      '<td style="font-size:.78rem;color:var(--muted)">'+lastDate+'</td>'+
-      '<td style="font-size:.78rem;color:var(--muted);max-width:200px">'+lastItems+'</td>'+
-    '</tr>';
-  }).join('');
-}
-
-/* ══════════════════════════════════════════
-   PRINTABLE MENU
-══════════════════════════════════════════ */
-async function printMenu() {
-  showToast('⏳ Generating printable menu…');
-
-  // Fetch all visible products grouped by category
-  var { data: products } = await sb.from('products')
-    .select('*')
-    .eq('is_hidden', false)
-    .order('category_sort')
-    .order('sort_order');
-
-  var { data: combos } = await sb.from('combos')
-    .select('*')
-    .eq('is_hidden', false)
-    .order('sort_order');
-
-  var byCat = {};
-  (products||[]).forEach(function(p) {
-    if (!byCat[p.category_id]) byCat[p.category_id] = { name: p.category_name||p.category_id, emoji: p.category_emoji||'', items: [] };
-    byCat[p.category_id].items.push(p);
-  });
-
-  function priceStr(p) {
-    if (p.fils) return p.fils + ' Fils';
-    if (p.sml_s) return 'S: '+p.sml_s+' / M: '+p.sml_m+' / L: '+p.sml_l+' KD';
-    if (p.meal_price) return p.price.toFixed(3)+' KD  |  Meal: '+p.meal_price.toFixed(3)+' KD';
-    return parseFloat(p.price||0).toFixed(3)+' KD';
-  }
-
-  var categoriesHTML = Object.values(byCat).map(function(cat) {
-    return '<div class="cat-section">'+
-      '<div class="cat-header-print">'+cat.emoji+' '+cat.name+'</div>'+
-      '<table class="items-table">'+
-      cat.items.map(function(p) {
-        return '<tr>'+
-          '<td class="item-emoji">'+(p.emoji||'')+'</td>'+
-          '<td class="item-name">'+p.name+(p.name_ar?'<span class="item-ar"> / '+p.name_ar+'</span>':'')+(p.badge?'<span class="item-badge">'+p.badge+'</span>':'')+'</td>'+
-          '<td class="item-price">'+priceStr(p)+'</td>'+
-        '</tr>';
-      }).join('')+
-      '</table></div>';
-  }).join('');
-
-  var combosHTML = (combos&&combos.length) ? (
-    '<div class="cat-section">'+
-    '<div class="cat-header-print">🎁 COMBO DEALS</div>'+
-    '<table class="items-table">'+
-    combos.map(function(c) {
-      var includes = (c.items||[]).map(function(i){return i.emoji+'×'+i.qty+' '+i.name;}).join(', ');
-      return '<tr>'+
-        '<td class="item-emoji">'+(c.emoji||'🎁')+'</td>'+
-        '<td class="item-name">'+c.name+(c.description?'<div style="font-size:8pt;color:#666">'+c.description+'</div>':'')+
-        '<div style="font-size:8pt;color:#444;margin-top:2px">Includes: '+includes+'</div></td>'+
-        '<td class="item-price">'+parseFloat(c.price||0).toFixed(3)+' KD</td>'+
-      '</tr>';
-    }).join('')+
-    '</table></div>'
-  ) : '';
-
-  var printDate = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
-
-  var html = `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Fayruza Restaurant — Menu</title>
-<style>
-  @page { size: A4; margin: 12mm 15mm; }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family: Arial, sans-serif; font-size: 10pt; color: #111; }
-  .header { text-align:center; margin-bottom: 8mm; border-bottom: 2px solid #1F9578; padding-bottom: 5mm; }
-  .restaurant-name { font-size: 28pt; font-weight: 900; letter-spacing: 4px; color: #1F9578; }
-  .restaurant-sub { font-size: 9pt; color: #666; letter-spacing: 3px; text-transform: uppercase; margin-top: 2mm; }
-  .print-date { font-size: 8pt; color: #999; margin-top: 2mm; }
-  .menu-grid { columns: 2; column-gap: 8mm; }
-  .cat-section { break-inside: avoid; margin-bottom: 6mm; }
-  .cat-header-print { font-size: 11pt; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #1F9578; border-bottom: 1px solid #4DC4A3; padding-bottom: 1.5mm; margin-bottom: 2mm; }
-  .items-table { width: 100%; border-collapse: collapse; }
-  .items-table tr { border-bottom: 1px solid #f0f0f0; }
-  .item-emoji { width: 16px; padding: 1.5mm 2mm 1.5mm 0; font-size: 10pt; }
-  .item-name { padding: 1.5mm 2mm; font-size: 8.5pt; }
-  .item-ar { color: #888; }
-  .item-badge { display:inline-block; background: #fff3e0; color: #e65100; font-size: 6.5pt; padding: 1px 4px; border-radius: 2px; margin-left: 4px; vertical-align: middle; }
-  .item-price { text-align: right; white-space: nowrap; font-weight: 600; font-size: 8.5pt; color: #1F9578; padding: 1.5mm 0 1.5mm 4mm; }
-  .footer { text-align: center; margin-top: 8mm; padding-top: 3mm; border-top: 1px solid #ccc; font-size: 7.5pt; color: #999; }
-</style>
-</head>
-<body>
-<div class="header">
-  <div class="restaurant-name">FAYRUZA RESTAURANT</div>
-  <div class="restaurant-sub">Jabriya · Block 12 · Jamia Branch</div>
-  <div class="print-date">Menu as of ${printDate}</div>
-</div>
-<div class="menu-grid">
-  ${categoriesHTML}
-  ${combosHTML}
-</div>
-<div class="footer">Prices in Kuwaiti Dinars (KD) · فيروزا مطعم · fayruza-website.vercel.app</div>
-<script>window.onload=function(){window.print();window.onafterprint=function(){window.close();};};<\/script>
-</body>
-</html>`;
-
-  var w = window.open('','_blank','width=900,height=1000');
+  var w = window.open('','_blank','width=900,height=1100,toolbar=0,menubar=0');
   if (!w) { showToast('⚠ Allow popups to print'); return; }
   w.document.write(html);
   w.document.close();
@@ -2807,7 +2406,7 @@ function printQRCodes() {
     '.scan-txt{font-size:7pt;color:#555;margin-top:2mm}' +
     '</style></head><body>' +
     '<div class="grid">' + rows + '</div>' +
-    '<script>window.onload=function(){window.print();window.onafterprint=function(){window.close();};};<\/script>' +
+    '<scr'+'ipt>window.onload=function(){window.print();window.onafterprint=function(){window.close();};};<'+'/script>' +
     '</body></html>';
   var w = window.open('', '_blank', 'width=900,height=1100');
   if (!w) { showToast('⚠ Allow popups to print'); return; }
@@ -3949,6 +3548,77 @@ notifyNewOrder = function(order) {
 };
 
 /* ══════════════════════════════════════════
+   BULK PRODUCT OPERATIONS
+══════════════════════════════════════════ */
+function toggleSelectAll(cb) {
+  document.querySelectorAll('.prod-cb').forEach(function(c) { c.checked = cb.checked; });
+  updateBulkButtons();
+}
+
+function updateBulkButtons() {
+  var checked = document.querySelectorAll('.prod-cb:checked').length;
+  var total   = document.querySelectorAll('.prod-cb').length;
+  var hideBtn  = document.getElementById('bulk-hide-btn');
+  var showBtn  = document.getElementById('bulk-show-btn');
+  var soBtn    = document.getElementById('bulk-soldout-btn');
+  var saEl     = document.getElementById('prod-select-all');
+  if (hideBtn)  hideBtn.style.display  = checked ? 'block' : 'none';
+  if (showBtn)  showBtn.style.display  = checked ? 'block' : 'none';
+  if (soBtn)    soBtn.style.display    = checked ? 'block' : 'none';
+  if (saEl) {
+    saEl.indeterminate = checked > 0 && checked < total;
+    saEl.checked = checked === total && total > 0;
+  }
+  // Update button labels with count
+  if (hideBtn && checked) hideBtn.textContent  = '🙈 HIDE (' + checked + ')';
+  if (showBtn && checked) showBtn.textContent  = '👁 SHOW (' + checked + ')';
+  if (soBtn   && checked) soBtn.textContent    = '❌ SOLD OUT (' + checked + ')';
+}
+
+function getSelectedProductIds() {
+  return Array.from(document.querySelectorAll('.prod-cb:checked')).map(function(c){ return parseInt(c.value); });
+}
+
+async function bulkHideSelected(hide) {
+  var ids = getSelectedProductIds();
+  if (!ids.length) return;
+  if (!confirm((hide ? 'Hide ' : 'Show ') + ids.length + ' product(s)?')) return;
+  try {
+    for (var i = 0; i < ids.length; i++) {
+      await sb.from('products').update({ is_hidden: hide }).eq('id', ids[i]);
+    }
+    showToast('✓ ' + ids.length + ' product(s) ' + (hide ? 'hidden' : 'shown'));
+    await loadProducts();
+  } catch(e) { showToast('⚠ ' + e.message); }
+}
+
+async function bulkSoldOut() {
+  var ids = getSelectedProductIds();
+  if (!ids.length) return;
+  if (!confirm('Mark ' + ids.length + ' product(s) as SOLD OUT?')) return;
+  try {
+    var now = new Date().toISOString();
+    for (var i = 0; i < ids.length; i++) {
+      await sb.from('products').update({ is_sold_out: true, sold_out_at: now }).eq('id', ids[i]);
+    }
+    showToast('✓ ' + ids.length + ' product(s) marked sold out');
+    await loadProducts();
+  } catch(e) { showToast('⚠ ' + e.message); }
+}
+
+async function restockAll() {
+  if (!confirm('Restock ALL sold-out items?')) return;
+  try {
+    var { error } = await sb.from('products')
+      .update({ is_sold_out: false, sold_out_at: null })
+      .eq('is_sold_out', true);
+    if (error) throw error;
+    showToast('🟢 All items restocked');
+    await loadProducts();
+  } catch(e) { showToast('⚠ ' + e.message); }
+}
+
+/* ══════════════════════════════════════════
    SHIFTS
 ══════════════════════════════════════════ */
 let allShifts = [];
@@ -4397,5 +4067,521 @@ updateClock();
 setInterval(updateClock, 1000);
 setInterval(loadAll, 3000);
 </script>
+
+<!-- Admin PWA Install Banner -->
+<div id="admin-install-bar" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#0d2b22;border-top:1px solid rgba(31,149,120,.4);padding:12px 16px;z-index:9999;display:none;align-items:center;gap:12px">
+  <div style="flex:1">
+    <div style="font-family:Bebas Neue,sans-serif;font-size:.95rem;letter-spacing:2px;color:var(--teal)">ADD TO HOME SCREEN</div>
+    <div style="font-family:Barlow Condensed,sans-serif;font-size:.75rem;color:var(--muted);margin-top:2px">Install Fayruza Admin as an app for quick access</div>
+  </div>
+  <button id="admin-install-btn" style="background:var(--green);color:#fff;font-family:Bebas Neue,sans-serif;font-size:.85rem;letter-spacing:2px;padding:8px 18px;border:none;border-radius:8px;cursor:pointer">INSTALL</button>
+  <button onclick="document.getElementById('admin-install-bar').style.display='none'" style="background:transparent;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer;padding:4px 8px">✕</button>
+</div>
+
+<script>
+// ── Admin PWA Service Worker ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('admin-sw.js').then(function(reg) {
+      console.log('Admin SW registered');
+    }).catch(function(e) { console.log('SW reg failed:', e); });
+  });
+}
+
+// ── Install prompt ──
+var _adminDeferredPrompt = null;
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  _adminDeferredPrompt = e;
+  var bar = document.getElementById('admin-install-bar');
+  if (bar) bar.style.display = 'flex';
+});
+
+var installBtn = document.getElementById('admin-install-btn');
+if (installBtn) {
+  installBtn.addEventListener('click', function() {
+    var bar = document.getElementById('admin-install-bar');
+    if (bar) bar.style.display = 'none';
+    if (_adminDeferredPrompt) {
+      _adminDeferredPrompt.prompt();
+      _adminDeferredPrompt.userChoice.then(function(choice) {
+        if (choice.outcome === 'accepted') showToast('✓ Admin app installed!');
+        _adminDeferredPrompt = null;
+      });
+    }
+  });
+}
+
+// iOS install guide — shows once if not installed
+if (/iphone|ipad|ipod/i.test(navigator.userAgent) && !window.navigator.standalone) {
+  var shown = localStorage.getItem('fayruza_admin_ios_tip');
+  if (!shown) {
+    localStorage.setItem('fayruza_admin_ios_tip', '1');
+    var bar = document.getElementById('admin-install-bar');
+    if (bar) {
+      bar.style.display = 'flex';
+      bar.querySelector('div').innerHTML = '<div style="font-family:Bebas Neue,sans-serif;font-size:.95rem;letter-spacing:2px;color:var(--teal)">INSTALL ON iOS</div><div style="font-family:Barlow Condensed,sans-serif;font-size:.75rem;color:var(--muted);margin-top:2px">Tap the Share button → Add to Home Screen</div>';
+      document.getElementById('admin-install-btn').style.display = 'none';
+    }
+  }
+}
+</script>
+</body>
+</html>`;
+
+  const w = window.open('','_blank','width=800,height=900');
+  if (!w) { showToast('⚠ Allow popups to print'); return; }
+  w.document.write(html);
+  w.document.close();
+}
+
+var ADMIN_SESSION = null;
+
+function initAuth() {
+  try {
+    ADMIN_SESSION = JSON.parse(localStorage.getItem('fayruza_admin') || 'null');
+  } catch(e) { ADMIN_SESSION = null; }
+
+  if (!ADMIN_SESSION) { window.location.replace('login.html'); return; }
+
+  // Show user info in sidebar
+  var userEl = document.getElementById('sb-user');
+  var roleEl = document.getElementById('sb-role');
+  if (userEl) userEl.textContent = ADMIN_SESSION.full_name || ADMIN_SESSION.username;
+  if (roleEl) roleEl.textContent = ADMIN_SESSION.role.toUpperCase();
+
+  // Build perms — users tab only for owner
+  var perms = ADMIN_SESSION.perms || {};
+  if (ADMIN_SESSION.role !== 'owner') perms.users = false;
+
+  // Hide nav items the user doesn't have access to
+  var navMap = {
+    dashboard: document.querySelector('[onclick*="dashboard"]'),
+    orders:    document.querySelector('[onclick*="orders"]'),
+    reports:   document.querySelector('[onclick*="reports"]'),
+    products:  document.querySelector('[onclick*="products"]'),
+    shifts:    document.querySelector('[onclick*="shifts"]'),
+    users:     document.querySelector('[onclick*="users"]'),
+  };
+  // Also hide section headers if all items under them are hidden
+  Object.keys(navMap).forEach(function(page) {
+    if (navMap[page] && perms[page] === false) {
+      navMap[page].style.display = 'none';
+    }
+  });
+  // Hide TEAM section header if users hidden
+  var teamSec = document.getElementById('nav-team-sec');
+  if (teamSec && perms.users === false) teamSec.style.display = 'none';
+  var menuSec = document.getElementById('nav-menu-sec');
+  if (menuSec && perms.products === false) menuSec.style.display = 'none';
+
+  // Start on first accessible page
+  var firstPage = ['dashboard','orders','reports','products','users'].find(function(p) {
+    return perms[p] !== false;
+  }) || 'orders';
+
+  // Activate the right nav button
+  document.querySelectorAll('.nb').forEach(function(b) { b.classList.remove('active'); });
+  var firstBtn = document.querySelector('[onclick*="' + firstPage + '"]');
+  if (firstBtn) firstBtn.classList.add('active');
+
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  var pg = document.getElementById('page-' + firstPage);
+  if (pg) pg.classList.add('active');
+
+  var titles = {dashboard:'DASHBOARD', orders:'ORDERS', reports:'REPORTS', expenses:'EXPENSES', categories:'CATEGORIES', products:'PRODUCTS', combos:'COMBOS', offers:'SPECIAL OFFERS', customers:'CUSTOMERS', settings:'SETTINGS', qrcodes:'TABLE QR CODES', shifts:'SHIFTS', users:'USERS'};
+  document.getElementById('page-title').textContent = titles[firstPage] || firstPage.toUpperCase();
+
+  if (firstPage === 'reports') renderReport();
+  if (firstPage === 'products') loadProducts();
+  if (firstPage === 'users') loadUsers();
+}
+
+function doLogout() {
+  localStorage.removeItem('fayruza_admin');
+  window.location.replace('login.html');
+}
+
+// Wrap showPage to enforce permissions
+var _origShowPage = showPage;
+showPage = function(name, btn) {
+  var perms = (ADMIN_SESSION && ADMIN_SESSION.perms) || {};
+  if (perms[name] === false) {
+    showToast('⚠ You don\'t have access to this section');
+    return;
+  }
+  _origShowPage(name, btn);
+  if (name === 'users') loadUsers();
+  if (name === 'shifts') { loadShifts(); populateShiftUserSelect(); }
+  if (name === 'categories') loadCategories();
+  if (name === 'combos') loadCombos();
+  if (name === 'customers') loadCustomers();
+  if (name === 'expenses') { loadExpenses(); }
+  if (name === 'offers') loadOffers();
+  if (name === 'qrcodes') generateQRCodes();
+  if (name === 'settings') { loadSettings(); loadInventory(); }
+};
+
+/* ══════════════════════════════════════════
+   REVENUE TREND CHARTS
+══════════════════════════════════════════ */
+function renderRevenueTrends() {
+  var now = new Date();
+
+  // 7-day
+  var week = {};
+  for (var i = 6; i >= 0; i--) {
+    var d = new Date(now); d.setDate(d.getDate() - i);
+    week[d.toDateString()] = 0;
+  }
+  allOrders.forEach(function(o) {
+    var d = new Date(o.created_at).toDateString();
+    if (week[d] !== undefined) week[d] += (o.total||0);
+  });
+  var weekVals = Object.values(week);
+  var weekMax  = Math.max.apply(null, weekVals) || 1;
+  var weekTotal = weekVals.reduce(function(a,b){return a+b;},0);
+  var weekEl = document.getElementById('week-chart');
+  var weekTot = document.getElementById('week-total');
+  if (weekTot) weekTot.textContent = fmt(weekTotal) + ' total';
+  if (weekEl) weekEl.innerHTML = Object.keys(week).map(function(dk, i) {
+    var h = Math.round(week[dk]/weekMax*100);
+    var d = new Date(dk);
+    var lbl = d.toLocaleDateString('en-GB',{weekday:'short'});
+    var isToday2 = d.toDateString() === now.toDateString();
+    return '<div class="bar-col">'+
+      '<div class="bar" style="height:'+h+'%;'+(isToday2?'background:linear-gradient(to top,var(--teal),#7effd4)':'')+'"></div>'+
+      '<div class="bar-lbl">'+lbl+'<br><strong style="color:var(--teal)">'+(week[dk]>0?fmt(week[dk]).split(' ')[0]:'')+'</strong></div>'+
+    '</div>';
+  }).join('');
+
+  // 30-day (by week buckets for readability)
+  var months = {};
+  for (var j = 29; j >= 0; j--) {
+    var dd = new Date(now); dd.setDate(dd.getDate() - j);
+    var key = dd.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
+    months[key] = 0;
+  }
+  allOrders.forEach(function(o) {
+    var key = new Date(o.created_at).toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
+    if (months[key] !== undefined) months[key] += (o.total||0);
+  });
+  var mKeys = Object.keys(months);
+  var mVals = Object.values(months);
+  var mMax  = Math.max.apply(null, mVals) || 1;
+  var mTotal = mVals.reduce(function(a,b){return a+b;},0);
+  var mEl  = document.getElementById('month-chart');
+  var mTot = document.getElementById('month-total');
+  if (mTot) mTot.textContent = fmt(mTotal) + ' total';
+  if (mEl) mEl.innerHTML = mKeys.map(function(k, i) {
+    var h = Math.round(months[k]/mMax*100);
+    // Only show label every 5 days
+    var lbl = (i % 5 === 0) ? k.split(' ')[0] : '';
+    return '<div class="bar-col">'+
+      '<div class="bar" style="height:'+h+'%"></div>'+
+      '<div class="bar-lbl">'+lbl+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+/* ══════════════════════════════════════════
+   COMBOS
+══════════════════════════════════════════ */
+var allCombos = [];
+var editingComboId = null;
+var comboItemRows = [];
+
+async function loadCombos() {
+  try {
+    var { data, error } = await sb.from('combos').select('*').order('sort_order');
+    if (error) throw error;
+    allCombos = data || [];
+    renderCombosTable();
+  } catch(e) { showToast('⚠ Could not load combos: ' + e.message); }
+}
+
+function renderCombosTable() {
+  var tbody = document.getElementById('combos-tbody');
+  if (!tbody) return;
+  if (!allCombos.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:28px">No combos yet — create your first bundle deal!</td></tr>';
+    return;
+  }
+  tbody.innerHTML = allCombos.map(function(c) {
+    var items = (c.items||[]).map(function(i){ return (i.emoji||'')+'×'+i.qty+' '+i.name; }).join(', ');
+    return '<tr style="opacity:'+(c.is_hidden?.45:1)+'">'+
+      '<td><span style="font-size:1.2rem;margin-right:6px">'+(c.emoji||'🎁')+'</span>'+
+      '<span style="font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:.9rem;text-transform:uppercase">'+c.name+'</span>'+
+      (c.description?'<div style="font-size:.76rem;color:var(--muted)">'+c.description+'</div>':'')+
+      '</td>'+
+      '<td style="font-size:.78rem;color:var(--muted);max-width:200px">'+items+'</td>'+
+      '<td style="font-family:Bebas Neue,sans-serif;font-size:1.1rem;color:var(--teal)">'+parseFloat(c.price||0).toFixed(3)+' KD</td>'+
+      '<td>'+(c.badge?'<span style="background:rgba(31,149,120,.15);color:var(--teal);font-family:Bebas Neue,sans-serif;font-size:.7rem;letter-spacing:1px;padding:2px 8px;border-radius:3px">'+c.badge+'</span>':'—')+'</td>'+
+      '<td>'+(c.is_hidden?'<span style="color:var(--muted);font-family:Bebas Neue,sans-serif;font-size:.7rem;letter-spacing:1px;background:rgba(255,255,255,.05);padding:3px 8px;border-radius:3px">HIDDEN</span>':'<span style="color:var(--teal);font-family:Bebas Neue,sans-serif;font-size:.7rem;letter-spacing:1px;background:rgba(31,149,120,.1);padding:3px 8px;border-radius:3px">ACTIVE</span>')+'</td>'+
+      '<td><div style="display:flex;gap:6px">'+
+        '<button onclick="openComboModal('+c.id+')" style="background:rgba(31,149,120,.1);border:1px solid rgba(31,149,120,.25);color:var(--teal);font-family:Bebas Neue,sans-serif,sans-serif;font-size:.75rem;letter-spacing:1px;padding:4px 10px;border-radius:5px;cursor:pointer">✏ EDIT</button>'+
+        '<button onclick="toggleComboHide('+c.id+','+!c.is_hidden+')" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--muted);font-family:Bebas Neue,sans-serif,sans-serif;font-size:.75rem;letter-spacing:1px;padding:4px 10px;border-radius:5px;cursor:pointer">'+(c.is_hidden?'👁 SHOW':'🙈 HIDE')+'</button>'+
+      '</div></td>'+
+    '</tr>';
+  }).join('');
+}
+
+function openComboModal(id) {
+  editingComboId = id;
+  comboItemRows = [];
+  var delBtn = document.getElementById('cb-del-btn');
+  ['cb-emoji','cb-name','cb-name-ar','cb-price','cb-badge','cb-desc'].forEach(function(i) {
+    var el = document.getElementById(i); if (el) el.value = '';
+  });
+  document.getElementById('cb-items-list').innerHTML = '';
+
+  if (id) {
+    var c = allCombos.find(function(x){ return x.id === id; });
+    if (!c) return;
+    document.getElementById('combo-title').textContent = 'EDIT COMBO';
+    if (delBtn) delBtn.style.display = 'block';
+    document.getElementById('cb-emoji').value   = c.emoji || '🎁';
+    document.getElementById('cb-name').value    = c.name || '';
+    document.getElementById('cb-name-ar').value = c.name_ar || '';
+    document.getElementById('cb-price').value   = c.price || '';
+    document.getElementById('cb-badge').value   = c.badge || '';
+    document.getElementById('cb-desc').value    = c.description || '';
+    (c.items||[]).forEach(function(item) { addComboItemRow(item); });
+  } else {
+    document.getElementById('combo-title').textContent = 'ADD COMBO';
+    if (delBtn) delBtn.style.display = 'none';
+    addComboItemRow();
+  }
+  document.getElementById('combo-modal').classList.add('open');
+}
+
+function closeComboModal() {
+  document.getElementById('combo-modal').classList.remove('open');
+  editingComboId = null; comboItemRows = [];
+}
+
+var _comboRowId = 0;
+function addComboItemRow(existing) {
+  var rid = ++_comboRowId;
+  comboItemRows.push(rid);
+  var list = document.getElementById('cb-items-list');
+  var row = document.createElement('div');
+  row.id = 'cb-row-'+rid;
+  row.style.cssText = 'display:grid;grid-template-columns:50px 1fr 70px auto;gap:8px;margin-bottom:8px;align-items:center';
+  var inpStyle = 'background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow,sans-serif;font-size:.88rem;padding:7px 10px;border-radius:6px;outline:none;width:100%';
+  row.innerHTML =
+    '<input type="text" id="cb-r-emoji-'+rid+'" placeholder="🍔" value="'+(existing?existing.emoji||'':'')+'" style="'+inpStyle+';text-align:center;font-size:1.1rem">'+
+    '<input type="text" id="cb-r-name-'+rid+'"  placeholder="Item name" value="'+(existing?existing.name||'':'')+'" style="'+inpStyle+'">'+
+    '<input type="number" id="cb-r-qty-'+rid+'" placeholder="1" value="'+(existing?existing.qty||1:1)+'" min="1" style="'+inpStyle+'">'+
+    '<button onclick="removeComboRow('+rid+')" style="background:rgba(255,71,87,.1);border:1px solid rgba(255,71,87,.2);color:var(--red);font-family:Bebas Neue,sans-serif;font-size:.8rem;padding:7px 10px;border-radius:6px;cursor:pointer">✕</button>';
+  list.appendChild(row);
+}
+
+function removeComboRow(rid) {
+  var el = document.getElementById('cb-row-'+rid);
+  if (el) el.remove();
+  comboItemRows = comboItemRows.filter(function(r){ return r !== rid; });
+}
+
+async function saveCombo() {
+  var emoji = (document.getElementById('cb-emoji')||{}).value || '🎁';
+  var name  = ((document.getElementById('cb-name')||{}).value||'').trim();
+  var price = parseFloat((document.getElementById('cb-price')||{}).value)||0;
+  if (!name || !price) { showToast('⚠ Name and price are required'); return; }
+
+  var items = [];
+  document.querySelectorAll('[id^="cb-row-"]').forEach(function(row) {
+    var rid = row.id.replace('cb-row-','');
+    var n = (document.getElementById('cb-r-name-'+rid)||{}).value||'';
+    var e = (document.getElementById('cb-r-emoji-'+rid)||{}).value||'';
+    var q = parseInt((document.getElementById('cb-r-qty-'+rid)||{}).value)||1;
+    if (n) items.push({emoji:e,name:n,qty:q});
+  });
+
+  var record = {
+    emoji: emoji, name: name,
+    name_ar: ((document.getElementById('cb-name-ar')||{}).value||'').trim(),
+    description: ((document.getElementById('cb-desc')||{}).value||'').trim(),
+    badge: ((document.getElementById('cb-badge')||{}).value||'').trim()||null,
+    price: price, items: items,
+    sort_order: editingComboId ? undefined : allCombos.length
+  };
+  if (!editingComboId) record.sort_order = allCombos.length;
+
+  try {
+    var error;
+    if (editingComboId) {
+      ({ error } = await sb.from('combos').update(record).eq('id', editingComboId));
+    } else {
+      ({ error } = await sb.from('combos').insert([record]));
+    }
+    if (error) throw error;
+    showToast(editingComboId ? '✓ Combo updated' : '✓ Combo created');
+    closeComboModal(); await loadCombos();
+  } catch(e) { showToast('⚠ ' + e.message); }
+}
+
+async function deleteCombo() {
+  if (!editingComboId || !confirm('Delete this combo?')) return;
+  try {
+    var { error } = await sb.from('combos').delete().eq('id', editingComboId);
+    if (error) throw error;
+    showToast('🗑 Combo deleted'); closeComboModal(); await loadCombos();
+  } catch(e) { showToast('⚠ ' + e.message); }
+}
+
+async function toggleComboHide(id, hide) {
+  try {
+    var { error } = await sb.from('combos').update({is_hidden:hide}).eq('id',id);
+    if (error) throw error;
+    showToast(hide?'🙈 Combo hidden':'👁 Combo visible'); await loadCombos();
+  } catch(e) { showToast('⚠ ' + e.message); }
+}
+
+/* ══════════════════════════════════════════
+   CUSTOMERS
+══════════════════════════════════════════ */
+var allCustomers = [];
+
+async function loadCustomers() {
+  try {
+    var { data, error } = await sb.from('customers').select('*').order('total_orders',{ascending:false}).limit(200);
+    if (error) throw error;
+    allCustomers = data || [];
+    renderCustomersTable();
+  } catch(e) { showToast('⚠ Could not load customers: ' + e.message); }
+}
+
+function renderCustomersTable() {
+  var tbody = document.getElementById('customers-tbody');
+  if (!tbody) return;
+  var search = ((document.getElementById('cust-search')||{}).value||'').toLowerCase();
+  var list = allCustomers;
+  if (search) list = list.filter(function(c) {
+    return (c.name||'').toLowerCase().includes(search) || (c.phone||'').includes(search);
+  });
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:28px"></td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(function(c) {
+    var lastItems = (c.last_order||[]).slice(0,3).map(function(i){ return (i.emoji||'')+'×'+(i.qty||1)+' '+i.name; }).join(' · ');
+    var lastDate = c.last_order_at ? fmtDate(c.last_order_at) : '—';
+    return '<tr>'+
+      '<td style="font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:.9rem">'+(c.name||'<span style="color:var(--muted)">—</span>')+'</td>'+
+      '<td style="font-family:Barlow Condensed,sans-serif;color:var(--teal)">'+c.phone+'</td>'+
+      '<td style="font-family:Bebas Neue,sans-serif;font-size:1.1rem;color:var(--teal)">'+c.total_orders+'</td>'+
+      '<td class="amt">'+fmt(c.total_spent)+'</td>'+
+      '<td style="font-family:Bebas Neue,sans-serif;font-size:1rem;color:var(--yellow)">'+((c.points_balance||0)>0?'⭐ '+(c.points_balance||0):'—')+'</td>'+
+      '<td style="font-size:.78rem;color:var(--muted)">'+lastDate+'</td>'+
+      '<td style="font-size:.78rem;color:var(--muted);max-width:200px">'+lastItems+'</td>'+
+    '</tr>';
+  }).join('');
+}
+
+/* ══════════════════════════════════════════
+   PRINTABLE MENU
+══════════════════════════════════════════ */
+async function printMenu() {
+  showToast('⏳ Generating printable menu…');
+
+  // Fetch all visible products grouped by category
+  var { data: products } = await sb.from('products')
+    .select('*')
+    .eq('is_hidden', false)
+    .order('category_sort')
+    .order('sort_order');
+
+  var { data: combos } = await sb.from('combos')
+    .select('*')
+    .eq('is_hidden', false)
+    .order('sort_order');
+
+  var byCat = {};
+  (products||[]).forEach(function(p) {
+    if (!byCat[p.category_id]) byCat[p.category_id] = { name: p.category_name||p.category_id, emoji: p.category_emoji||'', items: [] };
+    byCat[p.category_id].items.push(p);
+  });
+
+  function priceStr(p) {
+    if (p.fils) return p.fils + ' Fils';
+    if (p.sml_s) return 'S: '+p.sml_s+' / M: '+p.sml_m+' / L: '+p.sml_l+' KD';
+    if (p.meal_price) return p.price.toFixed(3)+' KD  |  Meal: '+p.meal_price.toFixed(3)+' KD';
+    return parseFloat(p.price||0).toFixed(3)+' KD';
+  }
+
+  var categoriesHTML = Object.values(byCat).map(function(cat) {
+    return '<div class="cat-section">'+
+      '<div class="cat-header-print">'+cat.emoji+' '+cat.name+'</div>'+
+      '<table class="items-table">'+
+      cat.items.map(function(p) {
+        return '<tr>'+
+          '<td class="item-emoji">'+(p.emoji||'')+'</td>'+
+          '<td class="item-name">'+p.name+(p.name_ar?'<span class="item-ar"> / '+p.name_ar+'</span>':'')+(p.badge?'<span class="item-badge">'+p.badge+'</span>':'')+'</td>'+
+          '<td class="item-price">'+priceStr(p)+'</td>'+
+        '</tr>';
+      }).join('')+
+      '</table></div>';
+  }).join('');
+
+  var combosHTML = (combos&&combos.length) ? (
+    '<div class="cat-section">'+
+    '<div class="cat-header-print">🎁 COMBO DEALS</div>'+
+    '<table class="items-table">'+
+    combos.map(function(c) {
+      var includes = (c.items||[]).map(function(i){return i.emoji+'×'+i.qty+' '+i.name;}).join(', ');
+      return '<tr>'+
+        '<td class="item-emoji">'+(c.emoji||'🎁')+'</td>'+
+        '<td class="item-name">'+c.name+(c.description?'<div style="font-size:8pt;color:#666">'+c.description+'</div>':'')+
+        '<div style="font-size:8pt;color:#444;margin-top:2px">Includes: '+includes+'</div></td>'+
+        '<td class="item-price">'+parseFloat(c.price||0).toFixed(3)+' KD</td>'+
+      '</tr>';
+    }).join('')+
+    '</table></div>'
+  ) : '';
+
+  var printDate = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+
+  var html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Fayruza Restaurant — Menu</title>
+<style>
+  @page { size: A4; margin: 12mm 15mm; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: Arial, sans-serif; font-size: 10pt; color: #111; }
+  .header { text-align:center; margin-bottom: 8mm; border-bottom: 2px solid #1F9578; padding-bottom: 5mm; }
+  .restaurant-name { font-size: 28pt; font-weight: 900; letter-spacing: 4px; color: #1F9578; }
+  .restaurant-sub { font-size: 9pt; color: #666; letter-spacing: 3px; text-transform: uppercase; margin-top: 2mm; }
+  .print-date { font-size: 8pt; color: #999; margin-top: 2mm; }
+  .menu-grid { columns: 2; column-gap: 8mm; }
+  .cat-section { break-inside: avoid; margin-bottom: 6mm; }
+  .cat-header-print { font-size: 11pt; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #1F9578; border-bottom: 1px solid #4DC4A3; padding-bottom: 1.5mm; margin-bottom: 2mm; }
+  .items-table { width: 100%; border-collapse: collapse; }
+  .items-table tr { border-bottom: 1px solid #f0f0f0; }
+  .item-emoji { width: 16px; padding: 1.5mm 2mm 1.5mm 0; font-size: 10pt; }
+  .item-name { padding: 1.5mm 2mm; font-size: 8.5pt; }
+  .item-ar { color: #888; }
+  .item-badge { display:inline-block; background: #fff3e0; color: #e65100; font-size: 6.5pt; padding: 1px 4px; border-radius: 2px; margin-left: 4px; vertical-align: middle; }
+  .item-price { text-align: right; white-space: nowrap; font-weight: 600; font-size: 8.5pt; color: #1F9578; padding: 1.5mm 0 1.5mm 4mm; }
+  .footer { text-align: center; margin-top: 8mm; padding-top: 3mm; border-top: 1px solid #ccc; font-size: 7.5pt; color: #999; }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="restaurant-name">FAYRUZA RESTAURANT</div>
+  <div class="restaurant-sub">Jabriya · Block 12 · Jamia Branch</div>
+  <div class="print-date">Menu as of ${printDate}</div>
+</div>
+<div class="menu-grid">
+  ${categoriesHTML}
+  ${combosHTML}
+</div>
+<div class="footer">Prices in Kuwaiti Dinars (KD) · فيروزا مطعم · fayruza-website.vercel.app</div>
+<script>window.onload=function(){window.print();window.onafterprint=function(){window.close();};};<\/script>
+</body>
+</html>`;
+
 </body>
 </html>
