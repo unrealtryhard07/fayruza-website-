@@ -454,7 +454,6 @@ body {
   content: ''; position: absolute; inset: 0;
   background: linear-gradient(135deg, rgba(31,149,120,0.05), transparent);
   opacity: 0; transition: opacity 0.2s;
-  pointer-events: none;
 }
 .item-card:hover::before { opacity: 1; }
 
@@ -753,6 +752,13 @@ body.ar .hero h1{font-size:clamp(50px,12vw,130px);}
   </div>
 
   <div class="cards-grid" id="cards-grid"></div>
+
+  <!-- COMBOS SECTION (loaded dynamically) -->
+  <div id="combos-section" style="display:none;padding:0 12px 20px;max-width:900px;margin:0 auto">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.7rem;letter-spacing:6px;text-transform:uppercase;color:var(--red);margin-bottom:4px;text-align:center">Special Deals</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,5vw,48px);color:var(--text);line-height:1;text-align:center;margin-bottom:16px">COMBO DEALS</div>
+    <div id="combos-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px"></div>
+  </div>
 
   <!-- FOOTER -->
   <div class="home-footer">
@@ -1087,8 +1093,22 @@ window.addEventListener('popstate', function() {
     </div>
     <div class="co-sec">
       <div class="co-sec-ttl">Details</div>
-      <label class="co-lbl">Customer Name (optional)</label>
-      <input class="co-inp" id="co-name" type="text" placeholder="Your name...">
+      <div class="co-row2">
+        <div>
+          <label class="co-lbl">Customer Name (optional)</label>
+          <input class="co-inp" id="co-name" type="text" placeholder="Your name..." oninput="coLookupPhone()">
+        </div>
+        <div>
+          <label class="co-lbl">Phone (optional)</label>
+          <input class="co-inp" id="co-phone" type="tel" placeholder="e.g. 9XXXXXXX" oninput="coLookupPhone()">
+        </div>
+      </div>
+      <!-- Reorder suggestion (shown if returning customer) -->
+      <div id="co-reorder-box" style="display:none;background:rgba(31,149,120,.08);border:1px solid rgba(31,149,120,.2);border-radius:8px;padding:12px 14px;margin-bottom:10px">
+        <div style="font-family:'Barlow Condensed';font-size:.68rem;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:8px">👋 WELCOME BACK! LAST ORDER:</div>
+        <div id="co-reorder-items" style="font-family:'Barlow Condensed';font-size:.85rem;color:var(--muted);margin-bottom:10px"></div>
+        <button onclick="coReorder()" style="background:var(--red);color:#fff;font-family:'Bebas Neue';font-size:.85rem;letter-spacing:2px;padding:7px 16px;border:none;border-radius:6px;cursor:pointer">↺ REORDER THIS</button>
+      </div>
       <div class="co-row2">
         <div>
           <label class="co-lbl">Order Type</label>
@@ -1360,6 +1380,11 @@ function renderCartBody() {
         '<span class="qty-n">'+ci.qty+'</span>'+
         '<button class="qty-b" onclick="g_qty('+i+',1)">&#43;</button>'+
       '</div>'+
+    '</div>'+
+    '<div style="padding:0 0 8px 56px">'+
+      '<input type="text" value="'+(ci.note||'')+'" placeholder="Add note (e.g. no onions)"'+
+      ' onchange="g_setNote('+i+',this.value)"'+
+      ' style="width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);color:var(--text);font-family:Barlow,sans-serif;font-size:.78rem;padding:5px 9px;border-radius:5px;outline:none">'+
     '</div>';
   }).join('');
   if (foot) foot.style.display='block';
@@ -1449,6 +1474,106 @@ function coRecalc() {
 }
 
 /* ── Place order ── */
+
+/* ── Per-item note ── */
+function g_setNote(i, val) {
+  if (cart[i]) { cart[i].note = val.trim(); }
+}
+
+/* ── Phone lookup / reorder ── */
+var _customerData = null;
+var _phoneTimer = null;
+
+function coLookupPhone() {
+  var phone = (document.getElementById('co-phone')||{}).value||'';
+  phone = phone.replace(/[^0-9+]/g,'');
+  clearTimeout(_phoneTimer);
+  if (phone.length < 8) {
+    document.getElementById('co-reorder-box').style.display = 'none';
+    return;
+  }
+  _phoneTimer = setTimeout(function() { _doPhoneLookup(phone); }, 600);
+}
+
+async function _doPhoneLookup(phone) {
+  try {
+    var res = await fetch(SB_URL + '/rest/v1/customers?phone=eq.' + encodeURIComponent(phone) + '&limit=1', {
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+    });
+    var data = await res.json();
+    if (data && data.length) {
+      _customerData = data[0];
+      // Pre-fill name
+      var nameEl = document.getElementById('co-name');
+      if (nameEl && !nameEl.value && _customerData.name) nameEl.value = _customerData.name;
+      // Show reorder box
+      if (_customerData.last_order && _customerData.last_order.length) {
+        var box = document.getElementById('co-reorder-box');
+        var itemsEl = document.getElementById('co-reorder-items');
+        if (box) box.style.display = 'block';
+        if (itemsEl) {
+          itemsEl.textContent = _customerData.last_order.slice(0,4).map(function(i) {
+            return (i.emoji||'') + ' ' + i.name + ' ×' + (i.qty||1);
+          }).join('  ·  ');
+        }
+      }
+    } else {
+      _customerData = null;
+      document.getElementById('co-reorder-box').style.display = 'none';
+    }
+  } catch(e) {}
+}
+
+function coReorder() {
+  if (!_customerData || !_customerData.last_order) return;
+  cart = [];
+  _customerData.last_order.forEach(function(i) {
+    cart.push({ id: i.id || i.name, name: i.name, emoji: i.emoji||'🍽️', price: i.price||0, qty: i.qty||1 });
+  });
+  updateFAB();
+  document.getElementById('co-reorder-box').style.display = 'none';
+  var msg = document.createElement('div');
+  msg.style.cssText = 'text-align:center;padding:8px;font-family:Barlow Condensed,sans-serif;font-size:.85rem;color:var(--teal);letter-spacing:1px';
+  msg.textContent = '✓ Previous order loaded!';
+  var sec = document.querySelector('.co-body .co-sec');
+  if (sec) sec.insertBefore(msg, sec.firstChild);
+  setTimeout(function() { if (msg.parentNode) msg.parentNode.removeChild(msg); }, 2000);
+}
+
+async function _saveCustomer(phone, name, orderItems, total) {
+  if (!phone) return;
+  phone = phone.replace(/[^0-9+]/g,'');
+  if (phone.length < 8) return;
+  try {
+    // Upsert customer record
+    var existing = _customerData;
+    if (existing && existing.id) {
+      await fetch(SB_URL + '/rest/v1/customers?id=eq.' + existing.id, {
+        method: 'PATCH',
+        headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        body: JSON.stringify({
+          name: name || existing.name,
+          total_orders: (existing.total_orders||0) + 1,
+          total_spent: (existing.total_spent||0) + total,
+          last_order: orderItems,
+          last_order_at: new Date().toISOString()
+        })
+      });
+    } else {
+      await fetch(SB_URL + '/rest/v1/customers', {
+        method: 'POST',
+        headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        body: JSON.stringify({
+          phone: phone, name: name || '',
+          total_orders: 1, total_spent: total,
+          last_order: orderItems,
+          last_order_at: new Date().toISOString()
+        })
+      });
+    }
+  } catch(e) {}
+}
+
 async function placeOrder() {
   if (cart.length===0) return;
   var btn = document.getElementById('co-place-btn');
@@ -1456,13 +1581,14 @@ async function placeOrder() {
   var sub = cartSum(), total = sub;
   var oid = 'ORD-'+Date.now().toString().slice(-6);
   var order = {
-    order_id:oid, items:cart.map(function(c){return Object.assign({},c);}),
+    order_id:oid, items:cart.map(function(c){var o=Object.assign({},c);if(!o.note)delete o.note;return o;}),
     subtotal:sub, discount_amt:0, discount_type:'kd', tax:0, total:total,
     payment_method:(document.getElementById('co-payment')||{}).value||'cash',
     order_type:(document.getElementById('co-type')||{}).value||'dinein',
     table_number:(document.getElementById('co-table')||{}).value||'',
     customer_name:(document.getElementById('co-name')||{}).value||'',
     notes:(document.getElementById('co-notes')||{}).value||'',
+    customer_phone:(document.getElementById('co-phone')||{}).value||'',
     status:'new'
   };
   try {
@@ -1473,6 +1599,10 @@ async function placeOrder() {
     });
     if (!res.ok) throw new Error(await res.text());
     document.getElementById('cv-id').textContent = oid;
+    // Save/update customer record
+    var _ph = (document.getElementById('co-phone')||{}).value||'';
+    var _nm = (document.getElementById('co-name')||{}).value||'';
+    _saveCustomer(_ph, _nm, cart.map(function(c){return Object.assign({},c);}), total);
     var trackLink = document.getElementById('cv-track-link');
     if (trackLink) trackLink.href = 'status.html?order=' + oid;
     document.getElementById('cv-total').textContent = money(total);
@@ -1488,7 +1618,9 @@ function backToMenu() {
   document.getElementById('confirm-view').classList.remove('open');
   document.getElementById('checkout-view').classList.remove('open');
   document.body.style.overflow='';
-  ['co-name','co-table','co-notes'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  ['co-name','co-table','co-notes','co-phone'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  _customerData=null;
+  document.getElementById('co-reorder-box').style.display='none';;
   var btn=document.getElementById('co-place-btn');
   if (btn) { btn.textContent='PLACE ORDER'; btn.disabled=false; }
 }
@@ -1518,7 +1650,170 @@ function toggleLang() {
   }
 })();
 
+async function loadMenuCombos() {
+  try {
+    var res = await fetch(_SB_URL + '/rest/v1/combos?select=*&is_hidden=eq.false&order=sort_order.asc', {
+      headers: { 'apikey': _SB_KEY, 'Authorization': 'Bearer ' + _SB_KEY }
+    });
+    var combos = await res.json();
+    if (!combos || !combos.length) return;
+    var section = document.getElementById('combos-section');
+    var grid    = document.getElementById('combos-grid');
+    if (!section || !grid) return;
+    section.style.display = 'block';
+    grid.innerHTML = combos.map(function(c) {
+      var includes = (c.items||[]).slice(0,4).map(function(i){ return (i.emoji||'')+'×'+(i.qty||1)+' '+i.name; }).join('  ·  ');
+      return '<div class="item-card" style="cursor:pointer" onclick="addComboToCart(this,'+JSON.stringify(c).replace(/</g,"\u003c").replace(/>/g,"\u003e").replace(/"/g,"&quot;")+')" data-qty="0">'+
+        (c.badge?'<div class="ic-badge">'+c.badge+'</div>':'')+
+        '<span class="ic-emoji">'+(c.emoji||'🎁')+'</span>'+
+        '<div class="ic-name">'+c.name+'</div>'+
+        (c.name_ar?'<div class="ic-name-ar">'+c.name_ar+'</div>':'')+
+        (c.description?'<div style="font-size:.72rem;color:var(--muted);margin-bottom:6px">'+c.description+'</div>':'')+
+        '<div style="font-size:.7rem;color:var(--muted);margin-bottom:8px">'+includes+'</div>'+
+        '<div class="ic-price">'+parseFloat(c.price||0).toFixed(3)+' <span class="ic-price-kd">KD</span></div>'+
+        '<div class="ic-atc-zone">'+
+          '<button class="atc-btn">+ ADD TO CART</button>'+
+          '<div class="ic-qty-row" style="display:none">'+
+            '<button class="iq-btn">&#8722;</button>'+
+            '<span class="iq-num">1</span>'+
+            '<button class="iq-btn">&#43;</button>'+
+          '</div>'+
+        '</div>'+
+      '</div>';
+    }).join('');
+
+    // Wire up qty buttons for combo cards
+    grid.querySelectorAll('.item-card').forEach(function(card) {
+      var zone = card.querySelector('.ic-atc-zone');
+      var btns = zone.querySelectorAll('.iq-btn');
+      btns[1].onclick = function(e) { e.stopPropagation(); comboQtyInc(card); };
+      btns[0].onclick = function(e) { e.stopPropagation(); comboQtyDec(card); };
+    });
+  } catch(e) { console.warn('Combos load failed:', e); }
+}
+
+function addComboToCart(card, combo) {
+  // Don't add if clicking the qty buttons
+  if (event && event.target.classList.contains('iq-btn')) return;
+  var zone = card.querySelector('.ic-atc-zone');
+  var cid = 'combo_' + combo.id;
+  pushCart({ id: cid, name: combo.name, emoji: combo.emoji||'🎁', price: parseFloat(combo.price||0) });
+  var qty = parseInt(card.getAttribute('data-qty')||'0') + 1;
+  card.setAttribute('data-qty', qty);
+  zone.querySelector('.atc-btn').style.display = 'none';
+  var qrow = zone.querySelector('.ic-qty-row');
+  qrow.style.display = 'flex';
+  qrow.querySelector('.iq-num').textContent = qty;
+}
+
+function comboQtyInc(card) {
+  var cid = 'combo_' + (JSON.parse(card.getAttribute('data-combo-id')||'0'));
+  // Simple: re-read from cart
+  var zone = card.querySelector('.ic-atc-zone');
+  var qrow = zone.querySelector('.ic-qty-row');
+  var num  = qrow.querySelector('.iq-num');
+  var qty  = parseInt(card.getAttribute('data-qty')||'1') + 1;
+  card.setAttribute('data-qty', qty);
+  num.textContent = qty;
+  // Find and increment in cart by matching name
+  var comboName = card.querySelector('.ic-name').textContent;
+  var ex = cart.find(function(c){ return c.name === comboName; });
+  if (ex) { ex.qty++; updateFAB(); }
+}
+
+function comboQtyDec(card) {
+  var zone = card.querySelector('.ic-atc-zone');
+  var qrow = zone.querySelector('.ic-qty-row');
+  var num  = qrow.querySelector('.iq-num');
+  var qty  = parseInt(card.getAttribute('data-qty')||'1') - 1;
+  var comboName = card.querySelector('.ic-name').textContent;
+  var ex = cart.find(function(c){ return c.name === comboName; });
+  if (ex) {
+    ex.qty--;
+    if (ex.qty <= 0) {
+      cart.splice(cart.indexOf(ex),1);
+      card.setAttribute('data-qty','0');
+      zone.querySelector('.atc-btn').style.display = '';
+      qrow.style.display = 'none';
+    } else {
+      card.setAttribute('data-qty', qty);
+      num.textContent = qty;
+    }
+    updateFAB();
+  }
+}
+
+// Pre-fill table from URL param ?table=X
+(function(){
+  var params = new URLSearchParams(window.location.search);
+  var t = params.get('table');
+  if (t) {
+    var el = document.getElementById('co-table');
+    if (el) el.value = t;
+    // Also switch to Dine In
+    var typeEl = document.getElementById('co-type');
+    if (typeEl) { typeEl.value = 'dinein'; coTableToggle(); }
+    // Store for confirmation
+    window._prefilledTable = t;
+  }
+})();
+
+// Load active special offers and apply to prices
+var _activeOffers = [];
+async function loadActiveOffers() {
+  try {
+    var res = await fetch(_SB_URL + '/rest/v1/special_offers?select=*&is_active=eq.true', {
+      headers: { 'apikey': _SB_KEY, 'Authorization': 'Bearer ' + _SB_KEY }
+    });
+    var offers = await res.json();
+    if (!offers || !Array.isArray(offers)) return;
+    var now = new Date();
+    var curMins = now.getHours()*60 + now.getMinutes();
+    var curDay = (now.getDay()+6)%7; // 0=Mon
+    _activeOffers = offers.filter(function(o) {
+      var startMins = parseInt((o.time_start||'00:00').split(':')[0])*60 + parseInt((o.time_start||'00:00').split(':')[1]||'0');
+      var endMins   = parseInt((o.time_end||'23:59').split(':')[0])*60 + parseInt((o.time_end||'23:59').split(':')[1]||'59');
+      var days = o.active_days || [0,1,2,3,4,5];
+      return days.includes(curDay) && curMins >= startMins && curMins <= endMins;
+    });
+    if (_activeOffers.length) {
+      // Show banner
+      var banner = document.getElementById('offers-banner');
+      if (!banner) {
+        banner = document.createElement('div');
+        banner.id = 'offers-banner';
+        banner.style.cssText = 'background:linear-gradient(90deg,var(--red),#ff6b35);color:#fff;text-align:center;padding:10px 16px;font-family:Bebas Neue,sans-serif;font-size:1rem;letter-spacing:3px;position:sticky;top:0;z-index:100';
+        document.body.insertBefore(banner, document.body.firstChild);
+      }
+      banner.textContent = '🏷️ ' + _activeOffers.map(function(o){
+        var d = o.discount_type==='percent' ? o.discount_value+'% OFF' : 'KD '+parseFloat(o.discount_value).toFixed(3)+' OFF';
+        return o.name + ' — ' + d;
+      }).join('  ·  ');
+    }
+  } catch(e) {}
+}
+
+function applyOfferToPrice(price, itemName, categoryId) {
+  if (!_activeOffers.length) return price;
+  var best = 0;
+  _activeOffers.forEach(function(o) {
+    var applies = false;
+    if (o.scope === 'all') applies = true;
+    else if (o.scope === 'category' && o.scope_value === categoryId) applies = true;
+    else if (o.scope === 'item' && o.scope_value && itemName.toLowerCase().includes(o.scope_value.toLowerCase())) applies = true;
+    if (applies) {
+      var disc = o.discount_type === 'percent'
+        ? price * (o.discount_value/100)
+        : parseFloat(o.discount_value)||0;
+      if (disc > best) best = disc;
+    }
+  });
+  return Math.max(0, price - best);
+}
+
 loadMenuFromSupabase();
+loadMenuCombos();
+loadActiveOffers();
 </script>
 
 

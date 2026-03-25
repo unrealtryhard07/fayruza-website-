@@ -149,15 +149,18 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
     <button class="nb" id="nav-orders" onclick="showPage('orders',this)"><span class="ic">📋</span> Orders<span class="bdg" id="new-badge" style="display:none">0</span></button>
     <div class="sb-sec">REPORTS</div>
     <button class="nb" id="nav-reports" onclick="showPage('reports',this)"><span class="ic">📈</span> Reports</button>
+    <button class="nb" id="nav-expenses" onclick="showPage('expenses',this)"><span class="ic">💸</span> Expenses</button>
     <div class="sb-sec" id="nav-menu-sec">MENU</div>
     <button class="nb" id="nav-categories" onclick="showPage('categories',this)"><span class="ic">📂</span> Categories</button>
     <button class="nb" id="nav-products" onclick="showPage('products',this)"><span class="ic">🍽️</span> Products</button>
     <button class="nb" id="nav-combos" onclick="showPage('combos',this)"><span class="ic">🎁</span> Combos</button>
+    <button class="nb" id="nav-offers" onclick="showPage('offers',this)"><span class="ic">🏷️</span> Special Offers</button>
     <div class="sb-sec" id="nav-team-sec">TEAM</div>
     <button class="nb" id="nav-shifts" onclick="showPage('shifts',this)"><span class="ic">🕐</span> Shifts</button>
     <button class="nb" id="nav-customers" onclick="showPage('customers',this)"><span class="ic">👤</span> Customers</button>
     <button class="nb" id="nav-users" onclick="showPage('users',this)"><span class="ic">👥</span> Users</button>
     <div class="sb-sec">SITE</div>
+    <button class="nb" id="nav-qrcodes" onclick="showPage('qrcodes',this)"><span class="ic">📲</span> Table QR Codes</button>
     <a href="kds.html" target="_blank" class="nb"><span class="ic">🍳</span> Kitchen Display</a>
     <button class="nb" id="nav-notif" onclick="requestNotifPermission()"><span class="ic">🔔</span> Notifications <span id="notif-status" style="font-size:.65rem;margin-left:4px;color:var(--muted)">OFF</span></button>
     <a href="index.html" class="nb"><span class="ic">🍔</span> View Menu</a>
@@ -335,6 +338,97 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
         <div class="tbl-wrap">
           <table><thead><tr><th>COMBO</th><th>INCLUDES</th><th>PRICE</th><th>BADGE</th><th>STATUS</th><th>ACTIONS</th></tr></thead>
           <tbody id="combos-tbody"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- QR CODES PAGE -->
+    <div class="page" id="page-qrcodes">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px">
+        <div style="font-family:'Barlow Condensed';font-size:.75rem;letter-spacing:3px;color:var(--muted);text-transform:uppercase">Print QR codes for each table — customers scan to open the menu</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <label style="font-family:'Barlow Condensed';font-size:.8rem;color:var(--muted)">Tables:</label>
+          <input type="number" id="qr-table-count" value="10" min="1" max="50" style="width:70px;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:'Barlow Condensed';font-size:.9rem;padding:6px 10px;border-radius:6px;outline:none">
+          <button onclick="generateQRCodes()" style="background:var(--green);color:#fff;font-family:'Bebas Neue';font-size:.95rem;letter-spacing:2px;padding:9px 20px;border:none;border-radius:8px;cursor:pointer">🔄 GENERATE</button>
+          <button onclick="printQRCodes()" style="background:rgba(31,149,120,.12);border:1px solid rgba(31,149,120,.3);color:var(--teal);font-family:'Bebas Neue';font-size:.95rem;letter-spacing:2px;padding:9px 20px;border-radius:8px;cursor:pointer">🖨 PRINT ALL</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="ph">
+          <div class="ph-title">TABLE QR CODES</div>
+          <div style="font-family:'Barlow Condensed';font-size:.78rem;color:var(--muted);letter-spacing:1px">Each QR links to the menu with the table number pre-filled</div>
+        </div>
+        <div id="qr-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;padding:18px"></div>
+      </div>
+    </div>
+
+    <!-- EXPENSES PAGE -->
+    <div class="page" id="page-expenses">
+      <div style="display:grid;grid-template-columns:340px 1fr;gap:16px;align-items:start">
+        <!-- Add expense form -->
+        <div class="panel">
+          <div class="ph"><div class="ph-title">➕ LOG EXPENSE</div></div>
+          <div style="padding:18px">
+            <label style="font-family:'Barlow Condensed';font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Category</label>
+            <select id="exp-cat" class="status-sel" style="margin-bottom:12px">
+              <option value="ingredients">🧅 Ingredients / Raw Materials</option>
+              <option value="packaging">📦 Packaging</option>
+              <option value="utilities">💡 Utilities (Gas, Electricity)</option>
+              <option value="staff">👤 Staff Wages</option>
+              <option value="rent">🏠 Rent</option>
+              <option value="maintenance">🔧 Maintenance / Repairs</option>
+              <option value="marketing">📣 Marketing</option>
+              <option value="other">📋 Other</option>
+            </select>
+            <label style="font-family:'Barlow Condensed';font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Description</label>
+            <input type="text" id="exp-desc" placeholder="e.g. Chicken from Al-Babtain" style="width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:.9rem;padding:8px 11px;border-radius:6px;outline:none;margin-bottom:12px">
+            <label style="font-family:'Barlow Condensed';font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Amount (KD)</label>
+            <input type="number" id="exp-amount" min="0" step="0.001" placeholder="0.000" style="width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:1rem;padding:8px 11px;border-radius:6px;outline:none;margin-bottom:12px">
+            <label style="font-family:'Barlow Condensed';font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Date</label>
+            <input type="date" id="exp-date" style="width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:'Barlow Condensed';font-size:.9rem;padding:8px 11px;border-radius:6px;outline:none;margin-bottom:14px">
+            <button onclick="saveExpense()" style="width:100%;padding:12px;background:var(--green);color:#fff;font-family:'Bebas Neue';font-size:1rem;letter-spacing:2px;border:none;border-radius:8px;cursor:pointer">SAVE EXPENSE</button>
+          </div>
+        </div>
+        <!-- Expense list + summary -->
+        <div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px;margin-bottom:16px">
+            <div class="stat-card"><div class="stat-icon">💸</div><div class="stat-lbl">This Month Expenses</div><div class="stat-val" id="exp-month-total">–</div><div class="stat-sub">All categories</div></div>
+            <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-lbl">This Month Revenue</div><div class="stat-val" id="exp-month-rev">–</div><div class="stat-sub">From orders</div></div>
+            <div class="stat-card"><div class="stat-icon">📊</div><div class="stat-lbl">Net Profit</div><div class="stat-val" id="exp-profit">–</div><div class="stat-sub">Revenue − Expenses</div></div>
+          </div>
+          <div class="panel">
+            <div class="ph">
+              <div class="ph-title">EXPENSE LOG</div>
+              <div class="ph-actions">
+                <select id="exp-filter-period" onchange="renderExpenses()" style="background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text);font-family:'Barlow Condensed';font-size:.82rem;padding:5px 10px;border-radius:6px;outline:none;cursor:pointer">
+                  <option value="today">Today</option>
+                  <option value="week">This Week</option>
+                  <option value="month" selected>This Month</option>
+                  <option value="all">All Time</option>
+                </select>
+                <button class="btn-refresh" onclick="loadExpenses()">↻</button>
+              </div>
+            </div>
+            <div class="tbl-wrap">
+              <table><thead><tr><th>DATE</th><th>CATEGORY</th><th>DESCRIPTION</th><th>AMOUNT</th><th></th></tr></thead>
+              <tbody id="exp-tbody"></tbody></table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SPECIAL OFFERS PAGE -->
+    <div class="page" id="page-offers">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+        <div style="font-family:'Barlow Condensed';font-size:.75rem;letter-spacing:3px;color:var(--muted);text-transform:uppercase">Set time-limited discounts on items — auto-applies on the menu</div>
+        <button onclick="openOfferModal(null)" style="background:var(--green);color:white;border:none;font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:2px;padding:9px 20px;border-radius:8px;cursor:pointer">＋ ADD OFFER</button>
+      </div>
+      <div class="panel">
+        <div class="ph"><div class="ph-title">ACTIVE OFFERS</div><button class="btn-refresh" onclick="loadOffers()">↻</button></div>
+        <div class="tbl-wrap">
+          <table><thead><tr><th>NAME</th><th>DISCOUNT</th><th>APPLIES TO</th><th>HOURS</th><th>DAYS</th><th>STATUS</th><th>ACTIONS</th></tr></thead>
+          <tbody id="offers-tbody"></tbody></table>
         </div>
       </div>
     </div>
@@ -637,6 +731,72 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
       <button class="btn-pri" onclick="saveCombo()">SAVE COMBO</button>
       <button class="btn-ghost" onclick="closeComboModal()">CANCEL</button>
       <button class="btn-dng" id="cb-del-btn" onclick="deleteCombo()" style="display:none">🗑 DELETE</button>
+    </div>
+  </div>
+</div>
+
+<!-- OFFER MODAL -->
+<div class="modal-bg" id="offer-modal">
+  <div class="modal" style="max-width:500px">
+    <div class="mh">
+      <div><div class="mh-title" id="offer-modal-title">ADD SPECIAL OFFER</div></div>
+      <button class="mc" onclick="closeOfferModal()">✕</button>
+    </div>
+    <div class="mbody">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div>
+          <label style="font-family:'Barlow Condensed';font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Offer Name</label>
+          <input type="text" id="off-name" placeholder="e.g. Happy Hour Juices" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:.9rem;padding:8px 11px;border-radius:6px;outline:none;width:100%">
+        </div>
+        <div>
+          <label style="font-family:'Barlow Condensed';font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Discount</label>
+          <div style="display:flex;gap:8px">
+            <input type="number" id="off-discount" min="1" max="100" placeholder="20" style="flex:1;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:'Barlow Condensed';font-size:1rem;padding:8px 11px;border-radius:6px;outline:none">
+            <select id="off-disc-type" class="status-sel" style="flex:1">
+              <option value="percent">% Off</option>
+              <option value="fixed">KD Off</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <label style="font-family:'Barlow Condensed';font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Applies To</label>
+      <select id="off-scope" class="status-sel" style="margin-bottom:12px" onchange="offScopeChange()">
+        <option value="all">All Items</option>
+        <option value="category">Specific Category</option>
+        <option value="item">Specific Item</option>
+      </select>
+      <div id="off-scope-detail" style="margin-bottom:12px;display:none">
+        <input type="text" id="off-scope-val" placeholder="Category ID or item name" style="width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:.9rem;padding:8px 11px;border-radius:6px;outline:none">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div>
+          <label style="font-family:'Barlow Condensed';font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Start Time</label>
+          <input type="time" id="off-start" value="15:00" style="width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:'Barlow Condensed';font-size:.9rem;padding:8px 11px;border-radius:6px;outline:none">
+        </div>
+        <div>
+          <label style="font-family:'Barlow Condensed';font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">End Time</label>
+          <input type="time" id="off-end" value="18:00" style="width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:'Barlow Condensed';font-size:.9rem;padding:8px 11px;border-radius:6px;outline:none">
+        </div>
+      </div>
+      <label style="font-family:'Barlow Condensed';font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:8px">Active Days</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px" id="off-days">
+        <button class="meal-opt sel" data-day="0" onclick="toggleOfferDay(this)">Mon</button>
+        <button class="meal-opt sel" data-day="1" onclick="toggleOfferDay(this)">Tue</button>
+        <button class="meal-opt sel" data-day="2" onclick="toggleOfferDay(this)">Wed</button>
+        <button class="meal-opt sel" data-day="3" onclick="toggleOfferDay(this)">Thu</button>
+        <button class="meal-opt sel" data-day="4" onclick="toggleOfferDay(this)">Fri</button>
+        <button class="meal-opt sel" data-day="5" onclick="toggleOfferDay(this)">Sat</button>
+        <button class="meal-opt" data-day="6" onclick="toggleOfferDay(this)">Sun</button>
+      </div>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-family:'Barlow Condensed';font-size:.9rem;color:var(--muted)">
+        <input type="checkbox" id="off-active" checked style="width:18px;height:18px;cursor:pointer;accent-color:var(--green)">
+        Offer is active
+      </label>
+    </div>
+    <div class="mfoot">
+      <button class="btn-pri" onclick="saveOffer()">SAVE OFFER</button>
+      <button class="btn-ghost" onclick="closeOfferModal()">CANCEL</button>
+      <button class="btn-dng" id="off-del-btn" onclick="deleteOffer()" style="display:none">🗑 DELETE</button>
     </div>
   </div>
 </div>
@@ -1849,7 +2009,7 @@ function initAuth() {
   var pg = document.getElementById('page-' + firstPage);
   if (pg) pg.classList.add('active');
 
-  var titles = {dashboard:'DASHBOARD', orders:'ORDERS', reports:'REPORTS', categories:'CATEGORIES', products:'PRODUCTS', combos:'COMBOS', customers:'CUSTOMERS', shifts:'SHIFTS', users:'USERS'};
+  var titles = {dashboard:'DASHBOARD', orders:'ORDERS', reports:'REPORTS', expenses:'EXPENSES', categories:'CATEGORIES', products:'PRODUCTS', combos:'COMBOS', offers:'SPECIAL OFFERS', customers:'CUSTOMERS', qrcodes:'TABLE QR CODES', shifts:'SHIFTS', users:'USERS'};
   document.getElementById('page-title').textContent = titles[firstPage] || firstPage.toUpperCase();
 
   if (firstPage === 'reports') renderReport();
@@ -1876,6 +2036,9 @@ showPage = function(name, btn) {
   if (name === 'categories') loadCategories();
   if (name === 'combos') loadCombos();
   if (name === 'customers') loadCustomers();
+  if (name === 'expenses') { loadExpenses(); }
+  if (name === 'offers') loadOffers();
+  if (name === 'qrcodes') generateQRCodes();
 };
 
 /* ══════════════════════════════════════════
@@ -2242,6 +2405,332 @@ async function printMenu() {
   if (!w) { showToast('⚠ Allow popups to print'); return; }
   w.document.write(html);
   w.document.close();
+}
+
+/* ══════════════════════════════════════════
+   TABLE QR CODES
+══════════════════════════════════════════ */
+var QR_BASE_URL = 'https://fayruza-website.vercel.app/index.html';
+
+function generateQRCodes() {
+  var count = parseInt(document.getElementById('qr-table-count').value) || 10;
+  var grid = document.getElementById('qr-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  for (var t = 1; t <= count; t++) {
+    var url = QR_BASE_URL + '?table=' + t;
+    var qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=' + encodeURIComponent(url);
+    var card = document.createElement('div');
+    card.style.cssText = 'background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;';
+    card.innerHTML =
+      '<div style="font-family:Bebas Neue,sans-serif;font-size:1.3rem;letter-spacing:3px;color:var(--teal);margin-bottom:10px">TABLE ' + t + '</div>' +
+      '<img src="' + qrApiUrl + '" width="140" height="140" style="border-radius:6px;background:#fff;padding:4px" alt="QR Table ' + t + '">' +
+      '<div style="font-family:Barlow Condensed,sans-serif;font-size:.68rem;color:var(--muted);letter-spacing:1px;margin-top:8px;word-break:break-all">?table=' + t + '</div>';
+    grid.appendChild(card);
+  }
+}
+
+function printQRCodes() {
+  var count = parseInt(document.getElementById('qr-table-count').value) || 10;
+  var rows = '';
+  for (var t = 1; t <= count; t++) {
+    var url = QR_BASE_URL + '?table=' + t;
+    var qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(url);
+    rows += '<div class="qr-card">' +
+      '<div class="restaurant-name">FAYRUZA</div>' +
+      '<div class="table-num">TABLE ' + t + '</div>' +
+      '<img src="' + qrApiUrl + '" width="180" height="180" style="display:block;margin:0 auto 6px">' +
+      '<div class="scan-txt">Scan to view menu & order</div>' +
+      '<div class="scan-txt" style="direction:rtl">امسح للقائمة والطلب</div>' +
+    '</div>';
+  }
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Table QR Codes — Fayruza</title><style>' +
+    '@page{size:A4;margin:10mm}' +
+    'body{margin:0;font-family:Arial,sans-serif}' +
+    '.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8mm;padding:4mm}' +
+    '.qr-card{border:1.5px solid #1F9578;border-radius:6mm;padding:6mm;text-align:center;break-inside:avoid}' +
+    '.restaurant-name{font-size:14pt;font-weight:900;letter-spacing:3px;color:#1F9578;margin-bottom:2mm}' +
+    '.table-num{font-size:22pt;font-weight:900;letter-spacing:2px;color:#111;margin-bottom:4mm}' +
+    '.scan-txt{font-size:7pt;color:#555;margin-top:2mm}' +
+    '</style></head><body>' +
+    '<div class="grid">' + rows + '</div>' +
+    '<script>window.onload=function(){window.print();window.onafterprint=function(){window.close();};};<\/script>' +
+    '</body></html>';
+  var w = window.open('', '_blank', 'width=900,height=1100');
+  if (!w) { showToast('⚠ Allow popups to print'); return; }
+  w.document.write(html); w.document.close();
+}
+
+/* ══════════════════════════════════════════
+   EXPENSES
+══════════════════════════════════════════ */
+var allExpenses = [];
+
+// Set today's date as default
+(function() {
+  var dateEl = document.getElementById('exp-date');
+  if (dateEl) dateEl.value = new Date().toISOString().split('T')[0];
+})();
+
+async function loadExpenses() {
+  try {
+    var { data, error } = await sb.from('expenses').select('*').order('date', {ascending:false}).limit(500);
+    if (error) throw error;
+    allExpenses = data || [];
+    renderExpenses();
+    renderExpenseSummary();
+  } catch(e) {
+    // Table might not exist yet
+    allExpenses = [];
+    renderExpenses();
+    renderExpenseSummary();
+  }
+}
+
+var EXP_CAT_LABELS = {
+  ingredients:'🧅 Ingredients', packaging:'📦 Packaging', utilities:'💡 Utilities',
+  staff:'👤 Staff Wages', rent:'🏠 Rent', maintenance:'🔧 Maintenance',
+  marketing:'📣 Marketing', other:'📋 Other'
+};
+
+function getExpenseFilteredByPeriod() {
+  var period = (document.getElementById('exp-filter-period')||{}).value || 'month';
+  var now = new Date();
+  return allExpenses.filter(function(e) {
+    var d = new Date(e.date);
+    if (period === 'today') return d.toDateString() === now.toDateString();
+    if (period === 'week') { var w=new Date(now); w.setDate(now.getDate()-7); return d>=w; }
+    if (period === 'month') return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
+    return true;
+  });
+}
+
+function renderExpenses() {
+  var tbody = document.getElementById('exp-tbody');
+  if (!tbody) return;
+  var list = getExpenseFilteredByPeriod();
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:28px">No expenses logged yet. Use the form on the left to add one.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(function(e) {
+    return '<tr>' +
+      '<td style="font-size:.8rem;color:var(--muted)">' + e.date + '</td>' +
+      '<td style="font-size:.82rem">' + (EXP_CAT_LABELS[e.category]||e.category) + '</td>' +
+      '<td>' + (e.description||'—') + '</td>' +
+      '<td class="amt">' + fmt(e.amount) + '</td>' +
+      '<td><button onclick="deleteExpense(' + e.id + ')" style="background:rgba(255,71,87,.08);border:1px solid rgba(255,71,87,.2);color:var(--red);font-family:Bebas Neue,sans-serif;font-size:.72rem;letter-spacing:1px;padding:3px 9px;border-radius:4px;cursor:pointer">✕</button></td>' +
+    '</tr>';
+  }).join('');
+  renderExpenseSummary();
+}
+
+function renderExpenseSummary() {
+  var now = new Date();
+  var monthExp = allExpenses.filter(function(e) {
+    var d = new Date(e.date);
+    return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
+  });
+  var totalExp = monthExp.reduce(function(s,e){return s+(e.amount||0);},0);
+
+  // Revenue this month from orders
+  var monthOrders = allOrders.filter(function(o) {
+    var d = new Date(o.created_at);
+    return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
+  });
+  var totalRev = monthOrders.reduce(function(s,o){return s+(o.total||0);},0);
+  var profit = totalRev - totalExp;
+
+  var el1 = document.getElementById('exp-month-total');
+  var el2 = document.getElementById('exp-month-rev');
+  var el3 = document.getElementById('exp-profit');
+  if (el1) el1.textContent = fmt(totalExp);
+  if (el2) el2.textContent = fmt(totalRev);
+  if (el3) {
+    el3.textContent = fmt(Math.abs(profit));
+    el3.style.color = profit >= 0 ? 'var(--teal)' : 'var(--red)';
+    el3.closest('.stat-card').querySelector('.stat-sub').textContent =
+      profit >= 0 ? '▲ Profitable this month' : '▼ Running at a loss';
+  }
+}
+
+async function saveExpense() {
+  var cat    = (document.getElementById('exp-cat')||{}).value;
+  var desc   = ((document.getElementById('exp-desc')||{}).value||'').trim();
+  var amount = parseFloat((document.getElementById('exp-amount')||{}).value)||0;
+  var date   = (document.getElementById('exp-date')||{}).value || new Date().toISOString().split('T')[0];
+  if (!amount) { showToast('⚠ Enter an amount'); return; }
+
+  try {
+    var { error } = await sb.from('expenses').insert([{ category:cat, description:desc, amount:amount, date:date }]);
+    if (error) throw error;
+    showToast('✓ Expense saved');
+    document.getElementById('exp-amount').value = '';
+    document.getElementById('exp-desc').value = '';
+    await loadExpenses();
+  } catch(e) { showToast('⚠ ' + e.message + ' — did you run the SQL to create the expenses table?'); }
+}
+
+async function deleteExpense(id) {
+  if (!confirm('Delete this expense?')) return;
+  try {
+    var { error } = await sb.from('expenses').delete().eq('id', id);
+    if (error) throw error;
+    showToast('🗑 Expense deleted'); await loadExpenses();
+  } catch(e) { showToast('⚠ ' + e.message); }
+}
+
+/* ══════════════════════════════════════════
+   SPECIAL OFFERS
+══════════════════════════════════════════ */
+var allOffers = [];
+var editingOfferId = null;
+
+async function loadOffers() {
+  try {
+    var { data, error } = await sb.from('special_offers').select('*').order('created_at',{ascending:false});
+    if (error) throw error;
+    allOffers = data || [];
+    renderOffersTable();
+  } catch(e) {
+    allOffers = [];
+    renderOffersTable();
+  }
+}
+
+var DAY_NAMES = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+function renderOffersTable() {
+  var tbody = document.getElementById('offers-tbody');
+  if (!tbody) return;
+  if (!allOffers.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:28px">No offers yet. Add a happy hour or special discount!</td></tr>';
+    return;
+  }
+  tbody.innerHTML = allOffers.map(function(o) {
+    var days = (o.active_days||[0,1,2,3,4,5]).map(function(d){return DAY_NAMES[d];}).join(', ');
+    var disc = o.discount_type==='percent' ? o.discount_value+'%' : fmt(o.discount_value)+' off';
+    var scope = o.scope==='all' ? 'All items' : o.scope==='category' ? 'Category: '+o.scope_value : 'Item: '+o.scope_value;
+    var now = new Date();
+    var curMins = now.getHours()*60 + now.getMinutes();
+    var startMins = parseInt((o.time_start||'00:00').split(':')[0])*60 + parseInt((o.time_start||'00:00').split(':')[1]);
+    var endMins   = parseInt((o.time_end||'23:59').split(':')[0])*60 + parseInt((o.time_end||'23:59').split(':')[1]);
+    var curDay = (now.getDay()+6)%7; // 0=Mon
+    var isActive = o.is_active && (o.active_days||[0,1,2,3,4,5]).includes(curDay) && curMins>=startMins && curMins<=endMins;
+    return '<tr>' +
+      '<td style="font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:.9rem">' + o.name + '</td>' +
+      '<td style="font-family:Bebas Neue,sans-serif;font-size:1.1rem;color:var(--yellow)">' + disc + '</td>' +
+      '<td style="font-size:.8rem;color:var(--muted)">' + scope + '</td>' +
+      '<td style="font-size:.82rem;color:var(--teal)">' + (o.time_start||'—') + ' → ' + (o.time_end||'—') + '</td>' +
+      '<td style="font-size:.78rem;color:var(--muted)">' + days + '</td>' +
+      '<td>' + (isActive
+        ? '<span style="font-family:Bebas Neue,sans-serif;font-size:.7rem;letter-spacing:1px;color:var(--teal);background:rgba(31,149,120,.15);padding:3px 8px;border-radius:3px;animation:pdot 2s infinite">● LIVE NOW</span>'
+        : o.is_active
+          ? '<span style="font-family:Bebas Neue,sans-serif;font-size:.7rem;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,.05);padding:3px 8px;border-radius:3px">SCHEDULED</span>'
+          : '<span style="font-family:Bebas Neue,sans-serif;font-size:.7rem;letter-spacing:1px;color:#555;background:rgba(255,255,255,.03);padding:3px 8px;border-radius:3px">OFF</span>') +
+      '</td>' +
+      '<td><div style="display:flex;gap:6px">' +
+        '<button onclick="openOfferModal(' + o.id + ')" style="background:rgba(31,149,120,.1);border:1px solid rgba(31,149,120,.25);color:var(--teal);font-family:Bebas Neue,sans-serif;font-size:.75rem;letter-spacing:1px;padding:4px 10px;border-radius:5px;cursor:pointer">✏ EDIT</button>' +
+        '<button onclick="toggleOfferActive(' + o.id + ',' + !o.is_active + ')" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--muted);font-family:Bebas Neue,sans-serif;font-size:.75rem;letter-spacing:1px;padding:4px 10px;border-radius:5px;cursor:pointer">' + (o.is_active?'⏸ PAUSE':'▶ ON') + '</button>' +
+      '</div></td>' +
+    '</tr>';
+  }).join('');
+}
+
+function openOfferModal(id) {
+  editingOfferId = id;
+  var delBtn = document.getElementById('off-del-btn');
+  // Reset day buttons
+  document.querySelectorAll('#off-days .meal-opt').forEach(function(b) { b.classList.add('sel'); });
+  document.getElementById('off-days').querySelector('[data-day="6"]').classList.remove('sel');
+  if (id) {
+    var o = allOffers.find(function(x){return x.id===id;});
+    if (!o) return;
+    document.getElementById('offer-modal-title').textContent = 'EDIT OFFER';
+    if (delBtn) delBtn.style.display = 'block';
+    document.getElementById('off-name').value = o.name||'';
+    document.getElementById('off-discount').value = o.discount_value||'';
+    document.getElementById('off-disc-type').value = o.discount_type||'percent';
+    document.getElementById('off-scope').value = o.scope||'all';
+    document.getElementById('off-scope-val').value = o.scope_value||'';
+    offScopeChange();
+    document.getElementById('off-start').value = o.time_start||'15:00';
+    document.getElementById('off-end').value   = o.time_end||'18:00';
+    document.getElementById('off-active').checked = !!o.is_active;
+    var days = o.active_days||[0,1,2,3,4,5];
+    document.querySelectorAll('#off-days .meal-opt').forEach(function(b) {
+      b.classList.toggle('sel', days.includes(parseInt(b.getAttribute('data-day'))));
+    });
+  } else {
+    document.getElementById('offer-modal-title').textContent = 'ADD SPECIAL OFFER';
+    if (delBtn) delBtn.style.display = 'none';
+    document.getElementById('off-name').value = '';
+    document.getElementById('off-discount').value = '';
+    document.getElementById('off-scope').value = 'all';
+    document.getElementById('off-active').checked = true;
+    offScopeChange();
+  }
+  document.getElementById('offer-modal').classList.add('open');
+}
+
+function closeOfferModal() { document.getElementById('offer-modal').classList.remove('open'); editingOfferId = null; }
+function offScopeChange() {
+  var s = (document.getElementById('off-scope')||{}).value;
+  var d = document.getElementById('off-scope-detail');
+  if (d) d.style.display = (s === 'all') ? 'none' : 'block';
+}
+function toggleOfferDay(btn) { btn.classList.toggle('sel'); }
+
+async function saveOffer() {
+  var name      = ((document.getElementById('off-name')||{}).value||'').trim();
+  var discVal   = parseFloat((document.getElementById('off-discount')||{}).value)||0;
+  var discType  = (document.getElementById('off-disc-type')||{}).value||'percent';
+  var scope     = (document.getElementById('off-scope')||{}).value||'all';
+  var scopeVal  = ((document.getElementById('off-scope-val')||{}).value||'').trim();
+  var timeStart = (document.getElementById('off-start')||{}).value||'15:00';
+  var timeEnd   = (document.getElementById('off-end')||{}).value||'18:00';
+  var active    = !!(document.getElementById('off-active')||{}).checked;
+  var days = [];
+  document.querySelectorAll('#off-days .meal-opt.sel').forEach(function(b){ days.push(parseInt(b.getAttribute('data-day'))); });
+
+  if (!name || !discVal) { showToast('⚠ Name and discount are required'); return; }
+
+  var record = {
+    name: name, discount_value: discVal, discount_type: discType,
+    scope: scope, scope_value: scopeVal||null,
+    time_start: timeStart, time_end: timeEnd,
+    active_days: days, is_active: active
+  };
+
+  try {
+    var error;
+    if (editingOfferId) {
+      ({ error } = await sb.from('special_offers').update(record).eq('id', editingOfferId));
+    } else {
+      ({ error } = await sb.from('special_offers').insert([record]));
+    }
+    if (error) throw error;
+    showToast(editingOfferId ? '✓ Offer updated' : '✓ Offer created');
+    closeOfferModal(); await loadOffers();
+  } catch(e) { showToast('⚠ ' + e.message + ' — did you run the SQL?'); }
+}
+
+async function deleteOffer() {
+  if (!editingOfferId || !confirm('Delete this offer?')) return;
+  try {
+    var { error } = await sb.from('special_offers').delete().eq('id', editingOfferId);
+    if (error) throw error;
+    showToast('🗑 Offer deleted'); closeOfferModal(); await loadOffers();
+  } catch(e) { showToast('⚠ ' + e.message); }
+}
+
+async function toggleOfferActive(id, active) {
+  try {
+    var { error } = await sb.from('special_offers').update({is_active:active}).eq('id',id);
+    if (error) throw error;
+    showToast(active ? '▶ Offer activated' : '⏸ Offer paused'); await loadOffers();
+  } catch(e) { showToast('⚠ ' + e.message); }
 }
 
 /* ══════════════════════════════════════════
@@ -2675,11 +3164,15 @@ async function toggleCatActive(dbId, active) {
 ══════════════════════════════════════════ */
 loadAll();
 subscribeRealtime();
+// Set expense date to today
+(function(){var d=document.getElementById('exp-date');if(d)d.value=new Date().toISOString().split('T')[0];})();
 loadProducts();
 loadUsers();
 loadCategories();
 loadCombos();
 loadCustomers();
+loadExpenses();
+loadOffers();
 initAuth();
 initNotifications();
 updateClock();
