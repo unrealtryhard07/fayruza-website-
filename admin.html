@@ -1119,31 +1119,28 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
   </div>
 </div>
 
-<!-- PRINT OPTIONS MODAL — Multi-Printer -->
+<!-- PRINT OPTIONS MODAL -->
 <div class="modal-bg" id="print-options-modal">
-  <div class="modal" style="max-width:420px">
+  <div class="modal" style="max-width:380px">
     <div class="mh">
       <div><div class="mh-title">🖨 PRINT RECEIPT</div><div class="mh-sub" id="po-order-label">Order receipt</div></div>
       <button class="mc" onclick="document.getElementById('print-options-modal').classList.remove('open')">✕</button>
     </div>
     <div class="mbody">
-      <!-- Always-available options -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
-        <!-- Browser Print (opens native printer picker on phone) -->
-        <button onclick="doPrint('browser')" style="padding:18px 12px;background:rgba(31,149,120,.08);border:2px solid rgba(31,149,120,.25);color:var(--teal);border-radius:12px;cursor:pointer;text-align:center;transition:all .2s" onmouseover="this.style.background='rgba(31,149,120,.15)'" onmouseout="this.style.background='rgba(31,149,120,.08)'">
-          <div style="font-size:1.8rem;margin-bottom:6px">🖨</div>
-          <div style="font-family:Bebas Neue,sans-serif;font-size:1rem;letter-spacing:2px">PRINT</div>
-          <div style="font-family:Barlow Condensed,sans-serif;font-size:.68rem;color:var(--muted);margin-top:3px">Select printer on device</div>
-        </button>
-        <!-- PDF View/Download -->
-        <button onclick="doPrint('pdf')" style="padding:18px 12px;background:rgba(255,255,255,.04);border:2px solid var(--border);color:var(--text);border-radius:12px;cursor:pointer;text-align:center;transition:all .2s" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='var(--border)'">
-          <div style="font-size:1.8rem;margin-bottom:6px">📥</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <button onclick="doPrint('pdf')" style="padding:20px 12px;background:rgba(31,149,120,.08);border:2px solid rgba(31,149,120,.25);color:var(--teal);border-radius:12px;cursor:pointer;text-align:center;transition:all .2s" onmouseover="this.style.background='rgba(31,149,120,.15)'" onmouseout="this.style.background='rgba(31,149,120,.08)'">
+          <div style="font-size:2rem;margin-bottom:6px">📥</div>
           <div style="font-family:Bebas Neue,sans-serif;font-size:1rem;letter-spacing:2px">VIEW PDF</div>
-          <div style="font-family:Barlow Condensed,sans-serif;font-size:.68rem;color:var(--muted);margin-top:3px">Download / save receipt</div>
+          <div style="font-family:Barlow Condensed,sans-serif;font-size:.7rem;color:var(--muted);margin-top:3px">Download / save receipt</div>
+        </button>
+        <button onclick="doPrint('print')" style="padding:20px 12px;background:rgba(255,255,255,.05);border:2px solid var(--border);color:var(--text);border-radius:12px;cursor:pointer;text-align:center;transition:all .2s" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="font-size:2rem;margin-bottom:6px">🖨</div>
+          <div style="font-family:Bebas Neue,sans-serif;font-size:1rem;letter-spacing:2px">PRINT</div>
+          <div style="font-family:Barlow Condensed,sans-serif;font-size:.7rem;color:var(--muted);margin-top:3px">Select printer & print</div>
         </button>
       </div>
-      <!-- Direct thermal printers (if configured) -->
-      <div id="po-printers-list"></div>
+      <!-- Direct thermal printers (BT/USB only, if paired in this session) -->
+      <div id="po-printers-list" style="margin-top:12px"></div>
     </div>
   </div>
 </div>
@@ -3586,25 +3583,7 @@ async function _printViaUSB(o, copies) {
   } catch(e) { showToast('⚠ USB error: ' + e.message); return false; }
 }
 
-async function _printViaNetwork(o, copies) {
-  var p = arguments[2] || {};  // printer config
-  var ip = p.ip || '';
-  var port = p.port || 9100;
-  if (!ip) { showToast('⚠ No IP configured for this printer'); return false; }
-  showToast('🌐 Sending to ' + ip + '…');
-  try {
-    var data = buildEscPosReceipt(o);
-    var encoder = new TextEncoder();
-    await fetch('http://' + ip + ':' + port, {
-      method: 'POST', body: encoder.encode(data.repeat(copies)),
-      mode: 'no-cors', headers: { 'Content-Type': 'application/octet-stream' }
-    });
-    showToast('✓ Sent to ' + (p.name || ip) + '!');
-    return true;
-  } catch(e) { showToast('⚠ Network printer unreachable'); return false; }
-}
-
-/* ── Print to a specific printer by ID ─────── */
+/* ── Print to a specific thermal printer (BT/USB only) ─────── */
 async function printToPrinter(printerId, orderId) {
   var p = _allPrinters.find(function(x){ return x.id === printerId; });
   var o = allOrders.find(function(x){ return String(x.id) === String(orderId); });
@@ -3615,51 +3594,42 @@ async function printToPrinter(printerId, orderId) {
   var success = false;
 
   if (p.type === 'bluetooth') {
-    if (!_btDevice) {
-      showToast('⚠ Bluetooth not paired — go to Printer Settings → 📶 PAIR BLUETOOTH first');
-      return;
-    }
     success = await _printViaBluetooth(o, copies);
   } else if (p.type === 'usb') {
-    if (!_usbDevice) {
-      showToast('⚠ USB not connected — go to Printer Settings → 🔌 CONNECT USB first');
-      return;
-    }
     success = await _printViaUSB(o, copies);
-  } else if (p.type === 'network') {
-    success = await _printViaNetwork(o, copies, p);
   }
 
   if (!success) {
-    showToast('⚠ Direct print failed — use 🖨 PRINT to select a printer from your device');
+    showToast('⚠ Direct print failed — use 🖨 PRINT to select printer from your device');
   }
 }
 
-/* ── Print options (always show modal) ─────────── */
+/* ── Show print options modal ─────────── */
 function showPrintOptions(orderId) {
   _currentPrintOrderId = orderId;
   var o = allOrders.find(function(x){ return String(x.id) === String(orderId); });
   var label = document.getElementById('po-order-label');
   if (label && o) label.textContent = (o.order_id || o.id) + ' · KD ' + parseFloat(o.total || 0).toFixed(3);
 
-  // Build direct thermal printer buttons (if any configured)
+  // Show direct thermal printer buttons ONLY for paired BT/USB devices
   var listEl = document.getElementById('po-printers-list');
-  var typeIcons = { bluetooth:'📶', network:'🌐', usb:'🔌' };
+  var directPrinters = _allPrinters.filter(function(p) {
+    return (p.type === 'bluetooth' && _btDevice) || (p.type === 'usb' && _usbDevice);
+  });
 
-  if (_allPrinters.length > 0) {
+  if (directPrinters.length > 0) {
+    var typeIcons = { bluetooth:'📶', usb:'🔌' };
     listEl.innerHTML =
-      '<div style="font-family:Barlow Condensed,sans-serif;font-size:.62rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">DIRECT THERMAL PRINTERS</div>' +
-      _allPrinters.map(function(p) {
+      '<div style="font-family:Barlow Condensed,sans-serif;font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">DIRECT THERMAL PRINT</div>' +
+      directPrinters.map(function(p) {
         var icon = typeIcons[p.type] || '🖨';
-        var detail = p.type === 'network' ? p.ip : p.type;
-        var isReady = (p.type === 'bluetooth' && _btDevice) || (p.type === 'usb' && _usbDevice) || p.type === 'network';
-        return '<button onclick="printToPrinter(' + p.id + ',' + orderId + ')" style="width:100%;padding:12px 14px;background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--text);border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .15s;text-align:left;margin-bottom:6px;opacity:' + (isReady ? '1' : '.5') + '" onmouseover="this.style.borderColor=\'var(--teal)\'" onmouseout="this.style.borderColor=\'var(--border)\'">' +
-          '<span style="font-size:1.2rem">' + icon + '</span>' +
+        return '<button onclick="printToPrinter(' + p.id + ',' + orderId + ')" style="width:100%;padding:11px 14px;background:rgba(255,212,59,.06);border:1px solid rgba(255,212,59,.2);color:var(--text);border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .15s;text-align:left;margin-bottom:4px" onmouseover="this.style.background=\'rgba(255,212,59,.12)\'" onmouseout="this.style.background=\'rgba(255,212,59,.06)\'">' +
+          '<span style="font-size:1.1rem">' + icon + '</span>' +
           '<div style="flex:1">' +
-            '<div style="font-family:Bebas Neue,sans-serif;font-size:.88rem;letter-spacing:2px">' + (p.name||'Printer').toUpperCase() + '</div>' +
-            '<div style="font-family:Barlow Condensed,sans-serif;font-size:.68rem;color:var(--muted)">' + detail + ' · ' + (p.copies||1) + ' copies' + (!isReady ? ' · ⚠ not paired' : '') + '</div>' +
+            '<div style="font-family:Bebas Neue,sans-serif;font-size:.85rem;letter-spacing:2px">' + (p.name||'Thermal').toUpperCase() + '</div>' +
+            '<div style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;color:var(--muted)">' + (p.copies||1) + ' copies · ESC/POS direct</div>' +
           '</div>' +
-          (p.is_default ? '<span style="font-size:.75rem">⭐</span>' : '') +
+          (p.is_default ? '<span style="font-size:.7rem">⭐</span>' : '') +
         '</button>';
       }).join('');
   } else {
@@ -3669,7 +3639,6 @@ function showPrintOptions(orderId) {
   document.getElementById('order-modal').classList.remove('open');
   document.getElementById('print-options-modal').classList.add('open');
 }
-function closePrintOptions() { document.getElementById('print-options-modal').classList.remove('open'); }
 
 async function doPrint(mode) {
   var orderId = _currentPrintOrderId;
@@ -3677,14 +3646,11 @@ async function doPrint(mode) {
   document.getElementById('print-options-modal').classList.remove('open');
 
   if (mode === 'pdf') {
-    // Open receipt HTML without auto-print — just view/download
+    // View/download receipt — no auto-print
     printReceipt(orderId, false);
-    return;
-  }
-  if (mode === 'browser') {
-    // Open receipt HTML with auto-print — triggers native printer picker
+  } else if (mode === 'print') {
+    // Opens receipt → triggers native print dialog → pick your printer → instant print
     printReceipt(orderId, true);
-    return;
   }
 }
 
@@ -3699,15 +3665,21 @@ function testPrintSingle(id) {
     items:[{name:'Zinger Burger',emoji:'🍔',qty:2,price:1.500},{name:'Mango Juice',emoji:'🥭',qty:1,price:0.650}],
     subtotal:3.650, discount_amt:0, total:3.650
   };
-  if (p.type==='bluetooth') _printViaBluetooth(mock, 1);
-  else if (p.type==='usb') _printViaUSB(mock, 1);
-  else if (p.type==='network') _printViaNetwork(mock, 1, p);
-  else { showToast('📄 Opening test PDF…'); printReceipt('TEST'); }
+  if (p.type === 'bluetooth' && _btDevice) { _printViaBluetooth(mock, 1); }
+  else if (p.type === 'usb' && _usbDevice) { _printViaUSB(mock, 1); }
+  else {
+    // Network or unpaired — use browser print dialog
+    showToast('🖨 Opening test receipt…');
+    printReceipt('TEST', true);
+  }
 }
 
-function testPrint() { testPrintSingle(_allPrinters.length ? _allPrinters[0].id : 0); }
+function testPrint() {
+  if (_allPrinters.length) testPrintSingle(_allPrinters[0].id);
+  else { showToast('📄 Opening test receipt…'); printReceipt('TEST', true); }
+}
 
-// Auto-print on new order — fires for ALL printers with auto_print_orders=true
+// Auto-print on new order — only BT/USB printers with auto_print_orders=true
 var _origNotifyNewOrder = notifyNewOrder;
 notifyNewOrder = function(order) {
   _origNotifyNewOrder(order);
@@ -3716,9 +3688,10 @@ notifyNewOrder = function(order) {
     if (!p.auto_print_orders) return;
     setTimeout(function() {
       var copies = p.copies || 1;
-      if (p.type === 'bluetooth' && _btDevice)     _printViaBluetooth(order, copies);
-      else if (p.type === 'usb' && _usbDevice)     _printViaUSB(order, copies);
-      else if (p.type === 'network' && p.ip)        _printViaNetwork(order, copies, p);
+      if (p.type === 'bluetooth' && _btDevice)  _printViaBluetooth(order, copies);
+      else if (p.type === 'usb' && _usbDevice)  _printViaUSB(order, copies);
+      // Network printers with auto-print: open receipt with native print dialog
+      else if (p.type === 'network') printReceipt(order.id, true);
     }, 500);
   });
 };
