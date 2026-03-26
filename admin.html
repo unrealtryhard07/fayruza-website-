@@ -4072,26 +4072,38 @@ function renderCatsTable() {
   const tbody = document.getElementById('cat-tbody');
   if (!tbody) return;
   if (!allCategories.length) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:28px">No categories yet</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:28px">No categories yet. Click ADD CATEGORY to create one.</td></tr>';
     return;
   }
-  tbody.innerHTML = allCategories.map(c => `
-    <tr style="opacity:${c.is_active ? 1 : .45}">
-      <td style="font-size:1.4rem">${c.emoji || '🍽️'}</td>
-      <td><span style="font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:.9rem;text-transform:uppercase">${c.name}</span></td>
-      <td style="color:var(--muted);font-size:.85rem">${c.name_ar || '—'}</td>
-      <td><span style="font-family:Bebas Neue,sans-serif;font-size:.78rem;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,.06);padding:2px 8px;border-radius:4px">${c.category_id}</span></td>
-      <td style="font-family:Bebas Neue,sans-serif;color:var(--muted)">${c.sort_order}</td>
-      <td>${c.is_active
+
+  // Check if we're in fallback mode (no DB ids)
+  var isFallback = allCategories.some(function(c) { return c.id === null; });
+
+  tbody.innerHTML = (isFallback
+    ? '<tr><td colspan="7" style="text-align:center;padding:12px;background:rgba(255,71,87,.08);color:var(--red);font-family:Barlow Condensed,sans-serif;font-size:.82rem;letter-spacing:1px">⚠ Categories loaded from local fallback — run the SQL setup to enable editing</td></tr>'
+    : '') +
+    allCategories.map(function(c) {
+    var hasId = c.id !== null && c.id !== undefined;
+    return '<tr style="opacity:' + (c.is_active ? 1 : .45) + '">' +
+      '<td style="font-size:1.4rem">' + (c.emoji || '🍽️') + '</td>' +
+      '<td><span style="font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:.9rem;text-transform:uppercase">' + c.name + '</span></td>' +
+      '<td style="color:var(--muted);font-size:.85rem">' + (c.name_ar || '—') + '</td>' +
+      '<td><span style="font-family:Bebas Neue,sans-serif;font-size:.78rem;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,.06);padding:2px 8px;border-radius:4px">' + c.category_id + '</span></td>' +
+      '<td style="font-family:Bebas Neue,sans-serif;color:var(--muted)">' + c.sort_order + '</td>' +
+      '<td>' + (c.is_active
         ? '<span style="font-family:Bebas Neue,sans-serif;font-size:.7rem;letter-spacing:1px;color:var(--teal);background:rgba(31,149,120,.1);padding:3px 8px;border-radius:3px">ACTIVE</span>'
-        : '<span style="font-family:Bebas Neue,sans-serif;font-size:.7rem;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,.05);padding:3px 8px;border-radius:3px">HIDDEN</span>'}</td>
-      <td>
-        <div style="display:flex;gap:6px">
-          <button onclick="openCatModal(${c.id})" style="background:rgba(31,149,120,.1);border:1px solid rgba(31,149,120,.25);color:var(--teal);font-family:Bebas Neue,sans-serif,sans-serif;font-size:.75rem;letter-spacing:1px;padding:4px 10px;border-radius:5px;cursor:pointer">✏ EDIT</button>
-          <button onclick="toggleCatActive(${c.id},${!c.is_active})" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--muted);font-family:Bebas Neue,sans-serif;font-size:.75rem;letter-spacing:1px;padding:4px 10px;border-radius:5px;cursor:pointer">${c.is_active ? '🙈 HIDE' : '👁 SHOW'}</button>
-        </div>
-      </td>
-    </tr>`).join('');
+        : '<span style="font-family:Bebas Neue,sans-serif;font-size:.7rem;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,.05);padding:3px 8px;border-radius:3px">HIDDEN</span>') + '</td>' +
+      '<td>' +
+        '<div style="display:flex;gap:6px">' +
+          (hasId
+            ? '<button onclick="openCatModal(' + c.id + ')" style="background:rgba(31,149,120,.1);border:1px solid rgba(31,149,120,.25);color:var(--teal);font-family:Bebas Neue,sans-serif;font-size:.75rem;letter-spacing:1px;padding:4px 10px;border-radius:5px;cursor:pointer">✏ EDIT</button>' +
+              '<button onclick="toggleCatActive(' + c.id + ',' + !c.is_active + ')" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--muted);font-family:Bebas Neue,sans-serif;font-size:.75rem;letter-spacing:1px;padding:4px 10px;border-radius:5px;cursor:pointer">' + (c.is_active ? '🙈 HIDE' : '👁 SHOW') + '</button>'
+            : '<span style="font-family:Barlow Condensed,sans-serif;font-size:.72rem;color:var(--muted)">Run SQL setup first</span>'
+          ) +
+        '</div>' +
+      '</td>' +
+    '</tr>';
+  }).join('');
 }
 
 function openCatModal(dbId) {
@@ -4103,9 +4115,9 @@ function openCatModal(dbId) {
   });
   document.getElementById('cm-active').checked = true;
 
-  if (dbId) {
+  if (dbId !== null && dbId !== undefined) {
     const c = allCategories.find(x => x.id === dbId);
-    if (!c) return;
+    if (!c) { showToast('⚠ Category not found'); return; }
     titleEl.textContent = 'EDIT CATEGORY';
     if (delBtn) delBtn.style.display = 'block';
     document.getElementById('cm-emoji').value   = c.emoji || '';
@@ -4189,11 +4201,27 @@ async function deleteCat() {
 }
 
 async function toggleCatActive(dbId, active) {
+  if (!dbId) {
+    showToast('⚠ Cannot toggle — category not saved to database yet. Edit and save it first.');
+    return;
+  }
   try {
+    // 1. Update the category itself
     const { error } = await sb.from('categories').update({ is_active: active }).eq('id', dbId);
     if (error) throw error;
-    showToast(active ? '👁 Category visible' : '🙈 Category hidden');
+
+    // 2. Find the category_id slug for this db row
+    var cat = allCategories.find(function(c) { return c.id === dbId; });
+    if (cat && cat.category_id) {
+      // 3. Bulk-hide/show all products in this category on the menu
+      var { error: prodErr } = await sb.from('products').update({ is_hidden: !active }).eq('category_id', cat.category_id);
+      if (prodErr) console.warn('Could not bulk-update products:', prodErr.message);
+    }
+
+    showToast(active ? '👁 Category + all its products are now visible' : '🙈 Category + all its products are now hidden from menu');
     await loadCategories();
+    // Refresh products list if that page is also loaded
+    if (allProducts.length) await loadProducts();
   } catch(e) { showToast('⚠ ' + e.message); }
 }
 

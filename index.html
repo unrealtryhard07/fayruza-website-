@@ -949,11 +949,32 @@ async function loadMenuFromSupabase() {
   if (grid) grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-family:sans-serif;letter-spacing:2px">LOADING MENU...</div>';
 
   try {
+    // Load active categories first
+    var activeCatIds = null;
+    try {
+      var catRes = await fetch(_SB_URL + '/rest/v1/categories?select=category_id&is_active=eq.true', {
+        headers: { 'apikey': _SB_KEY, 'Authorization': 'Bearer ' + _SB_KEY }
+      });
+      if (catRes.ok) {
+        var cats = await catRes.json();
+        if (cats && cats.length) {
+          activeCatIds = cats.map(function(c) { return c.category_id; });
+        }
+      }
+    } catch(e) { /* categories table may not exist yet — skip filter */ }
+
     var res = await fetch(_SB_URL + '/rest/v1/products?select=*&is_hidden=eq.false&order=category_sort.asc,sort_order.asc', {
       headers: { 'apikey': _SB_KEY, 'Authorization': 'Bearer ' + _SB_KEY }
     });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     var products = await res.json();
+
+    // Filter out products from hidden categories
+    if (activeCatIds) {
+      products = products.filter(function(p) {
+        return activeCatIds.indexOf(p.category_id) !== -1;
+      });
+    }
 
     if (!products.length) throw new Error('No products found');
 
