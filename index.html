@@ -4,7 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Fayruza Restaurant — Jabriya</title>
+<meta name="description" content="Order from Fayruza Restaurant in Jabriya, Kuwait. Browse our menu of burgers, biryani, rolls, juices & more. Dine in, takeaway, or delivery.">
+<meta property="og:title" content="Fayruza Restaurant — Jabriya, Kuwait">
+<meta property="og:description" content="Browse our menu and order online. Burgers, biryani, rolls, juices & more.">
+<meta property="og:image" content="/icon-512.png">
+<meta property="og:type" content="website">
 <link rel="manifest" href="/manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
 <meta name="theme-color" content="#1F9578">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -791,6 +797,10 @@ body.ar .hero h1{font-size:clamp(50px,12vw,130px);}
   <div class="home-footer">
     <div class="brand">FAYRUZA RESTAURANT</div>
     <div class="addr">Jabriya · Block 12 · Jamia Branch</div>
+    <div style="margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <a href="status.html" style="font-family:'Barlow Condensed',sans-serif;font-size:.82rem;letter-spacing:2px;color:var(--muted);text-decoration:none;padding:6px 14px;border:1px solid rgba(255,255,255,.08);border-radius:6px;transition:color .2s">📍 TRACK ORDER</a>
+      <a href="history.html" style="font-family:'Barlow Condensed',sans-serif;font-size:.82rem;letter-spacing:2px;color:var(--muted);text-decoration:none;padding:6px 14px;border:1px solid rgba(255,255,255,.08);border-radius:6px;transition:color .2s">📜 ORDER HISTORY</a>
+    </div>
   </div>
 
 </div><!-- end #home-view -->
@@ -995,6 +1005,8 @@ function buildCards() {
       '<div class="card-name-ar">' + cat.nameAr + '</div>';
     grid.appendChild(card);
   });
+  // Show FAB if cart was restored from localStorage
+  updateFAB();
 }
 
 /* renderItem defined in cart script */
@@ -1198,6 +1210,7 @@ window.addEventListener('popstate', function() {
   <div class="cv-total" id="cv-total"></div>
   <div class="cv-msg">Your order has been received!<br>We'll prepare it shortly 🍽</div>
   <a id="cv-track-link" href="status.html" style="display:inline-block;margin-top:16px;padding:12px 32px;background:rgba(31,149,120,.15);border:1px solid rgba(31,149,120,.35);color:var(--teal);font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:3px;border-radius:10px;text-decoration:none">📍 TRACK MY ORDER</a>
+  <a id="cv-wa-link" href="#" target="_blank" style="display:none;margin-top:10px;padding:10px 28px;background:rgba(37,211,102,.12);border:1px solid rgba(37,211,102,.3);color:#25d366;font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:2px;border-radius:10px;text-decoration:none">💬 CONTACT ON WHATSAPP</a>
   <button class="cv-back" onclick="backToMenu()">BACK TO MENU</button>
 </div>
 
@@ -1212,6 +1225,16 @@ function g_save(item) { G_ITEMS.push(item); return G_ITEMS.length - 1; }
 var cart = [];
 var g_sizeItem = null, g_sizeKey = 's';
 
+// Restore cart from localStorage on load
+(function() {
+  try {
+    var saved = JSON.parse(localStorage.getItem('fayruza_cart') || '[]');
+    if (Array.isArray(saved) && saved.length) {
+      cart = saved;
+    }
+  } catch(e) {}
+})();
+
 function money(v) {
   v = Number(v)||0;
   if (v===0) return '0 Fils';
@@ -1221,12 +1244,17 @@ function money(v) {
 function cartSum()   { return cart.reduce(function(s,i){return s+i.price*i.qty;},0); }
 function cartCount() { return cart.reduce(function(s,i){return s+i.qty;},0); }
 
+function saveCartToStorage() {
+  try { localStorage.setItem('fayruza_cart', JSON.stringify(cart)); } catch(e) {}
+}
+
 function updateFAB() {
   var n = cartCount();
   var fab = document.getElementById('cart-fab');
   var cnt = document.getElementById('cart-fab-count');
   if (fab) fab.style.display = n>0?'flex':'none';
   if (cnt) cnt.textContent = n;
+  saveCartToStorage();
 }
 
 /* ── renderItem ────────────────────────────────────────────
@@ -1448,6 +1476,10 @@ function g_qty(i,d) {
   cart[i].qty+=d;
   if (cart[i].qty<=0) cart.splice(i,1);
   renderCartBody(); updateFAB();
+}
+
+function g_setNote(i, note) {
+  if (cart[i]) cart[i].note = note || '';
 }
 
 function openCart() {
@@ -1732,6 +1764,14 @@ async function placeOrder() {
     _saveCustomer(_ph, _nm, cart.map(function(c){return Object.assign({},c);}), total);
     var trackLink = document.getElementById('cv-track-link');
     if (trackLink) trackLink.href = 'status.html?order=' + oid;
+    // WhatsApp contact link (if restaurant phone is configured)
+    var waLink = document.getElementById('cv-wa-link');
+    if (waLink && window._settings && window._settings['restaurant_phone']) {
+      var waPhone = window._settings['restaurant_phone'].replace(/[^0-9]/g, '');
+      var waMsg = 'Hi Fayruza! My order ' + oid + ' — just placed, total KD ' + money(total);
+      waLink.href = 'https://wa.me/' + waPhone + '?text=' + encodeURIComponent(waMsg);
+      waLink.style.display = 'inline-block';
+    }
     document.getElementById('cv-total').textContent = money(total);
     document.getElementById('confirm-view').classList.add('open');
     cart=[]; updateFAB();
@@ -1750,7 +1790,7 @@ function backToMenu() {
   _loyaltyDiscount = 0; _loyaltyPointsToRedeem = 0;
   var lb = document.getElementById('co-loyalty-box'); if (lb) lb.style.display='none';
   var ucb = document.getElementById('co-use-points'); if (ucb) ucb.checked = false;
-  document.getElementById('co-reorder-box').style.display='none';;
+  document.getElementById('co-reorder-box').style.display='none';
   var btn=document.getElementById('co-place-btn');
   if (btn) { btn.textContent='PLACE ORDER'; btn.disabled=false; }
 }
@@ -1793,7 +1833,7 @@ async function loadMenuCombos() {
     section.style.display = 'block';
     grid.innerHTML = combos.map(function(c) {
       var includes = (c.items||[]).slice(0,4).map(function(i){ return (i.emoji||'')+'×'+(i.qty||1)+' '+i.name; }).join('  ·  ');
-      return '<div class="item-card" style="cursor:pointer" onclick="addComboToCart(this,'+JSON.stringify(c).replace(/</g,"\u003c").replace(/>/g,"\u003e").replace(/"/g,"&quot;")+')" data-qty="0">'+
+      return '<div class="item-card" style="cursor:pointer" onclick="addComboToCart(this,'+JSON.stringify(c).replace(/</g,"\u003c").replace(/>/g,"\u003e").replace(/"/g,"&quot;")+')" data-qty="0" data-combo-id="'+c.id+'">'+
         (c.badge?'<div class="ic-badge">'+c.badge+'</div>':'')+
         '<span class="ic-emoji">'+(c.emoji||'🎁')+'</span>'+
         '<div class="ic-name">'+c.name+'</div>'+
@@ -2017,6 +2057,26 @@ loadMenuFromSupabase();
 loadMenuCombos();
 loadActiveOffers();
 loadRestaurantSettings();
+
+// Pick up reorder from history page
+(function(){
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('reorder') === '1') {
+    try {
+      var items = JSON.parse(localStorage.getItem('fayruza_reorder') || '[]');
+      localStorage.removeItem('fayruza_reorder');
+      if (items.length) {
+        cart = [];
+        items.forEach(function(i) {
+          cart.push({ id: i.id || i.name, name: i.name, emoji: i.emoji||'🍽️', price: i.price||0, qty: i.qty||1 });
+        });
+        updateFAB();
+        // Auto-open cart after a short delay
+        setTimeout(function() { if (cart.length) openCart(); }, 800);
+      }
+    } catch(e) {}
+  }
+})();
 </script>
 
 

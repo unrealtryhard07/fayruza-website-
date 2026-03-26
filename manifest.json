@@ -28,6 +28,16 @@
       "description": "Browse our menu"
     },
     {
+      "name": "Track Order",
+      "url": "/status.html",
+      "description": "Track your order status"
+    },
+    {
+      "name": "Order History",
+      "url": "/history.html",
+      "description": "View your past orders"
+    },
+    {
       "name": "Admin Panel",
       "url": "/login.html",
       "description": "Staff admin access"

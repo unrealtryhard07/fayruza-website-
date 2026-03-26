@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fayruza Admin</title>
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <!-- Auth guard — runs before anything renders -->
@@ -436,6 +437,16 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
                 <button onclick="saveSetting('min_order_delivery', document.getElementById('setting-min-delivery').value)" style="background:var(--green);color:#fff;font-family:Bebas Neue,sans-serif;font-size:.82rem;letter-spacing:2px;padding:7px 14px;border:none;border-radius:6px;cursor:pointer">SAVE</button>
               </div>
             </div>
+            <div>
+              <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Restaurant WhatsApp No. (with country code)</label>
+              <div style="display:flex;gap:8px">
+                <input type="tel" id="setting-restaurant-phone" placeholder="e.g. 96599999999" style="flex:1;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow Condensed,sans-serif;font-size:.95rem;padding:7px 11px;border-radius:6px;outline:none">
+                <button onclick="saveSetting('restaurant_phone', document.getElementById('setting-restaurant-phone').value)" style="background:var(--green);color:#fff;font-family:Bebas Neue,sans-serif;font-size:.82rem;letter-spacing:2px;padding:7px 14px;border:none;border-radius:6px;cursor:pointer">SAVE</button>
+              </div>
+              <div style="font-family:Barlow Condensed,sans-serif;font-size:.68rem;color:var(--muted);margin-top:4px;letter-spacing:1px">
+                Shown to customers after ordering · "Contact on WhatsApp" button
+              </div>
+            </div>
           </div>
         </div>
 
@@ -581,12 +592,20 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
 
     <!-- CUSTOMERS PAGE -->
     <div class="page" id="page-customers">
+      <!-- Customer Stats -->
+      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:18px">
+        <div class="stat-card"><div class="stat-icon">👤</div><div class="stat-lbl">Total Customers</div><div class="stat-val" id="cs-total">–</div><div class="stat-sub">Registered</div></div>
+        <div class="stat-card"><div class="stat-icon">🔄</div><div class="stat-lbl">Returning</div><div class="stat-val" id="cs-returning">–</div><div class="stat-sub">2+ orders</div></div>
+        <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-lbl">Avg Lifetime Value</div><div class="stat-val" id="cs-ltv">–</div><div class="stat-sub">Per customer</div></div>
+        <div class="stat-card"><div class="stat-icon">⭐</div><div class="stat-lbl">Total Points Outstanding</div><div class="stat-val" id="cs-points">–</div><div class="stat-sub">All customers</div></div>
+      </div>
       <div class="panel">
         <div class="ph">
           <div class="ph-title">CUSTOMER HISTORY</div>
           <div class="ph-actions">
             <input class="search-inp" id="cust-search" placeholder="Search name or phone…" oninput="renderCustomersTable()">
             <button class="btn-refresh" onclick="loadCustomers()">↻</button>
+            <button onclick="exportCustomersCSV()" style="background:rgba(31,149,120,.12);border:1px solid rgba(31,149,120,.4);color:var(--teal);font-family:Bebas Neue,sans-serif;font-size:.82rem;letter-spacing:2px;padding:6px 14px;border-radius:6px;cursor:pointer">⬇ EXPORT</button>
           </div>
         </div>
         <div class="tbl-wrap">
@@ -761,14 +780,41 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
       <div id="pm-price-fields">
         <!-- Populated by setPriceType -->
       </div>
-      <!-- Image URL field -->
+      <!-- Image Upload / URL field -->
       <div style="margin-top:10px">
-        <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Photo URL (optional)</label>
-        <input type="url" id="pm-image" placeholder="https://... paste image link or leave blank"
+        <label style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:8px">Product Photo</label>
+        <!-- Upload zone -->
+        <div id="pm-upload-zone" style="border:2px dashed rgba(31,149,120,.3);border-radius:10px;padding:20px 14px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(31,149,120,.03);position:relative"
+          onclick="document.getElementById('pm-file-input').click()"
+          ondragover="event.preventDefault();this.style.borderColor='var(--teal)';this.style.background='rgba(31,149,120,.08)'"
+          ondragleave="this.style.borderColor='rgba(31,149,120,.3)';this.style.background='rgba(31,149,120,.03)'"
+          ondrop="event.preventDefault();this.style.borderColor='rgba(31,149,120,.3)';this.style.background='rgba(31,149,120,.03)';handleImageDrop(event)">
+          <div style="font-size:1.8rem;margin-bottom:6px">📸</div>
+          <div style="font-family:Barlow Condensed,sans-serif;font-size:.85rem;color:var(--text);letter-spacing:1px">Drop image here or tap to upload</div>
+          <div style="font-family:Barlow Condensed,sans-serif;font-size:.68rem;color:var(--muted);margin-top:4px;letter-spacing:1px">JPG, PNG, WebP · Max 2MB</div>
+          <input type="file" id="pm-file-input" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="handleImageSelect(this)">
+        </div>
+        <!-- Upload progress -->
+        <div id="pm-upload-progress" style="display:none;margin-top:8px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="flex:1;height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden">
+              <div id="pm-upload-bar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--green),var(--teal));border-radius:2px;transition:width .3s"></div>
+            </div>
+            <span id="pm-upload-pct" style="font-family:Barlow Condensed,sans-serif;font-size:.75rem;color:var(--teal);min-width:36px;text-align:right">0%</span>
+          </div>
+        </div>
+        <!-- OR divider -->
+        <div style="display:flex;align-items:center;gap:10px;margin:10px 0">
+          <div style="flex:1;height:1px;background:var(--border)"></div>
+          <span style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:2px;color:var(--muted)">OR PASTE URL</span>
+          <div style="flex:1;height:1px;background:var(--border)"></div>
+        </div>
+        <input type="url" id="pm-image" placeholder="https://... paste image link"
           style="width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:Barlow,sans-serif,sans-serif;font-size:.85rem;padding:8px 11px;border-radius:6px;outline:none">
-        <div style="font-family:Barlow Condensed,sans-serif;font-size:.67rem;color:var(--muted);margin-top:4px;letter-spacing:1px">Upload image to imgur.com or imgbb.com → paste the direct link here</div>
-        <div id="pm-img-preview" style="margin-top:8px;display:none">
-          <img id="pm-img-thumb" src="" style="height:70px;border-radius:6px;object-fit:cover;border:1px solid var(--border)">
+        <!-- Preview -->
+        <div id="pm-img-preview" style="margin-top:8px;display:none;position:relative">
+          <img id="pm-img-thumb" src="" style="height:80px;border-radius:6px;object-fit:cover;border:1px solid var(--border)">
+          <button onclick="clearProductImage()" style="position:absolute;top:-6px;left:72px;width:22px;height:22px;border-radius:50%;background:var(--red);color:#fff;border:none;cursor:pointer;font-size:.7rem;display:flex;align-items:center;justify-content:center">✕</button>
         </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
@@ -1418,9 +1464,10 @@ function printReceipt(id) {
   var itemRows = items.map(function(i) {
     var name = i.name + (i.size ? ' ('+i.size+')' : '');
     var total = ((i.price||0)*(i.qty||1)).toFixed(3);
+    var noteRow = i.note ? '<tr><td></td><td colspan="3" class="rc-sm" style="font-style:italic;color:#555;padding:0 1mm 1mm">↳ '+i.note+'</td></tr>' : '';
     return '<tr><td class="rc-qty">'+i.qty+'</td><td class="rc-name">'+name+'</td>'+
            '<td class="rc-price">'+parseFloat(i.price||0).toFixed(3)+'</td>'+
-           '<td class="rc-total">'+total+'</td></tr>';
+           '<td class="rc-total">'+total+'</td></tr>'+noteRow;
   }).join('');
 
   var discRow  = (o.discount_amt > 0)
@@ -1432,34 +1479,35 @@ function printReceipt(id) {
   var notesRow = o.notes
     ? '<div class="rc-notes">Note: '+o.notes+'</div>' : '';
 
+  // Loyalty points earned (10 pts per 1 KD spent by default)
+  var loyaltyRate = parseInt((window._settings && window._settings['loyalty_rate']) || 10);
+  var ptsEarned = Math.floor((o.total || 0) * loyaltyRate);
+  var loyaltyRow = (o.customer_phone && ptsEarned > 0)
+    ? '<div class="rc-row" style="margin-top:1mm"><span>⭐ Points Earned</span><span>+' + ptsEarned + ' pts</span></div>' : '';
+
+  // Points redeemed
+  var ptsRedeemedRow = (o.points_redeemed > 0)
+    ? '<div class="rc-row sm"><span>Points Redeemed</span><span>' + o.points_redeemed + ' pts</span></div>' : '';
+
+  // QR code for order tracking
+  var trackUrl = 'https://fayruza-website.vercel.app/status.html?order=' + encodeURIComponent(o.order_id || o.id);
+  var qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=' + encodeURIComponent(trackUrl);
+
   var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">'+
     '<title>Receipt '+(o.order_id||o.id)+'</title>'+
     '<style>'+
-    /* ─────── KEY FIX: @page forces single column, no margins ─────── */
     '@page{size:80mm auto;margin:3mm;}'+
     '*{margin:0;padding:0;box-sizing:border-box;}'+
     'html,body{background:#fff;color:#000;}'+
-    /* Outer wrapper: centers narrow receipt on any paper size */
     '.rc-page{'+
-      'width:72mm;'+           /* 72mm = standard 80mm thermal content width */
-      'max-width:72mm;'+
-      'margin:4mm auto;'+      /* center on wider paper like A4 */
-      'padding:0;'+
-      'font-family:"Courier New",Courier,monospace;'+
-      'font-size:8.5pt;'+
-      'page-break-inside:avoid;'+   /* prevent splitting across pages */
-      'orphans:999;widows:999;'+    /* keep all lines together */
+      'width:72mm;max-width:72mm;margin:4mm auto;padding:0;'+
+      'font-family:"Courier New",Courier,monospace;font-size:8.5pt;'+
+      'page-break-inside:avoid;orphans:999;widows:999;'+
     '}'+
-    /* Force the receipt wrapper to stay on ONE page by capping height */
     '@media print{'+
       'html,body{height:auto!important;overflow:visible;}'+
-      '.rc-page{'+
-        'width:72mm!important;'+
-        'margin:0 auto!important;'+
-        'page-break-after:avoid!important;'+
-        'page-break-before:avoid!important;'+
-        'page-break-inside:avoid!important;'+
-      '}'+
+      '.rc-page{width:72mm!important;margin:0 auto!important;'+
+        'page-break-after:avoid!important;page-break-before:avoid!important;page-break-inside:avoid!important;}'+
     '}'+
     '.rc-center{text-align:center;}'+
     '.rc-bold{font-weight:bold;}'+
@@ -1479,6 +1527,8 @@ function printReceipt(id) {
     '.rc-row.grand{font-size:12pt;font-weight:bold;padding:1.5mm 0;border-top:1.5px solid #000;margin-top:1mm;}'+
     '.rc-row.sm{font-size:7pt;color:#555;}'+
     '.rc-notes{font-size:7.5pt;color:#333;margin:1.5mm 0;font-style:italic;}'+
+    '.rc-qr{text-align:center;margin-top:3mm;}'+
+    '.rc-qr img{width:22mm;height:22mm;}'+
     '</style></head><body>'+
     '<div class="rc-page">'+
       '<div class="rc-center"><div class="rc-xl">FAYRUZA</div>'+
@@ -1497,10 +1547,14 @@ function printReceipt(id) {
       '<hr class="rc-dash">'+
       '<div class="rc-row"><span>Subtotal</span><span>KD '+parseFloat(o.subtotal||0).toFixed(3)+'</span></div>'+
       discRow+
+      ptsRedeemedRow+
       '<div class="rc-row grand"><span>TOTAL</span><span>KD '+parseFloat(o.total||0).toFixed(3)+'</span></div>'+
+      loyaltyRow+
       notesRow+
       '<hr class="rc-dash">'+
-      '<div class="rc-center rc-sm" style="margin-top:2mm">Thank you! · شكراً لزيارتكم</div>'+
+      '<div class="rc-qr"><img src="'+qrUrl+'" alt="Track Order"><div class="rc-sm" style="margin-top:1mm">Scan to track your order</div></div>'+
+      '<hr class="rc-dash">'+
+      '<div class="rc-center rc-sm" style="margin-top:1mm">Thank you! · شكراً لزيارتكم</div>'+
       '<div class="rc-center rc-sm">fayruza-website.vercel.app</div>'+
       '<div style="height:6mm"></div>'+
     '</div>'+
@@ -1810,11 +1864,17 @@ function showPage(name, btn) {
   document.querySelectorAll('.nb').forEach(n => n.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
   btn.classList.add('active');
-  const titles = {dashboard:'DASHBOARD', orders:'ORDERS', reports:'REPORTS', products:'PRODUCTS', users:'TEAM USERS'};
+  const titles = {dashboard:'DASHBOARD', orders:'ORDERS', reports:'REPORTS', products:'PRODUCTS', users:'TEAM USERS', customers:'CUSTOMERS', categories:'CATEGORIES', combos:'COMBOS', offers:'SPECIAL OFFERS', shifts:'SHIFTS', expenses:'EXPENSES', settings:'SETTINGS', qrcodes:'TABLE QR CODES'};
   document.getElementById('page-title').textContent = titles[name]||name.toUpperCase();
   if (name==='orders') renderOrdersTable();
   if (name==='reports') renderReport();
   if (name==='products') { loadProducts(); }
+  if (name==='customers') { loadCustomers(); }
+  if (name==='shifts') { loadShifts(); }
+  if (name==='offers') { loadOffers(); }
+  if (name==='expenses') { loadExpenses(); }
+  if (name==='categories') { loadCategories(); }
+  if (name==='combos') { loadCombos(); }
   closeSidebarMobile();
 }
 function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
@@ -2225,6 +2285,96 @@ function pm_previewImage(url) {
 document.addEventListener('input', function(e) {
   if (e.target && e.target.id === 'pm-image') pm_previewImage(e.target.value);
 });
+
+function clearProductImage() {
+  var imgEl = document.getElementById('pm-image');
+  if (imgEl) imgEl.value = '';
+  pm_previewImage('');
+}
+
+function handleImageDrop(event) {
+  var files = event.dataTransfer.files;
+  if (files && files.length) uploadProductImage(files[0]);
+}
+
+function handleImageSelect(input) {
+  if (input.files && input.files.length) uploadProductImage(input.files[0]);
+  input.value = ''; // reset so same file can be re-selected
+}
+
+async function uploadProductImage(file) {
+  // Validate
+  if (!file.type.match(/^image\/(jpeg|png|webp)$/)) {
+    showToast('⚠ Only JPG, PNG, or WebP images allowed');
+    return;
+  }
+  if (file.size > 2 * 1024 * 1024) {
+    showToast('⚠ Image must be under 2MB');
+    return;
+  }
+
+  var progressEl = document.getElementById('pm-upload-progress');
+  var barEl = document.getElementById('pm-upload-bar');
+  var pctEl = document.getElementById('pm-upload-pct');
+  var zoneEl = document.getElementById('pm-upload-zone');
+
+  // Show progress
+  if (progressEl) progressEl.style.display = 'block';
+  if (barEl) barEl.style.width = '10%';
+  if (pctEl) pctEl.textContent = '10%';
+  if (zoneEl) zoneEl.style.opacity = '.5';
+
+  try {
+    // Generate unique filename
+    var ext = file.name.split('.').pop().toLowerCase();
+    var filename = 'product_' + Date.now() + '_' + Math.random().toString(36).substring(2,8) + '.' + ext;
+
+    if (barEl) barEl.style.width = '30%';
+    if (pctEl) pctEl.textContent = '30%';
+
+    // Upload to Supabase Storage
+    var { data, error } = await sb.storage.from('product-images').upload(filename, file, {
+      cacheControl: '3600',
+      upsert: false,
+      contentType: file.type
+    });
+
+    if (error) throw error;
+
+    if (barEl) barEl.style.width = '80%';
+    if (pctEl) pctEl.textContent = '80%';
+
+    // Get public URL
+    var { data: urlData } = sb.storage.from('product-images').getPublicUrl(filename);
+    var publicUrl = urlData.publicUrl;
+
+    if (barEl) barEl.style.width = '100%';
+    if (pctEl) pctEl.textContent = '100%';
+
+    // Set the URL in the input field
+    var imgInput = document.getElementById('pm-image');
+    if (imgInput) imgInput.value = publicUrl;
+    pm_previewImage(publicUrl);
+
+    showToast('✓ Image uploaded successfully');
+
+  } catch(e) {
+    console.error('Upload error:', e);
+    // Fallback: if storage bucket doesn't exist, show helpful message
+    if (e.message && (e.message.includes('Bucket not found') || e.message.includes('not found'))) {
+      showToast('⚠ Storage bucket "product-images" not found. Create it in Supabase → Storage, or paste a URL instead.');
+    } else {
+      showToast('⚠ Upload failed: ' + (e.message || 'Unknown error'));
+    }
+  } finally {
+    // Hide progress after a moment
+    setTimeout(function() {
+      if (progressEl) progressEl.style.display = 'none';
+      if (barEl) barEl.style.width = '0%';
+      if (zoneEl) zoneEl.style.opacity = '1';
+    }, 800);
+  }
+}
 
 /* ══════════════════════════════════════════
    DAILY CLOSING REPORT (PDF/Print)
@@ -3011,6 +3161,9 @@ function applySettingsToUI() {
 
   var rrEl = document.getElementById('setting-redeem-rate');
   if (rrEl) rrEl.value = _settings['loyalty_redeem_rate'] || '100';
+
+  var rpEl = document.getElementById('setting-restaurant-phone');
+  if (rpEl) rpEl.value = _settings['restaurant_phone'] || '';
 
   renderOpeningHoursEditor();
 
@@ -4268,7 +4421,49 @@ async function loadCustomers() {
     if (error) throw error;
     allCustomers = data || [];
     renderCustomersTable();
+    renderCustomerStats();
   } catch(e) { showToast('⚠ Could not load customers: ' + e.message); }
+}
+
+function renderCustomerStats() {
+  var total = allCustomers.length;
+  var returning = allCustomers.filter(function(c){ return c.total_orders >= 2; }).length;
+  var totalSpent = allCustomers.reduce(function(s,c){ return s + (c.total_spent||0); }, 0);
+  var avgLtv = total > 0 ? totalSpent / total : 0;
+  var totalPts = allCustomers.reduce(function(s,c){ return s + (c.points_balance||0); }, 0);
+
+  var el1 = document.getElementById('cs-total');
+  var el2 = document.getElementById('cs-returning');
+  var el3 = document.getElementById('cs-ltv');
+  var el4 = document.getElementById('cs-points');
+  if (el1) el1.textContent = total;
+  if (el2) el2.textContent = returning;
+  if (el3) el3.textContent = fmt(avgLtv);
+  if (el4) el4.textContent = totalPts.toLocaleString();
+}
+
+function exportCustomersCSV() {
+  if (!allCustomers.length) { showToast('⚠ No customers to export'); return; }
+  var rows = [['Name','Phone','Total Orders','Total Spent (KD)','Points Balance','Last Order Date']];
+  allCustomers.forEach(function(c) {
+    rows.push([
+      c.name||'',
+      c.phone||'',
+      c.total_orders||0,
+      (c.total_spent||0).toFixed(3),
+      c.points_balance||0,
+      c.last_order_at ? fmtDate(c.last_order_at) : ''
+    ]);
+  });
+  var csv = rows.map(function(r){ return r.map(function(v){ return '"'+String(v).replace(/"/g,'""')+'"'; }).join(','); }).join('\n');
+  var blob = new Blob([csv], {type:'text/csv'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'fayruza_customers_' + new Date().toISOString().split('T')[0] + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✓ Customers exported to CSV');
 }
 
 function renderCustomersTable() {
@@ -4280,17 +4475,19 @@ function renderCustomersTable() {
     return (c.name||'').toLowerCase().includes(search) || (c.phone||'').includes(search);
   });
   if (!list.length) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:28px">No customers yet. Phone numbers entered at checkout will appear here.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:28px">No customers yet. Phone numbers entered at checkout will appear here.</td></tr>';
     return;
   }
   tbody.innerHTML = list.map(function(c) {
     var lastItems = (c.last_order||[]).slice(0,3).map(function(i){ return (i.emoji||'')+'×'+(i.qty||1)+' '+i.name; }).join(' · ');
     var lastDate = c.last_order_at ? fmtDate(c.last_order_at) : '—';
+    var pts = c.points_balance || 0;
     return '<tr>'+
       '<td style="font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:.9rem">'+(c.name||'<span style="color:var(--muted)">—</span>')+'</td>'+
       '<td style="font-family:Barlow Condensed,sans-serif;color:var(--teal)">'+c.phone+'</td>'+
       '<td style="font-family:\'Bebas Neue\',sans-serif;font-size:1.1rem;color:var(--teal)">'+c.total_orders+'</td>'+
       '<td class="amt">'+fmt(c.total_spent)+'</td>'+
+      '<td style="font-family:Bebas Neue,sans-serif;font-size:1rem;color:var(--yellow)">'+(pts>0?pts+' pts':'—')+'</td>'+
       '<td style="font-size:.78rem;color:var(--muted)">'+lastDate+'</td>'+
       '<td style="font-size:.78rem;color:var(--muted);max-width:200px">'+lastItems+'</td>'+
     '</tr>';

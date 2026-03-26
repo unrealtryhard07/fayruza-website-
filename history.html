@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order History — Fayruza Restaurant</title>
+<meta name="description" content="View your order history and loyalty points at Fayruza Restaurant, Jabriya.">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--green:#1F9578;--teal:#4DC4A3;--dark:#0A0F0D;--dark2:#0E1511;--card:#111714;--border:rgba(255,255,255,.08);--text:#EDF5F2;--muted:#7A9990;--red:#ff4757;--yellow:#ffd43b;}
+body{background:var(--dark);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;padding:20px;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(31,149,120,.06),transparent 70%);pointer-events:none;}
+
+.header{text-align:center;padding:30px 20px 24px;}
+.logo{font-family:'Bebas Neue';font-size:2rem;letter-spacing:5px;background:linear-gradient(90deg,var(--teal),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.logo-sub{font-family:'Barlow Condensed';font-size:.75rem;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-top:2px;}
+
+.search-wrap{max-width:420px;margin:0 auto 32px;}
+.search-label{font-family:'Barlow Condensed';font-size:.7rem;letter-spacing:4px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:8px;text-align:center;}
+.search-row{display:flex;gap:8px;}
+.search-inp{flex:1;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:'Barlow Condensed';font-size:1rem;letter-spacing:1px;padding:13px 16px;border-radius:10px;outline:none;transition:border-color .2s;-webkit-appearance:none;}
+.search-inp:focus{border-color:var(--teal);}
+.search-inp::placeholder{color:var(--muted);}
+.search-btn{background:var(--green);color:#fff;font-family:'Bebas Neue';font-size:1rem;letter-spacing:2px;padding:13px 20px;border:none;border-radius:10px;cursor:pointer;white-space:nowrap;transition:background .2s;}
+.search-btn:hover{background:#167A62;}
+.search-btn:active{transform:scale(.97);}
+
+/* Profile Card */
+.profile-card{max-width:420px;margin:0 auto 20px;background:var(--dark2);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
+.pc-header{padding:20px;display:flex;align-items:center;gap:16px;border-bottom:1px solid var(--border);}
+.pc-avatar{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--teal));display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;}
+.pc-info{flex:1;}
+.pc-name{font-family:'Bebas Neue';font-size:1.3rem;letter-spacing:2px;}
+.pc-phone{font-family:'Barlow Condensed';font-size:.85rem;color:var(--muted);letter-spacing:1px;}
+.pc-member{font-family:'Barlow Condensed';font-size:.72rem;color:var(--teal);letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
+
+.pc-stats{display:grid;grid-template-columns:1fr 1fr 1fr;padding:0;}
+.pc-stat{text-align:center;padding:16px 10px;border-right:1px solid var(--border);}
+.pc-stat:last-child{border-right:none;}
+.pc-stat-val{font-family:'Bebas Neue';font-size:1.4rem;color:var(--teal);}
+.pc-stat-lbl{font-family:'Barlow Condensed';font-size:.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:2px;}
+
+/* Loyalty Banner */
+.loyalty-banner{max-width:420px;margin:0 auto 20px;background:linear-gradient(135deg,rgba(255,212,59,.1),rgba(255,212,59,.04));border:1px solid rgba(255,212,59,.2);border-radius:12px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;}
+.lb-left{display:flex;align-items:center;gap:12px;}
+.lb-icon{font-size:1.8rem;}
+.lb-pts{font-family:'Bebas Neue';font-size:1.5rem;color:var(--yellow);}
+.lb-lbl{font-family:'Barlow Condensed';font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+.lb-value{font-family:'Barlow Condensed';font-size:.85rem;color:var(--yellow);}
+
+/* Orders List */
+.orders-section{max-width:420px;margin:0 auto;}
+.os-title{font-family:'Barlow Condensed';font-size:.68rem;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;padding:0 4px;}
+
+.order-card{background:var(--dark2);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px;transition:border-color .2s;}
+.order-card:hover{border-color:rgba(31,149,120,.25);}
+.oc-header{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);cursor:pointer;}
+.oc-left{}
+.oc-oid{font-family:'Bebas Neue';font-size:1.05rem;letter-spacing:1px;}
+.oc-date{font-family:'Barlow Condensed';font-size:.78rem;color:var(--muted);margin-top:1px;}
+.oc-right{text-align:right;}
+.oc-total{font-family:'Bebas Neue';font-size:1.1rem;color:var(--teal);}
+.oc-status{font-family:'Bebas Neue';font-size:.65rem;letter-spacing:1px;padding:2px 8px;border-radius:10px;display:inline-block;margin-top:3px;}
+.oc-status.done{background:rgba(31,149,120,.15);color:var(--teal);}
+.oc-status.cancelled{background:rgba(255,71,87,.12);color:var(--red);}
+.oc-status.new,.oc-status.preparing,.oc-status.ready{background:rgba(255,212,59,.15);color:var(--yellow);}
+
+.oc-details{display:none;padding:12px 16px;border-top:1px solid var(--border);}
+.oc-details.open{display:block;}
+.oc-item{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.03);font-family:'Barlow Condensed';font-size:.85rem;}
+.oc-item:last-child{border-bottom:none;}
+.oc-item-name{color:var(--text);}
+.oc-item-qty{color:var(--muted);font-size:.75rem;margin-left:4px;}
+.oc-item-price{color:var(--teal);font-weight:700;}
+.oc-meta{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+.oc-badge{font-family:'Barlow Condensed';font-size:.72rem;letter-spacing:1px;padding:4px 10px;border-radius:16px;background:rgba(255,255,255,.06);color:var(--muted);}
+.oc-reorder{margin-top:10px;width:100%;padding:10px;background:rgba(31,149,120,.12);border:1px solid rgba(31,149,120,.3);color:var(--teal);font-family:'Bebas Neue';font-size:.88rem;letter-spacing:2px;border-radius:8px;cursor:pointer;transition:background .2s;}
+.oc-reorder:hover{background:rgba(31,149,120,.22);}
+
+/* States */
+.state-box{max-width:420px;margin:0 auto;text-align:center;padding:60px 20px;}
+.state-icon{font-size:3.5rem;display:block;margin-bottom:16px;}
+.state-title{font-family:'Bebas Neue';font-size:1.4rem;letter-spacing:3px;margin-bottom:6px;}
+.state-sub{font-family:'Barlow Condensed';font-size:.9rem;color:var(--muted);letter-spacing:1px;}
+
+.back-link{display:block;text-align:center;margin-top:24px;font-family:'Barlow Condensed';font-size:.85rem;letter-spacing:2px;color:var(--muted);text-decoration:none;}
+.back-link:hover{color:var(--teal);}
+
+.load-more{display:block;max-width:420px;margin:12px auto 0;width:100%;padding:12px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);font-family:'Bebas Neue';font-size:.88rem;letter-spacing:2px;border-radius:8px;cursor:pointer;transition:all .2s;}
+.load-more:hover{border-color:var(--teal);color:var(--teal);}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">FAYRUZA</div>
+  <div class="logo-sub">Order History</div>
+</div>
+
+<div class="search-wrap">
+  <span class="search-label">Enter your phone number</span>
+  <div class="search-row">
+    <input class="search-inp" id="phone-inp" type="tel" placeholder="e.g. 9XXXXXXX"
+      autocomplete="tel" inputmode="numeric"
+      onkeydown="if(event.key==='Enter') lookupHistory()">
+    <button class="search-btn" onclick="lookupHistory()">LOOK UP</button>
+  </div>
+</div>
+
+<div id="result-area"></div>
+
+<a href="index.html" class="back-link">← Back to Menu</a>
+
+<script>
+var SB_URL = 'https://zbsdmtjtypzfqrjuvpts.supabase.co';
+var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpic2RtdGp0eXB6ZnFyanV2cHRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyNTQ2ODcsImV4cCI6MjA4OTgzMDY4N30.qeoSk8L7SQbsKetUEbm5Koe0iIIVlkhKkaaUG9qVrxo';
+var sb = supabase.createClient(SB_URL, SB_KEY);
+
+var customerData = null;
+var allCustomerOrders = [];
+var displayedCount = 0;
+var PAGE_SIZE = 10;
+
+function fmt(kd) {
+  if (!kd) return '0 Fils';
+  if (kd < 1) return Math.round(kd * 1000) + ' Fils';
+  return Number(kd).toFixed(3) + ' KD';
+}
+function fmtTime(ts) {
+  if (!ts) return '';
+  return new Date(ts).toLocaleTimeString('en-KW', {hour:'2-digit',minute:'2-digit'});
+}
+function fmtDate(ts) {
+  if (!ts) return '';
+  return new Date(ts).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'});
+}
+function fmtRelative(ts) {
+  if (!ts) return '';
+  var diff = Date.now() - new Date(ts).getTime();
+  var mins = Math.floor(diff / 60000);
+  if (mins < 60) return mins + 'm ago';
+  var hrs = Math.floor(mins / 60);
+  if (hrs < 24) return hrs + 'h ago';
+  var days = Math.floor(hrs / 24);
+  if (days < 7) return days + 'd ago';
+  return fmtDate(ts);
+}
+
+// Auto-fill from URL param ?phone=XXXX
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var phone = params.get('phone');
+  if (phone) {
+    document.getElementById('phone-inp').value = phone;
+    lookupHistory();
+  }
+})();
+
+async function lookupHistory() {
+  var raw = (document.getElementById('phone-inp').value || '').trim().replace(/[^0-9+]/g, '');
+  if (!raw || raw.length < 8) {
+    document.getElementById('result-area').innerHTML =
+      '<div class="state-box"><span class="state-icon">📱</span><div class="state-title">ENTER YOUR PHONE</div><div class="state-sub">We need at least 8 digits to look you up</div></div>';
+    return;
+  }
+
+  var area = document.getElementById('result-area');
+  area.innerHTML = '<div class="state-box"><span class="state-icon">⏳</span><div class="state-title">LOOKING UP...</div></div>';
+
+  try {
+    // Lookup customer
+    var custRes = await fetch(SB_URL + '/rest/v1/customers?phone=eq.' + encodeURIComponent(raw) + '&limit=1', {
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+    });
+    var customers = await custRes.json();
+
+    if (!customers || !customers.length) {
+      area.innerHTML = '<div class="state-box"><span class="state-icon">🔍</span><div class="state-title">NOT FOUND</div><div class="state-sub">No order history for this phone number.<br>Place your first order to get started!</div></div>';
+      return;
+    }
+
+    customerData = customers[0];
+
+    // Fetch all orders by this phone
+    var ordRes = await fetch(SB_URL + '/rest/v1/orders?customer_phone=eq.' + encodeURIComponent(raw) + '&order=created_at.desc&limit=100', {
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+    });
+    allCustomerOrders = await ordRes.json() || [];
+
+    displayedCount = 0;
+    renderProfile();
+  } catch(e) {
+    area.innerHTML = '<div class="state-box"><span class="state-icon">⚠️</span><div class="state-title">ERROR</div><div class="state-sub">' + e.message + '</div></div>';
+  }
+}
+
+function renderProfile() {
+  var c = customerData;
+  var area = document.getElementById('result-area');
+  var totalSpent = allCustomerOrders.reduce(function(s,o){ return s + (o.total||0); }, 0);
+  var completedOrders = allCustomerOrders.filter(function(o){ return o.status === 'done'; });
+  var avgOrder = completedOrders.length ? totalSpent / completedOrders.length : 0;
+  var pts = c.points_balance || 0;
+
+  // Calculate loyalty tier
+  var tier = 'New';
+  var tierEmoji = '🌱';
+  if (allCustomerOrders.length >= 50) { tier = 'Gold'; tierEmoji = '🥇'; }
+  else if (allCustomerOrders.length >= 20) { tier = 'Silver'; tierEmoji = '🥈'; }
+  else if (allCustomerOrders.length >= 5) { tier = 'Regular'; tierEmoji = '⭐'; }
+
+  var html = '';
+
+  // Profile card
+  html += '<div class="profile-card">' +
+    '<div class="pc-header">' +
+      '<div class="pc-avatar">' + tierEmoji + '</div>' +
+      '<div class="pc-info">' +
+        '<div class="pc-name">' + (c.name || 'Customer') + '</div>' +
+        '<div class="pc-phone">📱 ' + c.phone + '</div>' +
+        '<div class="pc-member">' + tierEmoji + ' ' + tier + ' Member</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="pc-stats">' +
+      '<div class="pc-stat"><div class="pc-stat-val">' + allCustomerOrders.length + '</div><div class="pc-stat-lbl">Orders</div></div>' +
+      '<div class="pc-stat"><div class="pc-stat-val">' + fmt(totalSpent) + '</div><div class="pc-stat-lbl">Total Spent</div></div>' +
+      '<div class="pc-stat"><div class="pc-stat-val">' + fmt(avgOrder) + '</div><div class="pc-stat-lbl">Avg Order</div></div>' +
+    '</div>' +
+  '</div>';
+
+  // Loyalty banner
+  if (pts > 0) {
+    var redeemValue = Math.floor(pts / 100);
+    html += '<div class="loyalty-banner">' +
+      '<div class="lb-left">' +
+        '<div class="lb-icon">⭐</div>' +
+        '<div>' +
+          '<div class="lb-pts">' + pts + ' pts</div>' +
+          '<div class="lb-lbl">Loyalty Balance</div>' +
+        '</div>' +
+      '</div>' +
+      (redeemValue > 0 ? '<div class="lb-value">= ' + redeemValue + '.000 KD</div>' : '') +
+    '</div>';
+  }
+
+  // Orders section
+  html += '<div class="orders-section">' +
+    '<div class="os-title">ORDER HISTORY (' + allCustomerOrders.length + ')</div>' +
+    '<div id="orders-list"></div>' +
+  '</div>';
+
+  area.innerHTML = html;
+
+  // Render first batch of orders
+  renderMoreOrders();
+}
+
+function renderMoreOrders() {
+  var listEl = document.getElementById('orders-list');
+  if (!listEl) return;
+
+  var end = Math.min(displayedCount + PAGE_SIZE, allCustomerOrders.length);
+  var typeL = { dinein:'🍽 Dine In', takeaway:'🥡 Takeaway', delivery:'🚴 Delivery' };
+  var payL = { cash:'💵 Cash', knet:'💳 KNET', card:'💳 Card' };
+
+  var html = '';
+  for (var i = displayedCount; i < end; i++) {
+    var o = allCustomerOrders[i];
+    var items = o.items || [];
+    var statusClass = (o.status || 'done');
+
+    html += '<div class="order-card">' +
+      '<div class="oc-header" onclick="toggleOrderDetails(this)">' +
+        '<div class="oc-left">' +
+          '<div class="oc-oid">#' + (o.order_id || o.id) + '</div>' +
+          '<div class="oc-date">' + fmtDate(o.created_at) + ' · ' + fmtTime(o.created_at) + ' · ' + fmtRelative(o.created_at) + '</div>' +
+        '</div>' +
+        '<div class="oc-right">' +
+          '<div class="oc-total">' + fmt(o.total) + '</div>' +
+          '<span class="oc-status ' + statusClass + '">' + (o.status || '').toUpperCase() + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="oc-details">' +
+        items.map(function(it) {
+          return '<div class="oc-item">' +
+            '<span class="oc-item-name">' + (it.emoji||'') + ' ' + it.name + (it.size?' ('+it.size+')':'') + '<span class="oc-item-qty">×' + (it.qty||1) + '</span></span>' +
+            '<span class="oc-item-price">' + fmt((it.price||0)*(it.qty||1)) + '</span>' +
+          '</div>';
+        }).join('') +
+        (o.notes ? '<div style="font-family:Barlow Condensed;font-size:.8rem;color:var(--yellow);margin-top:8px;padding:6px 10px;background:rgba(255,212,59,.06);border-radius:6px">📝 ' + o.notes + '</div>' : '') +
+        '<div class="oc-meta">' +
+          '<span class="oc-badge">' + (typeL[o.order_type]||o.order_type||'—') + '</span>' +
+          '<span class="oc-badge">' + (payL[o.payment_method]||o.payment_method||'Cash') + '</span>' +
+          (o.table_number ? '<span class="oc-badge">Table ' + o.table_number + '</span>' : '') +
+          '<span class="oc-badge">' + items.length + ' item' + (items.length!==1?'s':'') + '</span>' +
+        '</div>' +
+        '<button class="oc-reorder" onclick="reorderFromHistory(\'' + encodeURIComponent(JSON.stringify(items)) + '\')">↺ REORDER THIS</button>' +
+      '</div>' +
+    '</div>';
+  }
+  displayedCount = end;
+
+  // Remove old load-more button
+  var oldBtn = document.querySelector('.load-more');
+  if (oldBtn) oldBtn.remove();
+
+  listEl.insertAdjacentHTML('beforeend', html);
+
+  // Add load more button if needed
+  if (displayedCount < allCustomerOrders.length) {
+    var remaining = allCustomerOrders.length - displayedCount;
+    listEl.insertAdjacentHTML('afterend',
+      '<button class="load-more" onclick="renderMoreOrders()">LOAD MORE (' + remaining + ' remaining)</button>');
+  }
+}
+
+function toggleOrderDetails(headerEl) {
+  var details = headerEl.nextElementSibling;
+  if (details) details.classList.toggle('open');
+}
+
+function reorderFromHistory(encodedItems) {
+  try {
+    var items = JSON.parse(decodeURIComponent(encodedItems));
+    // Store in localStorage for the menu page to pick up
+    localStorage.setItem('fayruza_reorder', JSON.stringify(items));
+    window.location.href = 'index.html?reorder=1';
+  } catch(e) {
+    alert('Could not prepare reorder. Please try again.');
+  }
+}
+</script>
+</body>
+</html>

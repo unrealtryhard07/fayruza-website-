@@ -1,5 +1,5 @@
 // Fayruza Admin Service Worker
-var CACHE = 'fayruza-admin-v1';
+var CACHE = 'fayruza-admin-v2';
 var OFFLINE_URL = '/admin.html';
 
 // Cache admin shell on install

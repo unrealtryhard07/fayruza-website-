@@ -1,9 +1,11 @@
 // Fayruza Restaurant — Service Worker
 // Caches the menu shell for fast loading and basic offline support
 
-const CACHE = 'fayruza-v1';
+const CACHE = 'fayruza-v2';
 const SHELL = [
   '/index.html',
+  '/history.html',
+  '/status.html',
   '/manifest.json'
 ];
 
