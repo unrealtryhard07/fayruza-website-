@@ -203,6 +203,22 @@ CREATE TABLE IF NOT EXISTS special_offers (
 
 
 -- ════════════════════════════════════════
+-- 10b. PRINTERS TABLE
+-- ════════════════════════════════════════
+CREATE TABLE IF NOT EXISTS printers (
+  id                  BIGSERIAL PRIMARY KEY,
+  name                TEXT NOT NULL,             -- e.g. 'Kitchen', 'Counter', 'Bar'
+  type                TEXT DEFAULT 'bluetooth',  -- bluetooth | network | usb
+  ip                  TEXT DEFAULT '',           -- for network printers
+  port                INT DEFAULT 9100,
+  copies              INT DEFAULT 1,
+  auto_print_orders   BOOLEAN DEFAULT FALSE,     -- auto-print when new order comes in
+  is_default          BOOLEAN DEFAULT FALSE,     -- default printer for quick-print
+  created_at          TIMESTAMPTZ DEFAULT NOW()
+);
+
+
+-- ════════════════════════════════════════
 -- 11. ROW-LEVEL SECURITY (RLS)
 -- ════════════════════════════════════════
 ALTER TABLE orders             ENABLE ROW LEVEL SECURITY;
@@ -215,6 +231,7 @@ ALTER TABLE restaurant_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE expenses           ENABLE ROW LEVEL SECURITY;
 ALTER TABLE shifts             ENABLE ROW LEVEL SECURITY;
 ALTER TABLE special_offers     ENABLE ROW LEVEL SECURITY;
+ALTER TABLE printers           ENABLE ROW LEVEL SECURITY;
 
 -- Full access for anon key (your app uses anon key directly)
 -- Drop first to make re-run safe, then create
@@ -227,7 +244,7 @@ BEGIN
     ('orders','orders_all'), ('products','products_all'), ('categories','categories_all'),
     ('combos','combos_all'), ('admin_users','admin_users_all'), ('customers','customers_all'),
     ('restaurant_settings','settings_all'), ('expenses','expenses_all'),
-    ('shifts','shifts_all'), ('special_offers','offers_all')
+    ('shifts','shifts_all'), ('special_offers','offers_all'), ('printers','printers_all')
   LOOP
     EXECUTE format('DROP POLICY IF EXISTS %I ON %I', pol || '_select', tbl);
     EXECUTE format('DROP POLICY IF EXISTS %I ON %I', pol || '_insert', tbl);
