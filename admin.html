@@ -149,7 +149,13 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
 .mob-btn.active{color:var(--teal);}
 .mob-btn .mico{font-size:1.3rem;line-height:1;}
 
-@media(min-width:769px) and (max-width:1100px){.stats-grid{grid-template-columns:repeat(3,1fr)!important;}.content{padding:16px 20px;}}@media print{.sidebar,.topbar,.mfoot,.mc{display:none!important;}.main{margin-left:0;}.modal-bg{position:static;opacity:1;pointer-events:all;background:none;}.modal{max-height:none;border:none;}}
+@media(min-width:769px) and (max-width:1100px){.stats-grid{grid-template-columns:repeat(3,1fr)!important;}.content{padding:16px 20px;}}
+@media print{
+  body>*:not(#print-receipt-container){display:none!important;}
+  #print-receipt-container{display:block!important;position:static!important;}
+  .sidebar,.topbar,.main,.mob-nav,.modal-bg,.toast,.cart-fab{display:none!important;}
+}
+#print-receipt-container{display:none;}
 </style>
 
 <!-- Admin PWA -->
@@ -1159,6 +1165,7 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
 </div>
 
 <div class="toast" id="toast"></div>
+<div id="print-receipt-container"></div>
 
 <script>
 const SB_URL = 'https://zbsdmtjtypzfqrjuvpts.supabase.co';
@@ -1561,33 +1568,60 @@ function printReceipt(id, autoPrint) {
     '</body></html>';
 
   if (autoPrint) {
-    // HIDDEN IFRAME — prints directly via system dialog, no visible tab
-    var iframeId = 'print-frame-' + Date.now();
-    var iframe = document.createElement('iframe');
-    iframe.id = iframeId;
-    iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:400px;height:600px;border:none;visibility:hidden;';
-    document.body.appendChild(iframe);
-    var doc = iframe.contentDocument || iframe.contentWindow.document;
-    doc.open();
-    doc.write(html.replace(/<scr.*?<\/script>/g, '')); // strip auto-print script, we handle it
-    doc.close();
+    // IN-PAGE PRINT — renders receipt into a hidden div, triggers native print dialog directly
+    // Works on mobile (Android/iOS) without opening a new tab
+    var container = document.getElementById('print-receipt-container');
+    if (!container) return;
+
+    // Extract just the receipt body content (strip the full HTML wrapper)
+    var bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+    var receiptBody = bodyMatch ? bodyMatch[1] : html;
+    // Remove any script tags
+    receiptBody = receiptBody.replace(/<scr[\s\S]*?<\/script>/gi, '');
+
+    // Build a self-contained receipt with inline styles
+    container.innerHTML = '<div style="background:#fff;color:#000;width:72mm;max-width:100%;margin:0 auto;padding:4mm;font-family:Courier New,Courier,monospace;font-size:8.5pt;">' +
+      '<style>' +
+        '@page{size:80mm auto;margin:3mm;}' +
+        '#print-receipt-container *{color:#000!important;background:transparent!important;}' +
+        '#print-receipt-container .rc-page{width:72mm;max-width:72mm;margin:0 auto;font-family:"Courier New",Courier,monospace;font-size:8.5pt;}' +
+        '#print-receipt-container .rc-center{text-align:center;}' +
+        '#print-receipt-container .rc-bold{font-weight:bold;}' +
+        '#print-receipt-container .rc-xl{font-size:15pt;font-weight:900;letter-spacing:3px;}' +
+        '#print-receipt-container .rc-sm,.sm{font-size:7pt;color:#444!important;}' +
+        '#print-receipt-container .rc-dash{border:none;border-top:1px dashed #000;margin:2mm 0;}' +
+        '#print-receipt-container .rc-solid{border:none;border-top:1.5px solid #000;margin:2mm 0;}' +
+        '#print-receipt-container table{width:100%;border-collapse:collapse;}' +
+        '#print-receipt-container thead th{font-size:7pt;font-weight:bold;padding:1mm 0;border-bottom:1px solid #000;}' +
+        '#print-receipt-container td{font-size:8pt;padding:0.6mm 0;vertical-align:top;}' +
+        '#print-receipt-container .rc-qty{width:7mm;}' +
+        '#print-receipt-container .rc-name{padding:0 1mm;}' +
+        '#print-receipt-container .rc-price{width:14mm;text-align:right;}' +
+        '#print-receipt-container .rc-total{width:15mm;text-align:right;font-weight:bold;}' +
+        '#print-receipt-container .rc-row{display:flex;justify-content:space-between;padding:0.5mm 0;font-size:8pt;}' +
+        '#print-receipt-container .rc-row.grand{font-size:12pt;font-weight:bold;padding:1.5mm 0;border-top:1.5px solid #000;margin-top:1mm;}' +
+        '#print-receipt-container .rc-row.sm{font-size:7pt;color:#555!important;}' +
+        '#print-receipt-container .rc-notes{font-size:7.5pt;color:#333!important;margin:1.5mm 0;font-style:italic;}' +
+        '#print-receipt-container .rc-qr{text-align:center;margin-top:3mm;}' +
+        '#print-receipt-container .rc-qr img{width:22mm;height:22mm;}' +
+      '</style>' +
+      receiptBody +
+    '</div>';
+
+    container.style.display = 'block';
+
+    // Small delay to let images (QR code) load, then print
     setTimeout(function() {
-      try {
-        iframe.contentWindow.focus();
-        iframe.contentWindow.print();
-      } catch(e) {
-        // Fallback if iframe print fails
-        var w = window.open('','_blank','width=400');
-        if (w) { w.document.write(html); w.document.close(); }
-      }
-      // Cleanup iframe after printing
+      window.print();
+      // Clean up after print dialog closes
       setTimeout(function() {
-        var el = document.getElementById(iframeId);
-        if (el) el.remove();
-      }, 3000);
-    }, 400);
+        container.style.display = 'none';
+        container.innerHTML = '';
+      }, 1000);
+    }, 350);
+
   } else {
-    // VIEW PDF — open in new window for viewing/downloading, no auto-print
+    // VIEW PDF — open in new window for viewing/downloading
     var w = window.open('','_blank','width=400,toolbar=0,menubar=0,scrollbars=1');
     if (!w) { showToast('⚠ Allow popups to view receipt'); return; }
     w.document.write(html);
