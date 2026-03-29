@@ -1438,7 +1438,7 @@ async function deleteOrder(id) {
 function closeModal() { document.getElementById('order-modal').classList.remove('open'); currentOrderId = null; }
 
 function printReceipt(id, autoPrint) {
-  if (autoPrint === undefined) autoPrint = true;  // default: auto-print for backward compat
+  if (autoPrint === undefined) autoPrint = true;
   var isTest = (id === 'TEST');
   var o = isTest ? {
     id:'TEST-001', order_id:'ORD-TEST', created_at: new Date().toISOString(),
@@ -1455,176 +1455,71 @@ function printReceipt(id, autoPrint) {
   var timeStr = now.toLocaleTimeString('en-KW',{hour:'2-digit',minute:'2-digit'});
   var typeL   = {dinein:'Dine In', takeaway:'Takeaway', delivery:'Delivery'};
   var payL    = {cash:'Cash', knet:'KNET', card:'Card'};
-
-  var itemRows = items.map(function(i) {
-    var name = i.name + (i.size ? ' ('+i.size+')' : '');
-    var total = ((i.price||0)*(i.qty||1)).toFixed(3);
-    var noteRow = i.note ? '<tr><td></td><td colspan="3" class="rc-sm" style="font-style:italic;color:#555;padding:0 1mm 1mm">↳ '+i.note+'</td></tr>' : '';
-    return '<tr><td class="rc-qty">'+i.qty+'</td><td class="rc-name">'+name+'</td>'+
-           '<td class="rc-price">'+parseFloat(i.price||0).toFixed(3)+'</td>'+
-           '<td class="rc-total">'+total+'</td></tr>'+noteRow;
-  }).join('');
-
-  var discRow  = (o.discount_amt > 0)
-    ? '<div class="rc-row"><span>Discount</span><span style="color:#c00">- KD '+parseFloat(o.discount_amt).toFixed(3)+'</span></div>' : '';
-  var addrRow  = o.delivery_address
-    ? '<div class="rc-row sm">📍 '+o.delivery_address+(o.delivery_area?', '+o.delivery_area:'')+'</div>' : '';
-  var custRow  = o.customer_name
-    ? '<div class="rc-row sm"><span>Customer</span><span>'+o.customer_name+'</span></div>' : '';
-  var notesRow = o.notes
-    ? '<div class="rc-notes">Note: '+o.notes+'</div>' : '';
-
-  // Loyalty points earned (10 pts per 1 KD spent by default)
-  var loyaltyRate = parseInt((window._settings && window._settings['loyalty_rate']) || 10);
-  var ptsEarned = Math.floor((o.total || 0) * loyaltyRate);
-  var loyaltyRow = (o.customer_phone && ptsEarned > 0)
-    ? '<div class="rc-row" style="margin-top:1mm"><span>⭐ Points Earned</span><span>+' + ptsEarned + ' pts</span></div>' : '';
-
-  // Points redeemed
-  var ptsRedeemedRow = (o.points_redeemed > 0)
-    ? '<div class="rc-row sm"><span>Points Redeemed</span><span>' + o.points_redeemed + ' pts</span></div>' : '';
-
-  // QR code for order tracking
   var trackUrl = 'https://fayruza-website.vercel.app/status.html?order=' + encodeURIComponent(o.order_id || o.id);
   var qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=' + encodeURIComponent(trackUrl);
+  var row = 'style="display:flex;justify-content:space-between;padding:1px 0;font-size:8pt;color:#000"';
+  var dash = '<hr style="border:none;border-top:1px dashed #000;margin:2mm 0">';
+  var solid = '<hr style="border:none;border-top:1.5px solid #000;margin:2mm 0">';
 
-  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">'+
-    '<title>Receipt '+(o.order_id||o.id)+'</title>'+
-    '<style>'+
-    '@page{size:80mm auto;margin:3mm;}'+
-    '*{margin:0;padding:0;box-sizing:border-box;}'+
-    'html,body{background:#fff;color:#000;}'+
-    '.rc-page{'+
-      'width:72mm;max-width:72mm;margin:4mm auto;padding:0;'+
-      'font-family:"Courier New",Courier,monospace;font-size:8.5pt;'+
-      'page-break-inside:avoid;orphans:999;widows:999;'+
-    '}'+
-    '@media print{'+
-      'html,body{height:auto!important;overflow:visible;}'+
-      '.rc-page{width:72mm!important;margin:0 auto!important;'+
-        'page-break-after:avoid!important;page-break-before:avoid!important;page-break-inside:avoid!important;}'+
-    '}'+
-    '.rc-center{text-align:center;}'+
-    '.rc-bold{font-weight:bold;}'+
-    '.rc-xl{font-size:15pt;font-weight:900;letter-spacing:3px;}'+
-    '.rc-lg{font-size:10pt;font-weight:bold;}'+
-    '.rc-sm,.sm{font-size:7pt;color:#444;}'+
-    '.rc-dash{border:none;border-top:1px dashed #000;margin:2mm 0;}'+
-    '.rc-solid{border:none;border-top:1.5px solid #000;margin:2mm 0;}'+
-    'table{width:100%;border-collapse:collapse;}'+
-    'thead th{font-size:7pt;font-weight:bold;padding:1mm 0;border-bottom:1px solid #000;}'+
-    'td{font-size:8pt;padding:0.6mm 0;vertical-align:top;}'+
-    '.rc-qty{width:7mm;}'+
-    '.rc-name{padding:0 1mm;}'+
-    '.rc-price{width:14mm;text-align:right;}'+
-    '.rc-total{width:15mm;text-align:right;font-weight:bold;}'+
-    '.rc-row{display:flex;justify-content:space-between;padding:0.5mm 0;font-size:8pt;}'+
-    '.rc-row.grand{font-size:12pt;font-weight:bold;padding:1.5mm 0;border-top:1.5px solid #000;margin-top:1mm;}'+
-    '.rc-row.sm{font-size:7pt;color:#555;}'+
-    '.rc-notes{font-size:7.5pt;color:#333;margin:1.5mm 0;font-style:italic;}'+
-    '.rc-qr{text-align:center;margin-top:3mm;}'+
-    '.rc-qr img{width:22mm;height:22mm;}'+
-    '</style></head><body>'+
-    '<div class="rc-page">'+
-      '<div class="rc-center"><div class="rc-xl">FAYRUZA</div>'+
-      '<div style="font-size:8pt;letter-spacing:2px">RESTAURANT</div>'+
-      '<div class="rc-sm" style="margin-top:1mm">Jabriya · Block 12 · Jamia Branch</div></div>'+
-      '<hr class="rc-solid">'+
-      '<div class="rc-row rc-bold"><span>#'+(o.order_id||o.id)+'</span><span>'+dateStr+' '+timeStr+'</span></div>'+
-      '<div class="rc-row sm"><span>'+(typeL[o.order_type]||o.order_type||'—')+(o.table_number?' · Table '+o.table_number:'')+'</span>'+
-        '<span>'+(payL[o.payment_method]||o.payment_method||'—')+'</span></div>'+
-      custRow+addrRow+
-      '<hr class="rc-dash">'+
-      '<table><thead><tr>'+
-        '<th style="text-align:left">QTY</th><th style="text-align:left">ITEM</th>'+
-        '<th style="text-align:right">EACH</th><th style="text-align:right">KD</th>'+
-      '</tr></thead><tbody>'+itemRows+'</tbody></table>'+
-      '<hr class="rc-dash">'+
-      '<div class="rc-row"><span>Subtotal</span><span>KD '+parseFloat(o.subtotal||0).toFixed(3)+'</span></div>'+
-      discRow+
-      ptsRedeemedRow+
-      '<div class="rc-row grand"><span>TOTAL</span><span>KD '+parseFloat(o.total||0).toFixed(3)+'</span></div>'+
-      loyaltyRow+
-      notesRow+
-      '<hr class="rc-dash">'+
-      '<div class="rc-qr"><img src="'+qrUrl+'" alt="Track Order"><div class="rc-sm" style="margin-top:1mm">Scan to track your order</div></div>'+
-      '<hr class="rc-dash">'+
-      '<div class="rc-center rc-sm" style="margin-top:1mm">Thank you! · شكراً لزيارتكم</div>'+
-      '<div class="rc-center rc-sm">fayruza-website.vercel.app</div>'+
-      '<div style="height:6mm"></div>'+
-    '</div>'+
-    (autoPrint
-      ? '<scr'+'ipt>'+
-        'window.onload=function(){'+
-          'setTimeout(function(){'+
-            'window.print();'+
-            'window.onafterprint=function(){window.close();};'+
-            'setTimeout(function(){window.close();},6000);'+
-          '},300);'+
-        '};'+
-        '<\/script>'
-      : ''
-    ) +
-    '</body></html>';
+  // Build receipt with 100% inline styles — no CSS classes at all
+  var rc = '<div style="text-align:center;color:#000"><div style="font-size:15pt;font-weight:900;letter-spacing:3px;color:#000">FAYRUZA</div>' +
+    '<div style="font-size:8pt;letter-spacing:2px;color:#000">RESTAURANT</div>' +
+    '<div style="font-size:7pt;color:#444;margin-top:1mm">Jabriya · Block 12 · Jamia Branch</div></div>' +
+    solid +
+    '<div ' + row + '><span style="font-weight:bold">#' + (o.order_id||o.id) + '</span><span style="font-weight:bold">' + dateStr + ' ' + timeStr + '</span></div>' +
+    '<div ' + row + '><span style="font-size:7pt;color:#555">' + (typeL[o.order_type]||'') + (o.table_number ? ' · Table '+o.table_number : '') + '</span><span style="font-size:7pt;color:#555">' + (payL[o.payment_method]||'') + '</span></div>' +
+    (o.customer_name ? '<div ' + row + '><span style="font-size:7pt;color:#555">Customer</span><span style="font-size:7pt;color:#555">' + o.customer_name + '</span></div>' : '') +
+    (o.delivery_address ? '<div style="font-size:7pt;color:#555;padding:1px 0">📍 ' + o.delivery_address + (o.delivery_area ? ', '+o.delivery_area : '') + '</div>' : '') +
+    dash +
+    '<table style="width:100%;border-collapse:collapse;color:#000"><thead><tr>' +
+    '<th style="font-size:7pt;font-weight:bold;padding:1mm 0;border-bottom:1px solid #000;text-align:left">QTY</th>' +
+    '<th style="font-size:7pt;font-weight:bold;padding:1mm 0;border-bottom:1px solid #000;text-align:left">ITEM</th>' +
+    '<th style="font-size:7pt;font-weight:bold;padding:1mm 0;border-bottom:1px solid #000;text-align:right">EACH</th>' +
+    '<th style="font-size:7pt;font-weight:bold;padding:1mm 0;border-bottom:1px solid #000;text-align:right">KD</th>' +
+    '</tr></thead><tbody>';
+
+  items.forEach(function(i) {
+    var iname = i.name + (i.size ? ' ('+i.size+')' : '');
+    var itotal = ((i.price||0)*(i.qty||1)).toFixed(3);
+    rc += '<tr><td style="font-size:8pt;padding:0.6mm 0;color:#000;width:7mm">' + i.qty + '</td>' +
+      '<td style="font-size:8pt;padding:0.6mm 1mm;color:#000">' + iname + '</td>' +
+      '<td style="font-size:8pt;padding:0.6mm 0;text-align:right;color:#000;width:14mm">' + parseFloat(i.price||0).toFixed(3) + '</td>' +
+      '<td style="font-size:8pt;padding:0.6mm 0;text-align:right;font-weight:bold;color:#000;width:15mm">' + itotal + '</td></tr>';
+    if (i.note) rc += '<tr><td></td><td colspan="3" style="font-size:7pt;font-style:italic;color:#555;padding:0 1mm 1mm">↳ ' + i.note + '</td></tr>';
+  });
+
+  rc += '</tbody></table>' + dash;
+  rc += '<div ' + row + '><span>Subtotal</span><span>KD ' + parseFloat(o.subtotal||0).toFixed(3) + '</span></div>';
+  if (o.discount_amt > 0) rc += '<div ' + row + '><span>Discount</span><span style="color:#c00">- KD ' + parseFloat(o.discount_amt).toFixed(3) + '</span></div>';
+  if (o.points_redeemed > 0) rc += '<div ' + row + '><span style="font-size:7pt">Points Redeemed</span><span style="font-size:7pt">' + o.points_redeemed + ' pts</span></div>';
+  rc += '<div style="display:flex;justify-content:space-between;font-size:12pt;font-weight:bold;padding:1.5mm 0;border-top:1.5px solid #000;margin-top:1mm;color:#000"><span>TOTAL</span><span>KD ' + parseFloat(o.total||0).toFixed(3) + '</span></div>';
+  var loyaltyRate = parseInt((window._settings && window._settings['loyalty_rate']) || 10);
+  var ptsEarned = Math.floor((o.total || 0) * loyaltyRate);
+  if (o.customer_phone && ptsEarned > 0) rc += '<div ' + row + ' style="margin-top:1mm"><span>⭐ Points Earned</span><span>+' + ptsEarned + ' pts</span></div>';
+  if (o.notes) rc += '<div style="font-size:7.5pt;color:#333;margin:1.5mm 0;font-style:italic">Note: ' + o.notes + '</div>';
+  rc += dash;
+  rc += '<div style="text-align:center;margin-top:3mm"><img src="' + qrUrl + '" style="width:22mm;height:22mm"><div style="font-size:7pt;color:#444;margin-top:1mm">Scan to track your order</div></div>';
+  rc += dash;
+  rc += '<div style="text-align:center;font-size:7pt;color:#444;margin-top:1mm">Thank you! · شكراً لزيارتكم</div>';
+  rc += '<div style="text-align:center;font-size:7pt;color:#444">fayruza-website.vercel.app</div>';
 
   if (autoPrint) {
-    // IN-PAGE PRINT — renders receipt into a hidden div, triggers native print dialog directly
-    // Works on mobile (Android/iOS) without opening a new tab
-    var container = document.getElementById('print-receipt-container');
-    if (!container) return;
-
-    // Extract just the receipt body content (strip the full HTML wrapper)
-    var bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i);
-    var receiptBody = bodyMatch ? bodyMatch[1] : html;
-    // Remove any script tags
-    receiptBody = receiptBody.replace(/<scr[\s\S]*?<\/script>/gi, '');
-
-    // Build a self-contained receipt with inline styles
-    container.innerHTML = '<div style="background:#fff;color:#000;width:72mm;max-width:100%;margin:0 auto;padding:4mm;font-family:Courier New,Courier,monospace;font-size:8.5pt;">' +
-      '<style>' +
-        '@page{size:80mm auto;margin:3mm;}' +
-        '#print-receipt-container *{color:#000!important;background:transparent!important;}' +
-        '#print-receipt-container .rc-page{width:72mm;max-width:72mm;margin:0 auto;font-family:"Courier New",Courier,monospace;font-size:8.5pt;}' +
-        '#print-receipt-container .rc-center{text-align:center;}' +
-        '#print-receipt-container .rc-bold{font-weight:bold;}' +
-        '#print-receipt-container .rc-xl{font-size:15pt;font-weight:900;letter-spacing:3px;}' +
-        '#print-receipt-container .rc-sm,.sm{font-size:7pt;color:#444!important;}' +
-        '#print-receipt-container .rc-dash{border:none;border-top:1px dashed #000;margin:2mm 0;}' +
-        '#print-receipt-container .rc-solid{border:none;border-top:1.5px solid #000;margin:2mm 0;}' +
-        '#print-receipt-container table{width:100%;border-collapse:collapse;}' +
-        '#print-receipt-container thead th{font-size:7pt;font-weight:bold;padding:1mm 0;border-bottom:1px solid #000;}' +
-        '#print-receipt-container td{font-size:8pt;padding:0.6mm 0;vertical-align:top;}' +
-        '#print-receipt-container .rc-qty{width:7mm;}' +
-        '#print-receipt-container .rc-name{padding:0 1mm;}' +
-        '#print-receipt-container .rc-price{width:14mm;text-align:right;}' +
-        '#print-receipt-container .rc-total{width:15mm;text-align:right;font-weight:bold;}' +
-        '#print-receipt-container .rc-row{display:flex;justify-content:space-between;padding:0.5mm 0;font-size:8pt;}' +
-        '#print-receipt-container .rc-row.grand{font-size:12pt;font-weight:bold;padding:1.5mm 0;border-top:1.5px solid #000;margin-top:1mm;}' +
-        '#print-receipt-container .rc-row.sm{font-size:7pt;color:#555!important;}' +
-        '#print-receipt-container .rc-notes{font-size:7.5pt;color:#333!important;margin:1.5mm 0;font-style:italic;}' +
-        '#print-receipt-container .rc-qr{text-align:center;margin-top:3mm;}' +
-        '#print-receipt-container .rc-qr img{width:22mm;height:22mm;}' +
-      '</style>' +
-      receiptBody +
-    '</div>';
-
-    container.style.display = 'block';
-
-    // Small delay to let images (QR code) load, then print
+    // ── DIRECT PRINT: render on this page, call window.print() ──
+    var c = document.getElementById('print-receipt-container');
+    c.innerHTML = '<div style="background:#fff;color:#000;width:72mm;max-width:300px;margin:0 auto;padding:4mm;font-family:Courier New,Courier,monospace;font-size:8.5pt">' + rc + '</div>';
+    c.style.display = 'block';
     setTimeout(function() {
       window.print();
-      // Clean up after print dialog closes
-      setTimeout(function() {
-        container.style.display = 'none';
-        container.innerHTML = '';
-      }, 1000);
-    }, 350);
-
+      setTimeout(function() { c.style.display = 'none'; c.innerHTML = ''; }, 1000);
+    }, 300);
   } else {
-    // VIEW PDF — open in new window for viewing/downloading
+    // ── VIEW PDF: open in new window ──
+    var fullDoc = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Receipt ' + (o.order_id||o.id) + '</title>' +
+      '<style>@page{size:80mm auto;margin:3mm;}*{margin:0;padding:0;box-sizing:border-box;}body{background:#fff;color:#000;}</style>' +
+      '</head><body><div style="width:72mm;max-width:72mm;margin:4mm auto;font-family:Courier New,Courier,monospace;font-size:8.5pt">' + rc + '</div></body></html>';
     var w = window.open('','_blank','width=400,toolbar=0,menubar=0,scrollbars=1');
     if (!w) { showToast('⚠ Allow popups to view receipt'); return; }
-    w.document.write(html);
+    w.document.write(fullDoc);
     w.document.close();
   }
 }
