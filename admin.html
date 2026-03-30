@@ -2324,48 +2324,87 @@ function parseCSVLine(line) {
 async function bulkMatchImages(input) {
   var files = input.files;
   if (!files || !files.length) return;
-  input.value = '';
-
+  // Don't reset input yet — some browsers clear files on reset
+  
   if (!allProducts.length) {
-    showToast('⚠ Load products first');
+    showToast('⚠ No products loaded — go to Products page first');
     return;
   }
 
   var statusEl = document.getElementById('bulk-status');
   var matched = 0, unmatched = 0, uploaded = 0, errors = 0;
+  var debugLog = [];
   var unmatchedNames = [];
 
-  // Normalize function: lowercase, strip extension, trim
-  function normalize(s) {
-    return s.toLowerCase().replace(/\.[^.]+$/, '').replace(/[_\-]+/g, ' ').trim();
+  // Aggressive normalize: lowercase, strip extension, replace all non-alphanumeric with space, collapse spaces
+  function norm(s) {
+    return s.toLowerCase()
+      .replace(/\.[^.]+$/, '')        // strip file extension
+      .replace(/[^a-z0-9\u0600-\u06FF]/gi, ' ')  // non-alphanumeric (keep arabic) → space
+      .replace(/\s+/g, ' ')           // collapse multiple spaces
+      .trim();
   }
 
-  // Build lookup from products
-  var productMap = {};
+  // Build multiple lookup keys per product for best matching
+  var productLookups = [];
   allProducts.forEach(function(p) {
-    productMap[p.name.toLowerCase().trim()] = p;
+    var normalized = norm(p.name);
+    productLookups.push({ product: p, normalized: normalized, original: p.name });
   });
 
-  if (statusEl) statusEl.textContent = '🖼 Matching ' + files.length + ' images…';
+  if (statusEl) statusEl.textContent = '🖼 Matching ' + files.length + ' images against ' + allProducts.length + ' products…';
 
   for (var i = 0; i < files.length; i++) {
     var file = files[i];
-    var fname = normalize(file.name);
+    var fname = norm(file.name);
 
-    if (statusEl) statusEl.textContent = '🖼 Processing ' + (i+1) + '/' + files.length + '…';
+    debugLog.push('📄 "' + file.name + '" → normalized: "' + fname + '"');
 
-    // Find matching product
+    // Find matching product — multiple strategies
     var product = null;
+    var matchType = '';
 
-    // Exact match first
-    if (productMap[fname]) {
-      product = productMap[fname];
-    } else {
-      // Fuzzy: check if filename contains product name or vice versa
-      for (var pname in productMap) {
-        if (fname.indexOf(pname) !== -1 || pname.indexOf(fname) !== -1) {
-          product = productMap[pname];
+    // Strategy 1: Exact normalized match
+    for (var j = 0; j < productLookups.length; j++) {
+      if (fname === productLookups[j].normalized) {
+        product = productLookups[j].product;
+        matchType = 'exact';
+        break;
+      }
+    }
+
+    // Strategy 2: Filename contains product name
+    if (!product) {
+      for (var j = 0; j < productLookups.length; j++) {
+        if (productLookups[j].normalized.length >= 3 && fname.indexOf(productLookups[j].normalized) !== -1) {
+          product = productLookups[j].product;
+          matchType = 'file contains product';
           break;
+        }
+      }
+    }
+
+    // Strategy 3: Product name contains filename
+    if (!product) {
+      for (var j = 0; j < productLookups.length; j++) {
+        if (fname.length >= 3 && productLookups[j].normalized.indexOf(fname) !== -1) {
+          product = productLookups[j].product;
+          matchType = 'product contains file';
+          break;
+        }
+      }
+    }
+
+    // Strategy 4: First word match (at least 4 chars)
+    if (!product && fname.length >= 4) {
+      var fword = fname.split(' ')[0];
+      if (fword.length >= 4) {
+        for (var j = 0; j < productLookups.length; j++) {
+          if (productLookups[j].normalized.split(' ')[0] === fword) {
+            product = productLookups[j].product;
+            matchType = 'first word';
+            break;
+          }
         }
       }
     }
@@ -2373,12 +2412,16 @@ async function bulkMatchImages(input) {
     if (!product) {
       unmatched++;
       unmatchedNames.push(file.name);
+      debugLog.push('   ❌ NO MATCH');
       continue;
     }
 
+    debugLog.push('   ✅ MATCHED → "' + product.name + '" (via ' + matchType + ')');
     matched++;
 
     // Upload to Supabase Storage
+    if (statusEl) statusEl.textContent = '🖼 Uploading ' + (i+1) + '/' + files.length + ': ' + product.name + '…';
+
     try {
       var ext = file.name.split('.').pop().toLowerCase();
       var filename = 'product_' + product.id + '_' + Date.now() + '.' + ext;
@@ -2390,34 +2433,46 @@ async function bulkMatchImages(input) {
       var { data: urlData } = sb.storage.from('product-images').getPublicUrl(filename);
       var publicUrl = urlData.publicUrl;
 
-      // Update product with image URL
       var { error: updateErr } = await sb.from('products').update({ image_url: publicUrl }).eq('id', product.id);
       if (updateErr) throw updateErr;
 
       uploaded++;
+      debugLog.push('   📤 Uploaded → ' + publicUrl.split('/').pop());
     } catch(e) {
       errors++;
-      console.warn('Upload error for ' + file.name + ':', e.message);
-      // If storage bucket doesn't exist, stop early
+      debugLog.push('   ⚠ Upload error: ' + e.message);
       if (e.message && e.message.includes('Bucket not found')) {
         showToast('⚠ Create "product-images" bucket in Supabase → Storage first');
         if (statusEl) statusEl.textContent = '⚠ Storage bucket missing';
+        input.value = '';
         return;
       }
     }
   }
 
+  input.value = '';
   await loadProducts();
 
-  var msg = '✓ Images: ' + uploaded + ' uploaded, ' + matched + ' matched';
-  if (unmatched > 0) msg += ', ' + unmatched + ' no match';
+  var msg = '✓ ' + uploaded + ' uploaded, ' + matched + ' matched, ' + unmatched + ' no match';
   if (errors > 0) msg += ', ' + errors + ' errors';
   showToast(msg);
-
-  if (unmatched > 0 && unmatchedNames.length) {
-    msg += '\nUnmatched: ' + unmatchedNames.slice(0, 5).join(', ') + (unmatchedNames.length > 5 ? '…' : '');
-  }
   if (statusEl) statusEl.textContent = msg;
+
+  // Show debug log so user can see exactly what happened
+  var logText = 'BULK IMAGE MATCH RESULTS\n' +
+    '═══════════════════════\n' +
+    'Files: ' + files.length + ' | Products: ' + allProducts.length + '\n' +
+    'Matched: ' + matched + ' | Uploaded: ' + uploaded + ' | No match: ' + unmatched + '\n' +
+    '═══════════════════════\n\n' +
+    debugLog.join('\n') +
+    (unmatchedNames.length ? '\n\n── UNMATCHED FILES ──\n' + unmatchedNames.join('\n') : '') +
+    '\n\n── YOUR PRODUCT NAMES ──\n' + allProducts.map(function(p){ return p.name; }).join('\n');
+
+  // Show in a copyable prompt
+  var showLog = confirm(msg + '\n\nShow detailed matching log?');
+  if (showLog) {
+    prompt('Copy this log for debugging (Ctrl+A, Ctrl+C):', logText);
+  }
 }
 /* ══════════════════════════════════════════
    PUSH NOTIFICATIONS
