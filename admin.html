@@ -742,12 +742,12 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
     </div>
 
     <div class="page" id="page-products">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:10px">
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center" id="prod-cat-filters">
           <input class="search-inp" id="prod-search" placeholder="Search products…" oninput="renderProductList()" style="width:160px">
           <button class="btn-filter active" onclick="filterProdCat('all',this)">All</button>
         </div>
-        <div style="display:flex;gap:8px;align-items:center">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <button onclick="restockAll()" style="background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted);font-family:Bebas Neue,sans-serif;font-size:.82rem;letter-spacing:2px;padding:8px 14px;border-radius:7px;cursor:pointer">🟢 RESTOCK ALL</button>
           <button id="bulk-hide-btn" onclick="bulkHideSelected(true)" style="display:none;background:rgba(255,71,87,.1);border:1px solid rgba(255,71,87,.3);color:var(--red);font-family:Bebas Neue,sans-serif;font-size:.82rem;letter-spacing:2px;padding:8px 14px;border-radius:7px;cursor:pointer">🙈 HIDE SELECTED</button>
           <button id="bulk-show-btn" onclick="bulkHideSelected(false)" style="display:none;background:rgba(31,149,120,.1);border:1px solid rgba(31,149,120,.3);color:var(--teal);font-family:Bebas Neue,sans-serif;font-size:.82rem;letter-spacing:2px;padding:8px 14px;border-radius:7px;cursor:pointer">👁 SHOW SELECTED</button>
@@ -757,6 +757,36 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
           </button>
         </div>
       </div>
+
+      <!-- BULK TOOLS BAR -->
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center;padding:12px 16px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:10px">
+        <div style="font-family:Barlow Condensed,sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-right:6px">BULK TOOLS</div>
+        <button onclick="exportProductsCSV()" style="background:rgba(31,149,120,.1);border:1px solid rgba(31,149,120,.3);color:var(--teal);font-family:Bebas Neue,sans-serif;font-size:.8rem;letter-spacing:2px;padding:7px 14px;border-radius:7px;cursor:pointer;display:flex;align-items:center;gap:5px">⬇ EXPORT CSV</button>
+        <label style="background:rgba(255,212,59,.08);border:1px solid rgba(255,212,59,.3);color:var(--yellow);font-family:Bebas Neue,sans-serif;font-size:.8rem;letter-spacing:2px;padding:7px 14px;border-radius:7px;cursor:pointer;display:flex;align-items:center;gap:5px">
+          ⬆ IMPORT CSV
+          <input type="file" accept=".csv" onchange="importProductsCSV(this)" style="display:none">
+        </label>
+        <label style="background:rgba(100,149,237,.08);border:1px solid rgba(100,149,237,.25);color:#6495ed;font-family:Bebas Neue,sans-serif;font-size:.8rem;letter-spacing:2px;padding:7px 14px;border-radius:7px;cursor:pointer;display:flex;align-items:center;gap:5px">
+          🖼 BULK ADD IMAGES
+          <input type="file" accept="image/*" multiple onchange="bulkMatchImages(this)" style="display:none">
+        </label>
+        <div id="bulk-status" style="font-family:Barlow Condensed,sans-serif;font-size:.78rem;color:var(--muted);margin-left:auto"></div>
+        <button onclick="var g=document.getElementById('img-guide');g.style.display=g.style.display==='none'?'block':'none'" style="background:transparent;border:1px solid var(--border);color:var(--muted);font-family:Barlow Condensed,sans-serif;font-size:.72rem;letter-spacing:1px;padding:6px 10px;border-radius:6px;cursor:pointer">📐 IMAGE GUIDE</button>
+      </div>
+
+      <!-- Image size guide (collapsible) -->
+      <div id="img-guide" style="display:none;margin-bottom:14px;padding:12px 16px;background:rgba(31,149,120,.04);border:1px solid rgba(31,149,120,.12);border-radius:8px">
+        <div style="font-family:Bebas Neue,sans-serif;font-size:.85rem;letter-spacing:2px;color:var(--teal);margin-bottom:6px">📐 IMAGE SIZE GUIDE</div>
+        <div style="font-family:Barlow Condensed,sans-serif;font-size:.82rem;color:var(--muted);line-height:1.7">
+          <strong style="color:var(--text)">Recommended:</strong> 400×250 pixels (1.6:1 ratio) — fits perfectly in the menu card<br>
+          <strong style="color:var(--text)">Minimum:</strong> 300×200 pixels<br>
+          <strong style="color:var(--text)">Format:</strong> JPG or WebP for photos, PNG for graphics<br>
+          <strong style="color:var(--text)">Max size:</strong> 2MB per image<br>
+          <strong style="color:var(--text)">How it displays:</strong> Images are cropped to fill a 100% × 110px box using <code>object-fit: cover</code>. Wider images work best. Square images will crop the top/bottom slightly. Tall images lose a lot on the sides.<br>
+          <strong style="color:var(--text)">Bulk image matching:</strong> Name your files exactly like the product name (e.g. <code>Zinger Burger.jpg</code>, <code>karak tea.png</code>). Case-insensitive matching.
+        </div>
+      </div>
+
       <div id="prod-list"></div>
     </div>
 
@@ -2160,8 +2190,235 @@ async function deleteProd() {
 }
 
 /* ══════════════════════════════════════════
-   AUTH + ROLE-BASED ACCESS
+   BULK TOOLS — Export, Import, Image Matcher
 ══════════════════════════════════════════ */
+
+/* ── Export all products to CSV ── */
+function exportProductsCSV() {
+  if (!allProducts.length) { showToast('⚠ No products to export'); return; }
+  var headers = ['category_id','category_name','emoji','name','name_ar','price','meal_price','fils','sml_s','sml_m','sml_l','badge','image_url','is_hidden','is_sold_out','sort_order'];
+  var rows = [headers.join(',')];
+  allProducts.forEach(function(p) {
+    var vals = headers.map(function(h) {
+      var v = p[h];
+      if (v === null || v === undefined) v = '';
+      if (typeof v === 'boolean') v = v ? 'true' : 'false';
+      return '"' + String(v).replace(/"/g,'""') + '"';
+    });
+    rows.push(vals.join(','));
+  });
+  var csv = rows.join('\n');
+  var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'fayruza_products_' + new Date().toISOString().split('T')[0] + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✓ Exported ' + allProducts.length + ' products to CSV');
+}
+
+/* ── Import products from CSV ── */
+async function importProductsCSV(input) {
+  var file = input.files && input.files[0];
+  if (!file) return;
+  input.value = '';
+
+  var statusEl = document.getElementById('bulk-status');
+  if (statusEl) statusEl.textContent = '⏳ Reading CSV…';
+
+  var text = await file.text();
+  var lines = text.split(/\r?\n/).filter(function(l) { return l.trim(); });
+  if (lines.length < 2) { showToast('⚠ CSV is empty'); if (statusEl) statusEl.textContent = ''; return; }
+
+  // Parse header
+  var headers = parseCSVLine(lines[0]);
+  var nameIdx = headers.indexOf('name');
+  var catIdx  = headers.indexOf('category_id');
+  if (nameIdx === -1 || catIdx === -1) {
+    showToast('⚠ CSV must have "name" and "category_id" columns. Export first to get the template.');
+    if (statusEl) statusEl.textContent = '';
+    return;
+  }
+
+  var imported = 0, skipped = 0, errors = 0;
+
+  for (var i = 1; i < lines.length; i++) {
+    var vals = parseCSVLine(lines[i]);
+    if (!vals[nameIdx] || !vals[catIdx]) { skipped++; continue; }
+
+    var record = {};
+    headers.forEach(function(h, idx) {
+      var v = vals[idx] || '';
+      if (v === '') return;
+      if (h === 'is_hidden' || h === 'is_sold_out') { record[h] = v.toLowerCase() === 'true'; return; }
+      if (['price','meal_price','fils','sml_s','sml_m','sml_l','sort_order'].indexOf(h) !== -1) {
+        var num = parseFloat(v);
+        if (!isNaN(num)) record[h] = (h === 'fils' || h === 'sort_order') ? parseInt(v) : num;
+        return;
+      }
+      record[h] = v;
+    });
+
+    // Fill in category metadata if missing
+    if (record.category_id && !record.category_name) {
+      var meta = CAT_META[record.category_id];
+      if (meta) {
+        record.category_name = meta.name;
+        record.category_name_ar = record.category_name_ar || meta.ar || '';
+        record.category_emoji = record.category_emoji || meta.emoji || '';
+        record.category_anim_class = record.category_anim_class || meta.anim || record.category_id;
+        record.category_sort = record.category_sort || meta.sort || 0;
+      }
+    }
+
+    if (statusEl) statusEl.textContent = '⏳ Importing ' + i + '/' + (lines.length - 1) + '…';
+
+    try {
+      // Check if product with same name+category already exists → update, else insert
+      var existing = allProducts.find(function(p) {
+        return p.name && p.name.toLowerCase() === record.name.toLowerCase() && p.category_id === record.category_id;
+      });
+      if (existing) {
+        var { error } = await sb.from('products').update(record).eq('id', existing.id);
+        if (error) throw error;
+      } else {
+        var { error } = await sb.from('products').insert([record]);
+        if (error) throw error;
+      }
+      imported++;
+    } catch(e) {
+      errors++;
+      console.warn('Import error row ' + i + ':', e.message);
+    }
+  }
+
+  await loadProducts();
+  var msg = '✓ Import done: ' + imported + ' saved' + (skipped ? ', ' + skipped + ' skipped' : '') + (errors ? ', ' + errors + ' errors' : '');
+  showToast(msg);
+  if (statusEl) statusEl.textContent = msg;
+}
+
+/* CSV line parser (handles quoted fields with commas) */
+function parseCSVLine(line) {
+  var result = [];
+  var current = '';
+  var inQuotes = false;
+  for (var i = 0; i < line.length; i++) {
+    var c = line[i];
+    if (inQuotes) {
+      if (c === '"' && line[i+1] === '"') { current += '"'; i++; }
+      else if (c === '"') { inQuotes = false; }
+      else { current += c; }
+    } else {
+      if (c === '"') { inQuotes = true; }
+      else if (c === ',') { result.push(current.trim()); current = ''; }
+      else { current += c; }
+    }
+  }
+  result.push(current.trim());
+  return result;
+}
+
+/* ── Bulk Image Matcher ── */
+async function bulkMatchImages(input) {
+  var files = input.files;
+  if (!files || !files.length) return;
+  input.value = '';
+
+  if (!allProducts.length) {
+    showToast('⚠ Load products first');
+    return;
+  }
+
+  var statusEl = document.getElementById('bulk-status');
+  var matched = 0, unmatched = 0, uploaded = 0, errors = 0;
+  var unmatchedNames = [];
+
+  // Normalize function: lowercase, strip extension, trim
+  function normalize(s) {
+    return s.toLowerCase().replace(/\.[^.]+$/, '').replace(/[_\-]+/g, ' ').trim();
+  }
+
+  // Build lookup from products
+  var productMap = {};
+  allProducts.forEach(function(p) {
+    productMap[p.name.toLowerCase().trim()] = p;
+  });
+
+  if (statusEl) statusEl.textContent = '🖼 Matching ' + files.length + ' images…';
+
+  for (var i = 0; i < files.length; i++) {
+    var file = files[i];
+    var fname = normalize(file.name);
+
+    if (statusEl) statusEl.textContent = '🖼 Processing ' + (i+1) + '/' + files.length + '…';
+
+    // Find matching product
+    var product = null;
+
+    // Exact match first
+    if (productMap[fname]) {
+      product = productMap[fname];
+    } else {
+      // Fuzzy: check if filename contains product name or vice versa
+      for (var pname in productMap) {
+        if (fname.indexOf(pname) !== -1 || pname.indexOf(fname) !== -1) {
+          product = productMap[pname];
+          break;
+        }
+      }
+    }
+
+    if (!product) {
+      unmatched++;
+      unmatchedNames.push(file.name);
+      continue;
+    }
+
+    matched++;
+
+    // Upload to Supabase Storage
+    try {
+      var ext = file.name.split('.').pop().toLowerCase();
+      var filename = 'product_' + product.id + '_' + Date.now() + '.' + ext;
+      var { data, error } = await sb.storage.from('product-images').upload(filename, file, {
+        cacheControl: '3600', upsert: false, contentType: file.type
+      });
+      if (error) throw error;
+
+      var { data: urlData } = sb.storage.from('product-images').getPublicUrl(filename);
+      var publicUrl = urlData.publicUrl;
+
+      // Update product with image URL
+      var { error: updateErr } = await sb.from('products').update({ image_url: publicUrl }).eq('id', product.id);
+      if (updateErr) throw updateErr;
+
+      uploaded++;
+    } catch(e) {
+      errors++;
+      console.warn('Upload error for ' + file.name + ':', e.message);
+      // If storage bucket doesn't exist, stop early
+      if (e.message && e.message.includes('Bucket not found')) {
+        showToast('⚠ Create "product-images" bucket in Supabase → Storage first');
+        if (statusEl) statusEl.textContent = '⚠ Storage bucket missing';
+        return;
+      }
+    }
+  }
+
+  await loadProducts();
+
+  var msg = '✓ Images: ' + uploaded + ' uploaded, ' + matched + ' matched';
+  if (unmatched > 0) msg += ', ' + unmatched + ' no match';
+  if (errors > 0) msg += ', ' + errors + ' errors';
+  showToast(msg);
+
+  if (unmatched > 0 && unmatchedNames.length) {
+    msg += '\nUnmatched: ' + unmatchedNames.slice(0, 5).join(', ') + (unmatchedNames.length > 5 ? '…' : '');
+  }
+  if (statusEl) statusEl.textContent = msg;
+}
 /* ══════════════════════════════════════════
    PUSH NOTIFICATIONS
 ══════════════════════════════════════════ */
